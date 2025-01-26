@@ -1,0 +1,49 @@
+/* App.css */
+
+.base {
+    font-family: 'Arial', sans-serif; /* Assuming `fonts.regular` is 'Arial' */
+    color: #111920;
+}
+
+.darkButton1 {
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #111920;
+    padding: 18px 25px;
+}
+
+.para {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 15px;
+}
+
+.darkButtonText1 {
+    color: white;
+    font-weight: 600;
+}
+
+.lightButton1 {
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 18px 25px;
+    border: 2px solid #FC4343;
+}
+
+.lightButtonText1 {
+    color: #FC4343;
+    font-weight: 600;
+}
+
+.expressions {
+    font-family: 'Arial', sans-serif; /* Assuming `fonts.regular` is 'Arial' */
+    color: #111920;
+    font-size: 17px;
+    margin-top: 20px;
+    font-weight: 500;
+    margin-left: 20px;
+}

@@ -411,101 +411,132 @@ export const getStammeringAvatar = async id => {
     return [];
   }
 };
-export const checkArticVoice = async (audioPath, word) => {
-  const token = await getToken()
-  const formData = new FormData()
-  formData.append('audio', {
-    uri: audioPath,
-    type: 'audio/wav',
-    name: 'sound.wav',
-  });
-  formData.append('text', word || "");
-
+export const checkArticVoice = async (audioBlob, word) => {
   try {
-    const response = await axios.post(
-      `${BaseURL}/process_speech`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer ' + token
-        },
+    const token = await getToken();
+    const formData = new FormData();
+
+    // Log the audio blob details for debugging
+    console.log('Processing audio:', {
+      size: audioBlob.size,
+      type: audioBlob.type
+    });
+
+    formData.append('audio', audioBlob, 'recorded_audio.wav');
+    formData.append('text', word || '');
+
+    const response = await fetch(`${BaseURL}/process_speech`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
       },
-    );
-    return response
+      body: formData,
+    });
+
+    // Log the raw response for debugging
+    console.log('Server response:', response);
+
+    // Parse the response
+    const result = await response.json();
+    console.log('Processing speech response:', result);
+    return result;
   } catch (error) {
-    return null
+    // Enhanced error logging
+    const errorDetails = {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message,
+      requestConfig: {
+        url: error.config?.url,
+        method: error.config?.method,
+        headers: error.config?.headers
+      }
+    };
+
+    console.error('Detailed error information:', errorDetails);
+
+    // Provide more specific error messages based on the error type
+    if (error.response?.status === 500) {
+      throw new Error('Server processing error. Please try again or contact support if the issue persists.');
+    } else if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timed out. Please check your connection and try again.');
+    } else {
+      throw new Error(`Speech processing failed: ${error.response?.data?.message || error.message}`);
+    }
   }
 };
+
+
+
 export const checkVoiceDisorder = async (audioPath) => {
-  const token = await getToken()
-  const formData = new FormData()
-  formData.append('audio', {
-    uri: audioPath,
-    type: 'audio/wav',
-    name: 'sound.wav',
-  });
   try {
-    const response = await axios.post(
+    const formData = new FormData();
+    formData.append('audio', new File([audioPath], 'sound.wav', { type: 'audio/wav' }));
+
+    const token = await getToken();
+    const response = await fetch(
       `${BaseURL}/predict_voice_disorder`,
-      formData,
       {
+        method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer ' + token
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
         },
-      },
+        body: formData
+      }
     );
-    return response
+    const data = await response.json();
+    return data
   } catch (error) {
     return null
   }
 };
 export const voiceToText = async (audioPath) => {
-  const token = await getToken()
-  const formData = new FormData()
-  formData.append('audio', {
-    uri: audioPath,
-    type: 'audio/wav',
-    name: 'sound.wav',
-  });
+  const token = await getToken();
+  const formData = new FormData();
+  formData.append('audio', audioPath, 'sound.wav');
+
   try {
-    const response = await axios.post(
-      `${BaseURL}/api/voice_to_text`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer ' + token
-        },
+    const response = await fetch(`${BaseURL}/api/voice_to_text`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Accept: 'application/json',
+        Authorization: "Bearer " + token
       },
-    );
-    return response
+      // Remove Content-Type header to let the browser set it with the boundary
+    });
+    console.log(response)
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.text();
+    const data = JSON.parse(result);
+    return data
   } catch (error) {
     return null
   }
 };
 export const checkStammering = async (audioPath) => {
-  const token = await getToken()
-  const formData = new FormData()
-  formData.append('audio', {
-    uri: audioPath,
-    type: 'audio/wav',
-    name: 'sound.wav',
-  });
   try {
-    const response = await axios.post(
-      `${BaseURL}/predict_stutter`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer ' + token
-        },
+    const token = await getToken();
+    const formData = new FormData();
+    formData.append('audio', audioPath, 'stammering_audio.wav');
+
+    const response = await fetch(`${BaseURL}/predict_stutter`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
       },
-    );
-    return response
+      body: formData,
+    });
+    const data = await response.json();
+    return data
   } catch (error) {
+    console.log(error)
     return null
   }
 };

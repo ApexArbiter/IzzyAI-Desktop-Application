@@ -1,13 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ReactMic } from 'react-mic';
-import { Send, Mic, Play, Pause } from 'lucide-react';
+import { Send, Mic, Play, Pause, StopCircle } from 'lucide-react';
 import { CircleLoader } from 'react-spinners';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import BaseURL from '../components/ApiCreds';
 import { insertSessionData, capitalize, getToken } from "../utils/functions";
+import CustomHeader from '../components/CustomHeader';
 
+// Define the wave animation keyframe
+const waveAnimation = keyframes`
+  0% { height: 10px; }
+  50% { height: 25px; }
+  100% { height: 10px; }
+`;
 
+// Styled Components
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -31,44 +38,31 @@ const MessageGroup = styled.div`
   gap: 15px;
 `;
 
-const Avatar = styled.div`
+const AudioMessage = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 3px;
-`;
-
-const AvatarImage = styled.img`
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-`;
-
-const UserName = styled.span`
-  font-size: 12px;
-  font-weight: bold;
-  color: black;
-`;
-
-const MessageBubble = styled.div`
+  gap: 10px;
   padding: 10px;
+  background-color: ${props => props.isUser ? '#2DEEAA' : '#F8F8F8'};
   border-radius: 8px;
   max-width: 80%;
-  background-color: ${props => props.isUser ? '#2DEEAA' : '#F8F8F8'};
 `;
 
-const DisorderButton = styled.button`
-  background-color: white;
-  border: 1px solid #2DEEAA;
-  border-radius: 6px;
-  padding: 12px;
-  width: 210px;
-  text-align: left;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #f0f0f0;
-  }
+const Wave = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+`;
+
+const WaveLine = styled.div`
+  width: 3px;
+  height: ${props => props.height}px;
+  background-color: ${props => props.isUser ? '#fff' : '#2DEEAA'};
+  border-radius: 1px;
+  transition: height 0.1s ease;
+  animation: ${props => props.isAnimating ? waveAnimation : 'none'} 1s infinite;
+  animation-delay: ${props => props.delay}s;
 `;
 
 const InputContainer = styled.div`
@@ -85,6 +79,11 @@ const Input = styled.input`
   border-radius: 40px;
   padding: 8px 15px;
   color: black;
+  outline: none;
+  
+  &:focus {
+    border-color: #2DEEAA;
+  }
 `;
 
 const IconButton = styled.button`
@@ -96,173 +95,100 @@ const IconButton = styled.button`
   justify-content: center;
   border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
   
   &:hover {
     opacity: 0.8;
+    transform: scale(1.05);
   }
 `;
 
-const WaveContainer = styled.div`
-  width: 75%;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+const MessageText = styled.div`
+  padding: 12px;
+  border-radius: 8px;
+  max-width: 80%;
+  background-color: ${props => props.isUser ? '#2DEEAA' : '#F8F8F8'};
+  color: ${props => props.isUser ? '#fff' : '#000'};
 `;
 
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ModalContent = styled.div`
+const DisorderButton = styled.button`
   background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 75%;
-  max-width: 400px;
-  text-align: center;
+  border: 1px solid #2DEEAA;
+  border-radius: 6px;
+  padding: 12px;
+  width: 210px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-1px);
+  }
 `;
 
 const TherapistName = () => {
   const navigate = useNavigate();
   const [chats, setChats] = useState([
-    {
-      text: 'Welcome to IzzyAI Chatbot.',
-      isUser: false,
-      audio: null,
-    },
-    {
-      text: 'Click on any of the disorders for quick assessment.',
-      isUser: false,
-      audio: null,
-    },
-    {
-      text: '1: Articulation',
-      isUser: false,
-      audio: null,
-      path: "quick-articulation",
-    },
-    {
-      text: '2: Stammering',
-      isUser: false,
-      audio: null,
-      path: "quick-stammering",
-    },
-    {
-      text: '3: Voice',
-      isUser: false,
-      audio: null,
-      path: "quick-voice",
-    },
-    {
-      text: '4: Receptive Language',
-      isUser: false,
-      audio: null,
-      path: "quick-receptive",
-    },
-    {
-      text: '5: Expressive Language',
-      isUser: false,
-      audio: null,
-      path: "quick-expressive",
-    },
+    { text: 'Welcome to IzzyAI Chatbot.', isUser: false, audio: null },
+    { text: 'Click on any of the disorders for quick assessment.', isUser: false, audio: null },
+    { text: '1: Articulation', isUser: false, audio: null, path: "quick-articulation" },
+    { text: '2: Stammering', isUser: false, audio: null, path: "quick-stammering" },
+    { text: '3: Voice', isUser: false, audio: null, path: "quick-voice" },
+    { text: '4: Receptive Language', isUser: false, audio: null, path: "quick-receptive" },
+    { text: '5: Expressive Language', isUser: false, audio: null, path: "quick-expressive" }
   ]);
 
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioPlay, setAudioPlay] = useState();
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [recordingStatus, setRecordingStatus] = useState('idle');
+  const [playingAudioIndex, setPlayingAudioIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState('Voice Disorder');
-  const [modalScore, setModalScore] = useState('0.0');
-  const [audioURL, setAudioURL] = useState('');
-  const userId = localStorage.getItem('userId')
-  console.log(userId)
+  const [modalContent, setModalContent] = useState('');
+  const [modalScore, setModalScore] = useState('');
+  const userId = localStorage.getItem('userId');
 
-  const chatContainerRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
   const audioRef = useRef(new Audio());
+  const chatContainerRef = useRef(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const token = await getToken();
+  // Audio recording functions
+  const onStartRecord = async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        const response = await fetch(`${BaseURL}/get_user_profile/${userId}`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const userData = await response.json();
-        console.log(userData);
-        if (userData?.AvatarID) {
-          const avatarResponse = await fetch(`${BaseURL}/get_avatar/${userData.AvatarID}`);
-          const avatarData = await avatarResponse.json();
-          if (avatarData?.AvatarURL) {
-            setAvatarUrl(avatarData.AvatarURL);
-          }
-        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorderRef.current = new MediaRecorder(stream);
+        const chunks = [];
+
+        mediaRecorderRef.current.ondataavailable = (e) => {
+          chunks.push(e.data);
+        };
+
+        mediaRecorderRef.current.onstop = () => {
+          const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+          sendVoiceMessage(audioBlob);
+        };
+
+        mediaRecorderRef.current.start();
+        setRecordingStatus('recording');
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Error starting recording:', error);
       }
-    };
-
-    fetchUserProfile();
-  }, []);
-
-  const onStartRecording = () => {
-    setIsRecording(true);
+    }
   };
 
-  const onStopRecording = async (recordedBlob) => {
-    setIsRecording(false);
-    setAudioURL(recordedBlob.blobURL);
-
-    // Handle sending voice message
-    await sendVoiceMessage(recordedBlob.blob);
-  };
-
-  const sendMessage = async () => {
-    if (isLoading || !inputText.trim()) return;
-
-    setChats(prev => [...prev, { text: inputText, isUser: true, audio: null }]);
-    setInputText('');
-    setIsLoading(true);
-
-    try {
-      const token = await getToken();
-      const formData = new FormData();
-      formData.append('text', inputText);
-
-      const response = await fetch(`${BaseURL}/text`, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-
-      const data = await response.json();
-      const message = data.response === '' || data.response === 'AI:'
-        ? 'Sorry I did not understand!'
-        : data.response.slice(4);
-
-      setChats(prev => [...prev, { text: message, isUser: false, audio: null }]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setIsLoading(false);
+  const onStopRecord = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      const tracks = mediaRecorderRef.current.stream.getTracks();
+      tracks.forEach(track => track.stop());
+      setRecordingStatus('stopped');
     }
   };
 
   const sendVoiceMessage = async (audioBlob) => {
-    if (isLoading) return;
-
-    setChats(prev => [...prev, { text: '', isUser: true, audio: audioURL }]);
+    const audioUrl = URL.createObjectURL(audioBlob);
+    setChats(prev => [...prev, { text: '', isUser: true, audio: audioUrl }]);
     setIsLoading(true);
 
     try {
@@ -272,52 +198,103 @@ const TherapistName = () => {
 
       const response = await fetch(`${BaseURL}/audio`, {
         method: 'POST',
-        body: formData,
-        headers: { 'Authorization': 'Bearer ' + token }
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
       });
 
-      const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
 
-      if (data?.Highest_disorder_result) {
-        await addChatVoice(
-          data.Highest_disorder_result.Label,
-          data.Highest_disorder_result.Score
-        );
-        setModalContent(data.Highest_disorder_result.Label);
-        setModalScore(data.Highest_disorder_result.Score);
-        setShowModal(true);
-        setTimeout(() => setShowModal(false), 3000);
+        if (data?.Highest_disorder_result) {
+          setModalContent(data.Highest_disorder_result.Label);
+          setModalScore(data.Highest_disorder_result.Score);
+          setShowModal(true);
+          setTimeout(() => setShowModal(false), 3000);
+        }
+
+        const message = data.response === '' ?
+          'Sorry, can you please say it again!' :
+          data.response?.slice(4);
+
+        setChats(prev => [...prev, { text: message, isUser: false, audio: null }]);
       }
-
-      const message = data.response === ''
-        ? 'Sorry, can you please say it again!'
-        : data.response?.slice(4);
-
-      setChats(prev => [...prev, { text: message, isUser: false, audio: null }]);
     } catch (error) {
       console.error('Error sending voice message:', error);
+      setChats(prev => [...prev, {
+        text: 'Sorry, there was an error processing your voice message.',
+        isUser: false,
+        audio: null
+      }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const playAudio = async (audioPath, index) => {
-    if (audioPlay === index) {
-      audioRef.current.pause();
-      setAudioPlay(undefined);
-    } else {
-      audioRef.current.src = audioPath;
-      await audioRef.current.play();
-      setAudioPlay(index);
+  const sendMessage = async () => {
+    if (!inputText.trim() || isLoading) return;
+
+    const message = inputText.trim();
+    setInputText('');
+    setChats(prev => [...prev, { text: message, isUser: true, audio: null }]);
+    setIsLoading(true);
+
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('text', message);
+
+      const response = await fetch(`${BaseURL}/text`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      const data = await response.json();
+      const aiMessage = data.response === '' || data.response === 'AI:' ?
+        'Sorry, I did not understand!' :
+        data.response.slice(4);
+
+      setChats(prev => [...prev, { text: aiMessage, isUser: false, audio: null }]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setChats(prev => [...prev, {
+        text: 'Sorry, there was an error processing your message.',
+        isUser: false,
+        audio: null
+      }]);
+    } finally {
+      setIsLoading(false);
     }
   };
+  const navigateto = async (path) => {
 
-  const onPressDisorders = async (path) => {
-    setLoading(true);
-    const session = await insertSessionData(userId, 1);
-    setLoading(false);
-    if (session) {
-      navigate(`/${path}`, { state: { sessionId: session || "123" } });
+    const sessionId = await insertSessionData(userId, 1)
+
+    navigate(`/${path}`, { state: { sessionId } });
+  }
+
+  const playAudio = async (audioUrl, index) => {
+    try {
+      if (playingAudioIndex === index) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        setPlayingAudioIndex(null);
+      } else {
+        if (playingAudioIndex !== null) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
+        audioRef.current.src = audioUrl;
+        await audioRef.current.play();
+        setPlayingAudioIndex(index);
+
+        audioRef.current.onended = () => {
+          setPlayingAudioIndex(null);
+        };
+      }
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setPlayingAudioIndex(null);
     }
   };
 
@@ -328,68 +305,81 @@ const TherapistName = () => {
     });
   }, [chats, isLoading]);
 
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
+
   return (
     <Container>
+      <CustomHeader title="IzzyAI chatbot" goBack={() => navigate(-1)} />
+
       <ChatContainer ref={chatContainerRef}>
         {chats.map((chat, index) => (
           <MessageGroup key={index} isUser={chat.isUser}>
-            {!chat?.path && (
-              <Avatar>
-                {/* <AvatarImage
-                  src={chat.isUser ? avatarUrl : '/images/microphone.png'}
-                  alt={chat.isUser ? 'User' : 'AI'}
-                /> */}
-                <Mic />
-                <UserName>{chat.isUser ? 'You' : 'IzzyAI'}</UserName>
-              </Avatar>
-            )}
+            <div className="flex flex-col items-center gap-1">
+              <Mic size={24} />
+              <span className="text-sm font-bold">{chat.isUser ? 'You' : 'IzzyAI'}</span>
+            </div>
 
             {chat?.path ? (
-              <DisorderButton onClick={() => onPressDisorders(chat.path)}>
+              <DisorderButton onClick={() => navigateto(chat.path)}>
                 {chat.text}
               </DisorderButton>
             ) : chat.audio ? (
-              <MessageBubble isUser={chat.isUser}>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <WaveContainer>
-                    {/* Add your wave animation component here */}
-                  </WaveContainer>
-                  <IconButton onClick={() => playAudio(chat.audio, index)}>
-                    {audioPlay === index ? <Pause size={20} /> : <Play size={20} />}
-                  </IconButton>
-                </div>
-              </MessageBubble>
+              <AudioMessage isUser={chat.isUser}>
+                <Wave>
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <WaveLine
+                      key={i}
+                      isUser={chat.isUser}
+                      isAnimating={playingAudioIndex === index}
+                      delay={i * 0.1}
+                      height={15}
+                    />
+                  ))}
+                </Wave>
+                <IconButton onClick={() => playAudio(chat.audio, index)}>
+                  {playingAudioIndex === index ? <Pause size={20} /> : <Play size={20} />}
+                </IconButton>
+              </AudioMessage>
             ) : (
-              <MessageBubble isUser={chat.isUser}>
+              <MessageText isUser={chat.isUser}>
                 {capitalize(chat.text)}
-              </MessageBubble>
+              </MessageText>
             )}
           </MessageGroup>
         ))}
 
         {isLoading && (
           <MessageGroup>
-            <Avatar>
-              <AvatarImage src="/images/microphone.png" alt="AI" />
-              <UserName>IzzyAI</UserName>
-            </Avatar>
-            <MessageBubble>
+            <div className="flex flex-col items-center gap-1">
+              <Mic size={24} />
+              <span className="text-sm font-bold">IzzyAI</span>
+            </div>
+            <MessageText>
               <CircleLoader size={30} color="#2DEEAA" />
-            </MessageBubble>
+            </MessageText>
           </MessageGroup>
         )}
       </ChatContainer>
 
       <InputContainer>
-        {isRecording ? (
-          <WaveContainer>
-            <ReactMic
-              record={isRecording}
-              onStop={onStopRecording}
-              strokeColor="#2DEEAA"
-              backgroundColor="#ffffff"
-            />
-          </WaveContainer>
+        {recordingStatus === 'recording' ? (
+          <Wave style={{ flex: 1 }}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <WaveLine
+                key={i}
+                isAnimating={true}
+                delay={i * 0.1}
+                height={15}
+              />
+            ))}
+          </Wave>
         ) : (
           <Input
             value={inputText}
@@ -402,9 +392,10 @@ const TherapistName = () => {
 
         {inputText === '' ? (
           <IconButton
-            onClick={isRecording ? () => setIsRecording(false) : onStartRecording}
+            onClick={recordingStatus === 'recording' ? onStopRecord : onStartRecord}
+            primary={recordingStatus === 'recording'}
           >
-            <Mic size={20} />
+            {recordingStatus === 'recording' ? <StopCircle size={20} /> : <Mic size={20} />}
           </IconButton>
         ) : (
           <IconButton primary onClick={sendMessage}>
@@ -414,13 +405,13 @@ const TherapistName = () => {
       </InputContainer>
 
       {showModal && (
-        <Modal>
-          <ModalContent>
-            <h3>You have</h3>
-            <h2>{modalContent}</h2>
-            <h2>Score: {modalScore}</h2>
-          </ModalContent>
-        </Modal>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg text-center">
+            <h3 className="text-lg mb-2">You have</h3>
+            <h2 className="text-xl font-bold mb-2">{modalContent}</h2>
+            <h2 className="text-xl font-bold">Score: {modalScore}</h2>
+          </div>
+        </div>
       )}
     </Container>
   );

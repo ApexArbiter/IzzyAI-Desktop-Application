@@ -79,8 +79,8 @@ const LinearProgressBar = ({ value }) => {
 
 const ArticulationResult = () => {
   const navigate = useNavigate();
-  const { userId, updateUserDetail, articulationReport } = useDataContext();
-  console.log(userId)
+  const { updateUserDetail, articulationReport } = useDataContext();
+  const userId = localStorage.getItem("userId");
   const [loading, setLoading] = useState(false);
   const [endTime, setEndTime] = useState('');
   const location = useLocation();
@@ -154,16 +154,22 @@ const ArticulationResult = () => {
       }
 
       formData.append('AssessmentDate', moment(new Date()).format("YYYY-MM-DD hh:mm:ss"));
+      console.log("FormData contents:");
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
 
       const response = await fetch(`${BaseURL}/add_assessment_result`, {
         method: 'POST',
         body: formData,
         headers: { 'Authorization': "Bearer " + token }
       });
-
+      console.log(response)
       if (response.ok) {
         // If the response is successful, parse the response body as JSON
         const responseData = await response.json();
+        console.log(responseData)
       } else {
         // Handle error response
         const errorData = await response.json();
@@ -219,13 +225,13 @@ const ArticulationResult = () => {
     setEndTime(currentEndTime);
   }, []);
 
-  useEffect(() => {
-    const init = async () => {
-      // await endSession(sessionId, startTime, 'Completed', 1); // 1 for articulation disorder
-      // addAssessmentResult();
-    };
-    init();
-  }, []);
+  // useEffect(() => {
+  //   const init = async () => {
+  //     await endSession(sessionId, startTime, 'Completed', 1); 
+  //     addAssessmentResult();
+  //   };
+  //   init();
+  // }, []);
 
   useEffect(() => {
     if (SessiontypId === 1) {

@@ -9,6 +9,7 @@ import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import { useDataContext } from '../contexts/DataContext';
 import axios from 'axios';
 import dynamicfunctions from '../utils/dynamicfunctions';
+import LogoQuestionView from '../components/LogoQuestionView';
 
 const VoiceDisorderPage = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ const VoiceDisorderPage = () => {
   const [error, setError] = useState(null);
   const [voiceResponse, setVoiceResponse] = useState(null);
   const [startTime, setStartTime] = useState(null);
+  const [loader, setLoader] = useState(false)
 
 
 
@@ -99,6 +101,7 @@ const VoiceDisorderPage = () => {
 
   const fetchExerciseData = async () => {
     try {
+      setLoader(true);
       const token = await getToken();
       const userDetail = JSON.parse(storedUserDetail);
 
@@ -121,6 +124,8 @@ const VoiceDisorderPage = () => {
     } catch (error) {
       setError('Failed to fetch exercise data');
       console.error('Error fetching exercise data:', error);
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -186,6 +191,7 @@ const VoiceDisorderPage = () => {
 
   const onStopRecord = async () => {
     try {
+      setLoader(true);
       if (!mediaRecorderRef.current) return;
 
       return new Promise((resolve) => {
@@ -332,6 +338,8 @@ const VoiceDisorderPage = () => {
     } catch (error) {
       console.error('Error checking voice disorder:', error);
       return null;
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -442,17 +450,19 @@ const VoiceDisorderPage = () => {
           )}
 
           {/* Exercise Text */}
-          <div className="text-center space-y-2 bg-blue-50 p-6 rounded-xl">
-            <p className="text-blue-600 font-medium">Say this...</p>
-            <h3 className="text-2xl font-bold text-gray-800">
-              {exerciseData?.[exerciseCount - 1]?.WordText || 'loading'}
-            </h3>
+          <div className="flex justify-center">
+            <LogoQuestionView
+              first_text={"Say this..."}
+              second_text={exerciseData?.[exerciseCount - 1]?.WordText || 'loading'}
+
+            />
           </div>
+
 
           {/* Expression Display */}
           {expression && (
             <div className="bg-green-50 text-green-800 p-4 rounded-xl text-center text-lg font-medium">
-              Facial Expression: {typeof expression === 'object' ? JSON.stringify(expression) : expression}
+              Facial Expression: {expression.expression}
             </div>
           )}
 
@@ -562,7 +572,7 @@ const VoiceDisorderPage = () => {
 
           {/* Loader */}
           <div className="p-4 flex justify-center">
-            <Loader loading={recordingStatus === 'loading'} />
+            <Loader loading={loader} />
           </div>
         </div>
       </div>

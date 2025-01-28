@@ -87,6 +87,20 @@ function SignInPage() {
             DaysLeft: responseData?.DaysLeft,
             Amount: responseData?.SubscriptionDetails?.Amount ?? 0,
           });
+          console.log(
+            {
+              UserID: data?.USERID,
+              FullName: responseData?.UserProfile?.FullName,
+              Age: responseData?.UserProfile?.Age,
+              AvatarID: responseData?.UserProfile?.AvatarID,
+              email: email,
+              UserType: responseData?.UserType?.UserType,
+              Gender: responseData?.UserProfile?.Gender,
+              SubscriptionDetails: responseData?.SubscriptionDetails,
+              DaysLeft: responseData?.DaysLeft,
+              Amount: responseData?.SubscriptionDetails?.Amount ?? 0,
+            }
+          )
           setIsLoading(false);
 
           // Navigation logic remains the same

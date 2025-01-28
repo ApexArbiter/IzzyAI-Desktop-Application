@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDataContext } from '../contexts/DataContext';
+import CustomHeader from '../components/CustomHeader';
 
 const Games = () => {
   const location = useLocation();
@@ -15,7 +16,7 @@ const Games = () => {
       setHasError(true);
       return;
     }
-    
+
     // Request microphone permission when component mounts
     requestMicrophonePermission();
   }, [url]);
@@ -81,6 +82,10 @@ const Games = () => {
 
   return (
     <div className="flex flex-col h-screen w-full pt-2">
+
+      <div className='absolute top-0 left-0 right-0 z-10'>
+        <CustomHeader title="" goBack={() => navigate(-1)} />
+      </div>
       {renderContent()}
     </div>
   );

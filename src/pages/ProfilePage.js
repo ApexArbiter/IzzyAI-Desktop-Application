@@ -20,7 +20,7 @@ function ProfilePage() {
   };
 
   const menuItems = [
-    { icon: <Settings className="w-6 h-6" />, label: 'Settings' },
+    { icon: <Settings className="w-6 h-6" />, label: 'Settings', onClick: () => navigate("/settings") },
     { icon: <CreditCard className="w-6 h-6" />, label: 'Manage Subscriptions' },
     { icon: <User className="w-6 h-6" />, label: 'Bio Data' },
     { icon: <HelpCircle className="w-6 h-6" />, label: 'About App' },

@@ -5,10 +5,10 @@ export default function QuizComponent() {
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [questionCount, setQuestionCount] = useState(1);
     const [recordingStatus, setRecordingStatus] = useState('idle');
-    const [incorrectQuestions, setIncorrectQuestions] = useState([]);
     const [correctQuestions, setCorrectQuestions] = useState([]);
     const [incorrectExpressions, setIncorrectExpressions] = useState([]);
     const [correctExpressions, setCorrectExpressions] = useState([]);
+    const [incorrectQuestions, setIncorrectQuestions] = useState([]);
 
     const onCorrectAnswer = (ques, onCorrect = () => { }) => {
         setQuestionResponse('Correct!');
@@ -46,29 +46,29 @@ export default function QuizComponent() {
     }
 
     const onCorrectExpression = (ques, exp) => {
-        if (!correctExpressions.includes(ques + exp)) {
+        if (!correctExpressions.includes(ques + exp.expression)) {
             setCorrectExpressions(prevQuestions => [
                 ...prevQuestions,
-                ques + exp,
+                ques + exp.expression,
             ]);
         }
-        if (incorrectExpressions.some(q => q === ques + exp)) {
+        if (incorrectExpressions.some(q => q === ques + exp.expression)) {
             setIncorrectExpressions(prevQuestions =>
-                prevQuestions.filter(q => q !== ques + exp),
+                prevQuestions.filter(q => q !== ques + exp.expression),
             );
         }
     }
 
     const onWrongExpression = (ques, exp) => {
-        if (!incorrectExpressions.some(q => q === ques + exp)) {
+        if (!incorrectExpressions.some(q => q === ques + exp.expression)) {
             setIncorrectExpressions(prevQuestions => [
                 ...prevQuestions,
-                ques + exp,
+                ques + exp.expression,
             ]);
         }
-        if (correctExpressions.includes(ques + exp)) {
+        if (correctExpressions.includes(ques + exp.expression)) {
             setCorrectExpressions(prevQuestions =>
-                prevQuestions.filter(q => q !== (ques + exp)),
+                prevQuestions.filter(q => q !== (ques + exp.expression)),
             );
         }
     }

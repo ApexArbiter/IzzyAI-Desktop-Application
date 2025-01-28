@@ -65,6 +65,7 @@ const LoaderWave = ({ isAnimation, isDark }) => (
 const SpeechArticulationPage = () => {
     const location = useLocation();
     const { sessionId, isAll } = location?.state || {};
+    console.log(location.state)
     const [recordingStatus, setRecordingStatus] = useState('idle');
     const { setArticulationReport } = useDataContext();
     const [startTime, setStartTime] = useState('');
@@ -121,6 +122,7 @@ const SpeechArticulationPage = () => {
             incorrectQuestions: incorrectQuestions,
             isQuick: true
         };
+        console.log(navigationState)
 
         setArticulationReport(incorrectQuestions);
         navigate('/resultReport', {

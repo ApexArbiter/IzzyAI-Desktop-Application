@@ -11,6 +11,9 @@ import Loader from '../components/Loader';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import html2canvas from 'html2canvas';
 import { ArrowLeft } from 'lucide-react';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import LogoQuestionView from '../components/LogoQuestionView';
+
 const RecordButton = (props) => {
   return (
     <button
@@ -93,6 +96,7 @@ const SpeechArticulationPage = () => {
   const cameraRef = useRef(null);
   const [audioUrl, setAudioUrl] = useState('');
   const [result, setResult] = useState("");
+  const [loader, setLoader] = useState(false)
   // Ref for camera
   const mediaRecorderRef = useRef(null); // Ref for the MediaRecorder API
   const audioChunksRef = useRef([]);
@@ -101,6 +105,7 @@ const SpeechArticulationPage = () => {
   useEffect(() => {
     const fetchData = () => {
       try {
+
         // Retrieve user details and userId from localStorage
         const storedUserDetail = localStorage.getItem("userDetails");
         const storedUserId = User(); // This is synchronous, no need for await
@@ -115,10 +120,12 @@ const SpeechArticulationPage = () => {
         }
       } catch (error) {
         console.error("Error retrieving or parsing userDetails from localStorage", error);
+      } finally {
       }
     };
-
+    // setLoader(true)
     fetchData(); // Call the function inside useEffect
+    // setLoader(false)
     console.log(User());
   }, []); // Empty dependency array ensures this runs only once when the component mounts
 
@@ -155,7 +162,6 @@ const SpeechArticulationPage = () => {
       sessionId,
       isAll,
       totalQuestions: 44,
-      isExpressive: true,
       SessiontypId: 1,
       startTime,
       correctAnswers: correctAnswersCount || 0,
@@ -184,6 +190,7 @@ const SpeechArticulationPage = () => {
     const token = await getToken();
     const userDetail = JSON.parse(storedUserDetail());
     try {
+      setLoader(true)
       if (questionCount <= 44) {
         const response = await fetch(`${BaseURL}/get_assess_word/${id}/${userDetail?.AvatarID}`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -197,6 +204,8 @@ const SpeechArticulationPage = () => {
       }
     } catch (error) {
       console.error('Network request failed:', error);
+    } finally {
+      setLoader(false)
     }
   };
   useEffect(() => {
@@ -211,7 +220,7 @@ const SpeechArticulationPage = () => {
   useEffect(() => {
     if (questionCount <= 44) {
       fetchQuestionData(questionCount);
-    }
+    } setLoader(false)
   }, [questionCount]);
 
 
@@ -227,12 +236,14 @@ const SpeechArticulationPage = () => {
         mediaRecorderRef.current.ondataavailable = (e) => {
           audioChunks.push(e.data); // Store audio data as chunks
         };
+        sendSnapshot()
 
         mediaRecorderRef.current.onstop = () => {
           const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
           setAudioUrl(URL.createObjectURL(audioBlob)); // Set the audio URL for playback
           console.log("audioUrl", audioUrl);
           audioChunks.length = 0; // Reset chunks after recording stops
+          console.log(audioBlob)
 
           // Send audio after recording is stopped
           sendAudio(audioBlob); // Pass the audio blob directly
@@ -263,6 +274,7 @@ const SpeechArticulationPage = () => {
   // Stop recording both audio and video
   const onStopRecord = async () => {
     try {
+      setLoader(true)
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stop();
       }
@@ -365,8 +377,15 @@ const SpeechArticulationPage = () => {
         console.log("Response from expression api:", response);
 
         if (response?.expression) {
+          setExpressionsArray(prev => [...prev, response]);
+          if (response?.expression.toLowerCase() === 'happy') {
+            onCorrectExpression(questionData?.WordText, response)
+          } else {
+            onWrongExpression(questionData?.WordText, response)
+          }
+
           setExpression(response.expression);
-          console.log('Expression detected:', response.expression);
+          console.log('Expression detected:', response);
           return response.expression;
         }
       } else {
@@ -376,6 +395,8 @@ const SpeechArticulationPage = () => {
     } catch (error) {
       console.error('Failed to take snapshot or detect expression:', error);
       return null;
+    } finally {
+      setLoader(false)
     }
   };
 
@@ -601,36 +622,46 @@ const SpeechArticulationPage = () => {
 
 
             {/* Question Text */}
-            <p className="text-xl font-bold text-center mb-8">
-              Say this: {questionData?.WordText}
-            </p>
+
+            <div className='flex justify-center' >
+              <LogoQuestionView
+                first_text={"Say this..."}
+                second_text={questionData && questionData.WordText}
+                highlighted={questionData && questionData.HighlightWord
+                  ? JSON.parse(questionData.HighlightWord)
+                  : []}
+              />
+            </div>
 
             {/* Loading State */}
-            <Loader loading={recordingStatus === 'loading'} />
+            <Loader loading={loader} />
 
             {/* Expression Text */}
-            {recordingStatus === 'stop' && expression && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-lg text-red-500 text-center mb-6"
-              >
-                Facial Expression: {expression}
-              </motion.p>
-            )}
-            {recordingStatus === 'stop' && result && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-lg text-red-500 text-center mb-6"
-              >
-                Voice Result: {result}
-              </motion.p>
-            )}
+            <div className='flex flex-row gap-4 justify-center p-3 mt-1 ' >
+              {recordingStatus === 'stop' && expression && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className=" text-red-500 text-center mb-6 serif"
+                >
+                  Facial Expression: {expression}
+                </motion.p>
+              )}
+              {recordingStatus === 'stop' && result && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`${result === true ? 'text-green-600 text-center serif ' : 'text-red-600 text-center serif'}`}
+
+                >
+                  Voice Result: {result}
+                </motion.p>
+              )}
+            </div>
 
             {/* Camera View */}
             <div ref={cameraContainerRef} className="mb-8">
-              <div className="rounded-2xl overflow-hidden shadow-lg mx-auto max-w-md">
+              <div className="rounded-2xl overflow-hidden  flex justify-center align-items-center">
                 <Webcam
                   audio={false}
                   ref={cameraRef}
@@ -640,33 +671,39 @@ const SpeechArticulationPage = () => {
                     width: 300,
                     height: 300,
                   }}
-                  className="w-full"
+                  className='mb-6  rounded-2xl shadow-lg'
+
                 />
               </div>
             </div>
 
-            {/* Recording Controls */}
-            {recordingStatus === 'idle' && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onStartRecord}
-                className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-4 font-semibold transition-colors mb-6"
-              >
-                Start Recording
-              </motion.button>
-            )}
+            <div className="flex justify-center items-center">
+              {recordingStatus === 'idle' && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onStartRecord}
+                  className="flex items-center justify-center bg-black text-white rounded-full py-4 px-6 font-semibold transition-colors mb-6"
+                >
+                  <i className="fas fa-record-vinyl text-xl mr-2"></i>
+                  Start Recording
+                </motion.button>
+              )}
 
-            {recordingStatus === 'recording' && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onStopRecord}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-full py-4 font-semibold transition-colors mb-6"
-              >
-                Stop Recording
-              </motion.button>
-            )}
+              {recordingStatus === 'recording' && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onStopRecord}
+                  className="flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white rounded-full py-4 px-6 font-semibold transition-colors mb-6"
+                >
+                  <i className="fas fa-stop text-xl mr-2"></i>
+                  Stop Recording
+                </motion.button>
+              )}
+            </div>
+
+
 
             {/* Navigation Buttons */}
             {recordingStatus === 'stop' && (
@@ -685,8 +722,9 @@ const SpeechArticulationPage = () => {
                             setQuestionCount(prevCount => prevCount - 1);
                           }
                         }}
-                        className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-3 font-semibold transition-colors"
+                        className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-3 px-6 font-semibold transition-colors flex items-center justify-center"
                       >
+                        <i className="fas fa-arrow-left mr-2 text-lg"></i> {/* Left arrow icon */}
                         Previous
                       </motion.button>
                     )}
@@ -703,8 +741,9 @@ const SpeechArticulationPage = () => {
                           endAssessment();
                         }
                       }}
-                      className="flex-1 bg-green-400 hover:bg-green-500 text-gray-900 rounded-full py-3 font-semibold transition-colors"
+                      className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-full py-3 px-6 font-semibold transition-colors flex items-center justify-center"
                     >
+                      <i className="fas fa-arrow-right mr-2 text-lg"></i> {/* Right arrow icon */}
                       Next
                     </motion.button>
                   </div>
@@ -713,8 +752,9 @@ const SpeechArticulationPage = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => endAssessment()}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-3 font-semibold transition-colors"
+                  className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-3 px-6 font-semibold transition-colors flex items-center justify-center"
                 >
+                  <i className="fas fa-times mr-2 text-lg"></i> {/* Stop/End icon */}
                   {questionCount < 44 ? 'End Now' : 'Finish'}
                 </motion.button>
               </div>

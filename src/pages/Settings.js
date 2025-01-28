@@ -1,141 +1,112 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDataContext } from '../contexts/DataContext';
-import { makeStyles } from '@mui/styles';
-import { Button } from '@mui/material'; // For buttons, you can also use regular HTML buttons if preferred
-import GradientChevronRight from '../assets/GradientChevronRight'; // Ensure this component works for the web, or replace it.
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import CustomHeader from '../components/CustomHeader';
+import logo from '../assets/images/logo.png';
 
-function Settings() {
-  const { userDetail } = useDataContext();
-  const history = useNavigate();
 
-  const useStyles = makeStyles({
-    safe_area: {
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-    },
-    main_view: {
-      padding: '20px',
-      flex: 1,
-    },
-    base: {
-      fontFamily: 'Arial, sans-serif', // Assuming `fonts.regular` is equivalent to a system font
-      color: '#111920',
-    },
-    linearGradient: {
-      padding: '15px',
-      borderRadius: '16px',
-      background: 'linear-gradient(90deg, rgba(12, 200, 232, 0.12), rgba(46, 238, 170, 0.12))',
-      marginTop: '20px',
-    },
-    profile_row: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: '20px 0',
-    },
-    profile_image_view: {
-      height: '80px',
-      width: '80px',
-      borderRadius: '50%',
-    },
-    profile_image: {
-      height: '100%',
-      width: '100%',
-      borderRadius: '50%',
-    },
-    text_view: {
-      flex: 1,
-      marginLeft: '12px',
-    },
-    image_view: {
-      height: '60px',
-      width: '40%',
-      margin: '0 auto',
-    },
-    image: {
-      height: '100%',
-      width: '100%',
-    },
-  });
+const Settings = () => {
+  const navigate = useNavigate();
+  const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+  // Replace with your context
 
-  const classes = useStyles();
-
-  const navigateBack = () => {
-    history.goBack();
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        staggerChildren: 0.1
+      }
+    }
   };
 
-  const navigateToUpdateAvatar = () => {
-    history('/UpdateAvatar');
-  };
-
-  const navigateToChangePassword = () => {
-    history('/ChangePassword');
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.3 }
+    }
   };
 
   return (
-    <div className={classes.safe_area}>
-      <header>
-        <button onClick={navigateBack}>Back</button>
-        {/* CustomHeader component in React Native was used for title. Adjust as necessary */}
-      </header>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <CustomHeader title="Settings" goBack={() => navigate(-1)} />
 
-      <div className={classes.main_view}>
-        <div className={classes.image_view}>
+      {/* Main Content */}
+      <motion.main
+        className="flex-1 container mx-auto px-4 py-6 max-w-2xl"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Logo */}
+        <motion.div
+          className="w-48 h-16 mx-auto mb-8"
+          variants={itemVariants}
+        >
           <img
-            src={require('../assets/images/logo.png')}
+            src={logo}
             alt="Logo"
-            className={classes.image}
+            className="w-full h-full object-contain"
           />
-        </div>
+        </motion.div>
 
-        <div className={classes.linearGradient}>
-          <div className={classes.profile_row}>
-            <div className={classes.profile_image_view}>
+        {/* Profile Section */}
+        <motion.div
+          className="bg-gradient-to-r from-cyan-50 to-teal-50 rounded-2xl p-6 mb-6"
+          variants={itemVariants}
+        >
+          <div className="flex items-center">
+            <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
               <img
-                src={userDetail.avatarUrl}
+                src={userDetails.avatarUrl}
                 alt="Profile"
-                className={classes.profile_image}
-                style={{ objectFit: 'contain' }}
+                className="w-full h-full object-cover"
               />
             </div>
-            <div className={classes.text_view}>
-              <p style={{ fontSize: '20px', fontWeight: '500' }} title={userDetail.FullName}>
-                {userDetail.FullName}
-              </p>
-              <p style={{ fontSize: '15px', fontWeight: '500' }} title={userDetail.email}>
-                {userDetail.email}
+            <div className="ml-4 flex-1">
+              <h2 className="text-xl font-medium text-gray-900 truncate">
+                {userDetails.FullName}
+              </h2>
+              <p className="text-sm text-gray-600 truncate mt-1">
+                {userDetails.email}
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={classes.linearGradient}>
-          <button
-            onClick={navigateToUpdateAvatar}
-            style={{ display: 'flex', alignItems: 'center', width: '100%', border: 'none', background: 'transparent', padding: '20px' }}
+        {/* Settings Options */}
+        <motion.div className="space-y-4" variants={itemVariants}>
+          {/* Update Avatar Button */}
+          <motion.button
+            onClick={() => navigate('/UpdateAvatar')}
+            className="w-full bg-gradient-to-r from-cyan-50 to-teal-50 rounded-2xl p-6 flex items-center justify-between group hover:shadow-md transition-shadow"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
           >
-            <div className={classes.text_view}>
-              <p style={{ fontSize: '15px', fontWeight: '500' }}>Update Avatar</p>
-            </div>
-            <gradientChevronRight /> {/* Ensure this component is compatible with React or replace it with an icon */}
-          </button>
-        </div>
+            <span className="text-base font-medium text-gray-900">Update Avatar</span>
+            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+          </motion.button>
 
-        <div className={classes.linearGradient}>
-          <button
-            onClick={navigateToChangePassword}
-            style={{ display: 'flex', alignItems: 'center', width: '100%', border: 'none', background: 'transparent', padding: '20px' }}
+          {/* Change Password Button */}
+          <motion.button
+            onClick={() => navigate('/ChangePassword')}
+            className="w-full bg-gradient-to-r from-cyan-50 to-teal-50 rounded-2xl p-6 flex items-center justify-between group hover:shadow-md transition-shadow"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
           >
-            <div className={classes.text_view}>
-              <p style={{ fontSize: '15px', fontWeight: '500' }}>Change Password</p>
-            </div>
-            <gradientChevronRight /> {/* Ensure this component is compatible with React or replace it with an icon */}
-          </button>
-        </div>
-      </div>
+            <span className="text-base font-medium text-gray-900">Change Password</span>
+            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+          </motion.button>
+        </motion.div>
+      </motion.main>
     </div>
   );
-}
+};
 
 export default Settings;

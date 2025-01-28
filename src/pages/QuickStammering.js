@@ -65,6 +65,7 @@ const LoaderWave = ({ isAnimation, isDark }) => (
 const SpeechArticulationPage = () => {
     const location = useLocation();
     const { sessionId, isAll } = location?.state || {};
+    console.log(sessionId)
     const [recordingStatus, setRecordingStatus] = useState('idle');
     const [startTime, setStartTime] = useState('');
     const [backendResponseText, setBackendResponseText] = useState(null);
@@ -226,18 +227,7 @@ const SpeechArticulationPage = () => {
 
             <main className="flex-1 p-5">
                 <div className="max-w-3xl mx-auto">
-                    {/* Progress Section
-                    <div className="mb-8">
-                        <p className="text-lg mb-4">
-                            Assessment <span className="font-bold">{questionCount}</span> out of{' '}
-                            <span className="font-bold">{questions?.length || 0}</span>
-                        </p>
 
-                        <div className="flex items-center gap-4">
-                            <LinearProgress value={percentageCompleted / 100} />
-                            <span className="text-sm font-medium">{percentageCompleted.toFixed(1)}%</span>
-                        </div>
-                    </div> */}
 
                     {/* Question Image */}
                     <div className="border border-[#0CC8E8] rounded-2xl p-5 flex justify-center mb-8">
@@ -294,41 +284,7 @@ const SpeechArticulationPage = () => {
                         </div>
                     )}
 
-                    {/* Navigation Buttons
-                    {recordingStatus === 'stop' && (
-                        <div className="flex flex-col items-center gap-4 mt-8">
-                            {questionCount < (questions?.length || 0) && (
-                                <div className="flex justify-between w-full gap-4">
-                                    {questionCount !== 1 && (
-                                        <PrevButton
-                                            onPress={() => {
-                                                setRecordingStatus('idle');
-                                                setQuestionResponse('');
-                                                setQuestionCount(prev => prev - 1);
-                                            }}
-                                            title="Previous"
-                                        />
-                                    )}
-                                    <NextButton
-                                        onPress={() => {
-                                            setRecordingStatus('idle');
-                                            setQuestionResponse('');
-                                            if (questionCount < questions?.length) {
-                                                setQuestionCount(prev => prev + 1);
-                                            } else {
-                                                endAssessment();
-                                            }
-                                        }}
-                                        title="Next"
-                                    />
-                                </div>
-                            )}
-                            <EndButton
-                                onPress={endAssessment}
-                                title={questionCount < (questions?.length || 0) ? "End Now" : "Finish"}
-                            /> */}
-                    {/* </div> */}
-                    {/* )} */}
+
                 </div>
             </main>
         </div>

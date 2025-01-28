@@ -40,7 +40,7 @@ import TherapistProfilePage from './pages/TherapistProfile';
 import AssessmentPage from './pages/AssesmentPage';
 import ResultExpressiveLanguage from './pages/ResultExpressiveLanguage'
 import ResultReportArticulation from './pages/ResultReportArticulation';
-import ReportsPage from './pages/ProfilePage';
+import ReportsPage from './pages/ReportsPage';
 import VoiceReport from './pages/VoiceReport';
 import PassagePageTwo from './pages/PassagePageTwo';
 import Games from './pages/Games';
@@ -54,6 +54,9 @@ import QuickExpressive from './pages/QuickExpressive';
 import QuickReceptive from './pages/QuickReceptive';
 import QuickStammering from './pages/QuickStammering';
 import QuickVoice from './pages/QuickVoice';
+import AvatarTherapistName from './pages/AvatarTharapistPage';
+import Settings from './pages/Settings';
+import UpdateAvatar from './pages/UpdateAvatar';
 
 function App() {
   return (
@@ -115,6 +118,10 @@ function App() {
           <Route path="/quick-voice" element={<QuickVoice />} />
           <Route path="/quick-receptive" element={<QuickReceptive />} />
           <Route path="/quick-expressive" element={<QuickExpressive />} />
+          <Route path="/conversationalAvatar" element={<AvatarTherapistName />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/UpdateAvatar" element={<UpdateAvatar />} />
+
 
         </Routes>
       </Router>

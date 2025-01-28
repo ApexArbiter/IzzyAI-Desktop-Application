@@ -6,10 +6,10 @@ import TherapistImage from '../../assets/images/TherapistImage.png';
 
 function Card({ navigate, isAvatar }) {
   const handleClick = () => {
-    navigate(isAvatar ? "/AvatarTherapistName" : '/therapistProfile', {
+    navigate(isAvatar ? "/conversationalAvatar" : '/therapistProfile', {
       state: {
         itemId: 86,
-        otherParam: 'anything you want here',
+
       }
     });
   };
@@ -45,13 +45,13 @@ export default function TherapistsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <CustomHeader title="Articulation Disorder" goBack={() => navigate(-1)} />
+      <CustomHeader title="Articulation Disorder" goBack={() => navigate("/home")} />
       <main className="p-5">
         <h2 className="text-2xl font-medium text-[#111920] my-5">
           List of therapists you can choose from!
         </h2>
-        <Card navigate={navigate} />
         <Card navigate={navigate} isAvatar />
+        <Card navigate={navigate} />
       </main>
     </div>
   );

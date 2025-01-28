@@ -140,6 +140,11 @@ const PassageResults = () => {
         formData.append('quick_assessment', "quick_assessment");
       }
       formData.append('emotion', JSON.stringify(obj));
+      console.log("FormData contents:");
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
 
       const response = await fetch(`${BaseURL}/${isExercise ? 'stammering_user_exercise' : 'add_assessment_stammering'}`, {
         method: 'POST',

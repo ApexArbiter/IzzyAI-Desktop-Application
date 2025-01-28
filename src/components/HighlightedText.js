@@ -1,6 +1,10 @@
 import React from 'react';
 
-const HighlightedText = ({ text, indexes }) => {
+const HighlightedText = ({ text = '', indexes }) => {
+    // Early return if text is null/undefined with a fallback
+    if (!text) {
+        return null; // or return some fallback UI
+    }
 
     return (
         <>
@@ -12,7 +16,7 @@ const HighlightedText = ({ text, indexes }) => {
                         style={{
                             textTransform: index === 0 ? 'uppercase' : 'lowercase',
                             color: isHighlighted ? 'red' : '#111920',
-                            fontFamily: 'Arial, sans-serif', // Replace with the appropriate font
+                            fontFamily: 'Arial, sans-serif',
                             fontSize: '18px',
                         }}>
                         {letter}

@@ -15,7 +15,7 @@ const VideoPlayer = ({ source, onEnd, onStart, videoHeight }) => {
           onEnd(); // Trigger onEnd callback
         }
       });
-      
+
       videoElement.addEventListener('play', () => {
         if (onStart) {
           onStart(); // Trigger onStart callback when video starts

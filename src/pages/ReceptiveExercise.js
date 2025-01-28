@@ -290,7 +290,7 @@ function ReceptiveExercise() {
 
   const navigateTo = () => {
     // Your custom navigation method (useNavigate)
-    history(`/result-expressive-language/${sessionId}`);
+    history(`/result-expressive-language/`);
   };
 
   const navigateBack = () => {

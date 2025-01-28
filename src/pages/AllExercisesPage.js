@@ -170,8 +170,8 @@ function AllExercisesPage() {
                 state: {
                     sessionId: data.SessionID,
                     SessiontypId: SessiontypId,
+                    isAll: true,
                 }
-
             });
         } else {
             console.error('Error:', sessionResponse.statusText);
@@ -197,7 +197,13 @@ function AllExercisesPage() {
 
         if (sessionResponse.ok) {
             const data = await sessionResponse.json();
-            navigate('/VoiceExercisePage', { sessionId: data?.SessionID });
+            navigate('/VoiceExercisePage', {
+                state: {
+                    sessionId: data.SessionID,
+                    SessiontypId: SessiontypId,
+                    isAll: true,
+                }
+            });
         } else {
             console.error('Error:', sessionResponse.statusText);
         }
@@ -232,9 +238,13 @@ function AllExercisesPage() {
 
             if (sessionResponse.ok) {
                 const data = await sessionResponse.json();
+                console.log("SessionId", data.SessionID)
                 navigate(isReceptive ? '/ReceptiveExercise' : '/ExpressiveExercise', {
-                    sessionId: data.SessionID,
-                    isAll: true,
+                    state: {
+                        sessionId: data.SessionID,
+                        SessiontypId: SessiontypId,
+                        isAll: true,
+                    }
                 });
             } else {
                 setLoading(false);

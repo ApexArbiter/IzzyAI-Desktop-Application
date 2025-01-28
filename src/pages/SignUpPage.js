@@ -144,7 +144,7 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <CustomHeader title="Sign Up" goBack={() => navigate(-1)} />
-      
+
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
           {/* Logo */}
@@ -232,7 +232,7 @@ const SignUpPage = () => {
             <p className="text-center text-gray-600">
               Already have an account?{' '}
               <button
-                onClick={() => navigate('/signInPage')}
+                onClick={() => navigate('/')}
                 className="text-blue-600 hover:text-blue-800 font-semibold transition-colors duration-300"
               >
                 Sign In

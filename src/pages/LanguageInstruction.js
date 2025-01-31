@@ -21,82 +21,67 @@ function LanguageInstructions() {
   };
 
   return (
-    <div style={styles.safe_area}>
-      <CustomHeader title="Expressive Language Disorder" goBack={navigateBack} />
-      <div style={styles.main_view}>
-        <div style={styles.scrollView}>
-          <img
-            style={styles.image}
-            src={require('../assets/images/mouth.png')} // Replace with a web-friendly import or path
-            alt="Mouth"
-          />
+   
+    <div className="flex flex-col min-h-screen">
+      <CustomHeader
+        title="Receptive Language Disorder"
+        goBack={() => history(-1)}
+      />
 
-          <h1 style={styles.heading}>Assessment Instructions</h1>
+      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg md:m-20 m-0">
+        {/* Image container */}
+        <div className="flex justify-center mb-12">
+          <div className="relative w-56 h-56 bg-teal-50 rounded-full flex items-center justify-center">
+            <img
+              src={require("../assets/images/mouth.png")}
+              alt="Mouth"
+              className="h-44 w-auto transform transition-transform hover:scale-105"
+            />
+          </div>
+        </div>
 
-          <div style={styles.text_row}>
-            <span style={styles.base}>{"\u2B24"}</span>
-            <p style={styles.base}>Speak out loud and clearly to answer each question.</p>
+        {/* Heading */}
+        <h2 className="text-xl font-bold   mt-12 font-serif text-gray-900">
+          Assessment Instructions
+        </h2>
+
+        {/* Instructions list - centered with max-width */}
+        <div className="space-y-4 h-[23vh] mt-6 max-w-md mx-auto w-full pl-4">
+          <div className="flex items-start gap-3 ">
+            <span className="text-teal-500 text-[20px] relative bottom-1 animate-pulse glow">•</span>
+            <p className="text-gray-900 font-serif">
+              Speak out loud and clearly to answer each question.
+            </p>
           </div>
 
-          <div style={styles.text_row}>
-            <span style={styles.base}>{"\u2B24"}</span>
-            <p style={styles.base}>Hit the “Record” button to record your voice.</p>
+          <div className="flex items-start gap-3 ">
+            <span className="text-teal-500 text-[20px] relative bottom-1 animate-pulse glow">•</span>
+            <p className="text-gray-900 font-serif">
+              Hit the “Record” button to record your voice.
+            </p>
           </div>
 
-          <div style={styles.text_row}>
-            <span style={styles.base}>{"\u2B24"}</span>
-            <p style={styles.base}>
+          <div className="flex items-start gap-3 ">
+            <span className="text-teal-500 text-[20px] relative bottom-1 animate-pulse glow">•</span>
+            <p className="text-gray-900 font-serif">
               IzzyAI will respond advising whether your answer is correct or incorrect.
             </p>
           </div>
         </div>
-        <CustomButton onPress={navigate} title="Start Now" />
-      </div>
+
+        {/* Start button - centered */}
+        <div className=" w-full max-w-xs flex justify-center">
+          <button
+            className="bg-black hover:bg-gray-800 text-white pl-16 pr-16 pt-2 pb-2 rounded-full"
+            onClick={navigate}
+          >
+            Start Now
+          </button>
+        </div>
+      </main>
     </div>
   );
 }
 
-const styles = {
-  safe_area: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px',
-    backgroundColor: '#F7F7F7',
-    minHeight: '100vh',
-  },
-  main_view: {
-    flex: 1,
-    width: '100%',
-    maxWidth: '800px',
-  },
-  scrollView: {
-    overflowY: 'auto',
-    maxHeight: 'calc(100vh - 120px)',
-  },
-  text_row: {
-    gap: '10px',
-    marginTop: '10px',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  base: {
-    fontFamily: fonts.regular,
-    color: '#111920',
-  },
-  heading: {
-    paddingTop: '50px',
-    fontSize: '24px',
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  image: {
-    marginTop: '40px',
-    display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-};
 
 export default LanguageInstructions;

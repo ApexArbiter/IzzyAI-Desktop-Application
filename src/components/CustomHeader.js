@@ -7,7 +7,7 @@ const CustomHeader = (props) => {
       <button onClick={() => props.goBack()} style={styles.iconButton}>
         <ArrowLeft />
       </button>
-      <span style={styles.text}>{props.title}</span>
+      <span className='font-semibold' style={styles.text}>{props.title}</span>
     </div>
   );
 };

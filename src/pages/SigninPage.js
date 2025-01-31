@@ -221,17 +221,27 @@ function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <CustomHeader title="Sign In" goBack={() => navigate(-1)} />
-      <button className='p-3 text-xl' onClick={() => { navigate("home") }} >Homepage</button>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 overflow-hidden">
+      {/* <CustomHeader title="Sign In" goBack={() => navigate(-1)} /> */}
+      {/* <button className='p-3 text-xl' onClick={() => { navigate("home") }} >Homepage</button> */}
       {/* <button className='p-3 text-xl' onClick={() => { navigate("allAssessmentPage") }} >All Assessments</button> */}
 
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4">
-        <img />
+      <div className="flex flex-col  items-center justify-center min-h-[calc(100vh-64px)] px-4">
+
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-center text-gray-900">Welcome Back</h1>
-            <p className="text-center text-gray-500">Please enter your details to sign in</p>
+            <h1 className="text-3xl font-bold text-center pb-4 text-gray-900">Sign In</h1>
+
+            <div
+              className="w-48 h-16 mx-auto mb-8"
+            >
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <p className="text-center pb-0 text-gray-500">Please enter your details to sign in</p>
           </div>
 
           {/* Form Container */}

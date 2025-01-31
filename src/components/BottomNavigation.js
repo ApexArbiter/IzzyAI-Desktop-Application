@@ -12,7 +12,7 @@ const getIcon = (name) => {
   switch (name) {
     case 'home':
       return HomeIcon;
-    case 'assessments':
+    case 'Assessments':
       return FileIcon;
     case 'therapists':
       return BrainIcon;
@@ -32,8 +32,8 @@ const BottomNavigation = () => {
 
   const routes = [
     { name: 'home', label: 'Home' },
-    { name: 'assessments', label: 'Assessments' },
-    { name: 'therapists', label: 'Therapists' },
+    { name: 'Assessments', label: 'Assessments' },
+    { name: 'therapistsPage', label: 'Therapists' },
     { name: 'profile', label: 'Profile' },
   ];
 
@@ -47,10 +47,10 @@ const BottomNavigation = () => {
       case 'home':
         navigate('/home');
         break;
-      case 'assessments':
+      case 'Assessments':
         navigate('/assessmentPage');
         break;
-      case 'therapists':
+      case 'therapistsPage':
         navigate('/therapistsPage');
         break;
       case 'profile':
@@ -78,6 +78,7 @@ const BottomNavigation = () => {
             >
               <Icon active={isFocused} />
               <span
+
                 style={{
                   ...styles.base,
                   color: isFocused ? '#111920' : '#888C90',

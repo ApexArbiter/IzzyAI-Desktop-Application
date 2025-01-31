@@ -67,7 +67,7 @@ const PlayButton = ({ onPress, disabled }) => (
 function ExpressiveAssessment() {
   const location = useLocation();
   const { sessionId, isAll } = location.state || {};
-  // console.log(location.state)
+  console.log(location.state)
   const navigate = useNavigate();
   const { setExpressiveReport } = useDataContext();
   const webcamRef = useRef(null);
@@ -82,7 +82,7 @@ function ExpressiveAssessment() {
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [questionResponse, setQuestionResponse] = useState('');
-  const [questionCount, setQuestionCount] = useState(0);
+  const [questionCount, setQuestionCount] = useState(1);
   const [recordingStatus, setRecordingStatus] = useState('idle');
   const [incorrectQuestions, setIncorrectQuestions] = useState([]);
   const [correctQuestions, setCorrectQuestions] = useState([]);
@@ -90,8 +90,8 @@ function ExpressiveAssessment() {
   const [disableRecordingButton, setDisableRecordingButton] = useState(false);
   const [correctExpressions, setCorrectExpressions] = useState([]);
   const [expressionsArray, setExpressionsArray] = useState([]);
-  const [isFinalEvaluation, setIsFinalEvaluation] = useState(false);
   const [questions, setQuestions] = useState([]);
+  const [isComplete, setIsComplete] = useState(false);
   // Add these new states at the start of your component
   const [answerCount, setAnswerCount] = useState(0);  // Tracks which part of the answer we're on
   const [recordCount, setRecordCount] = useState(0);  // Tracks number of attempts
@@ -141,7 +141,7 @@ function ExpressiveAssessment() {
     try {
       setIsLoading(true);
       console.log("isALL", isAll)
-      const response = !isAll ? await getExpressiveAllExerciseQuestions(userId, userDetail?.AvatarID) : await getExpressiveExerciseQuestions(userId, userDetail?.AvatarID)
+      const response = isAll ? await getExpressiveAllExerciseQuestions(userId, userDetail?.AvatarID) : await getExpressiveExerciseQuestions(userId, userDetail?.AvatarID)
       console.log(response)
       if (response) {
         console.log("Questions from response", response?.[questionCount - 1]?.question);
@@ -153,9 +153,7 @@ function ExpressiveAssessment() {
       setIsLoading(false);
     }
   };
-  Video Behavior Fix
-
-  // Replace the existing useEffect for video reset with this:
+  // Add this at the component level
   useEffect(() => {
     const resetAndPlayVideo = () => {
       if (videoRef.current) {
@@ -192,10 +190,10 @@ function ExpressiveAssessment() {
         incorrectQuestions,
         isExpressive: true,
         totalQuestions: questions?.length,
-        categorywiseReport,
+        isExercise: true, // Add this
         expressionsArray,
-        correctExpressions,
-        incorrectExpressions
+        incorrectExpressions,
+        correctExpressions
       }
     });
   };
@@ -357,7 +355,6 @@ function ExpressiveAssessment() {
     }
   };
 
-
   const getCurrentAnswer = () => {
     let answers = questions?.[questionCount - 1]?.answers?.split(";")
     return answers?.[answerCount]?.trim()
@@ -481,7 +478,9 @@ function ExpressiveAssessment() {
           </div>
           {/* Add this after the progress bar */}
           <div className="flex justify-between items-center mt-3">
-            <p className="text-sm font-medium text-slate-900">Attempt: {recordCount + 1}/3</p>
+            <p className="text-sm font-medium text-slate-900">
+              Attempt: {Math.min(recordCount + 1, 3)}/3
+            </p>
             <p className="text-sm font-medium text-slate-900">Answer Part: {answerCount + 1}</p>
           </div>
 
@@ -508,7 +507,7 @@ function ExpressiveAssessment() {
                 source={`${IMAGE_BASE_URL}/${questions?.[questionCount - 1]?.avatar_exercise?.split(",")?.[answerCount]?.trim()}`}
                 onEnd={() => {
                   setIsVideoEnd(true);
-                  if (!isDelay && recordCount < 3 && recordingStatus !== 'stop') {
+                  if (!isDelay && recordCount < 3) {
                     setDisableRecordingButton(false);
                   }
                 }}
@@ -576,7 +575,7 @@ function ExpressiveAssessment() {
             )}
 
             {/* Show navigation buttons only after 3 attempts or when evaluation is complete */}
-            {(
+            {((recordingStatus === 'stop' && recordCount >= 3) || recordCount >= 3) && (
               <div className="flex justify-between items-center mt-5 gap-3">
                 {questionCount !== 1 && (
                   <PrevButton

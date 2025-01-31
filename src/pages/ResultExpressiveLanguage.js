@@ -100,12 +100,17 @@ const ResultExpressiveLanguage = () => {
       formData.append('emotion', JSON.stringify(obj));
 
       console.log('Sending data:', Object.fromEntries(formData));
+      console.log(formData);
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
 
-      const response = await fetch(`${BaseURL}/receptive_expressive_user_exercise`, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Authorization': "Bearer " + token }///}
-      });
+
+      // const response = await fetch(`${BaseURL}/receptive_expressive_user_exercise`, {
+      //   method: 'POST',
+      //   body: formData,
+      //   headers: { 'Authorization': "Bearer " + token }///}
+      // });
       if (response.ok) {
 
       } else {
@@ -165,15 +170,24 @@ const ResultExpressiveLanguage = () => {
     console.log(response)
   };
 
-  updateSession();
+  // updateSession();
 
-  useEffect(() => {
-    if (isExercise) {
-      addExerciseResult()
+  // useEffect(() => {
+  //   if (isExercise) {
+  //     addExerciseResult()
+  //   } else {
+  //     addAssessmentResult();
+  //   }
+  // }, []);
+
+  const onPressBack = () => {
+    if (isQuick) {
+      navigate(-2);
     } else {
-      addAssessmentResult();
+      navigate('/home');
     }
-  }, []);
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -192,8 +206,8 @@ const ResultExpressiveLanguage = () => {
           </h1>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 h-1/2 w-1/2 mx-auto">
+          <div className="relative ">
             <svg className="transform -rotate-90" viewBox="0 0 100 100">
               <circle
                 cx="50"
@@ -317,7 +331,7 @@ const ResultExpressiveLanguage = () => {
 
         <div className="flex justify-center">
           <button
-            onClick={() => navigate(isQuick ? "/AvatarTherapistName" : "/home")}
+            onClick={onPressBack()}
             className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
           >
             Back to Home

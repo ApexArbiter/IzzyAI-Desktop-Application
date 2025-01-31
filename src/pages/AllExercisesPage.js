@@ -219,7 +219,7 @@ function AllExercisesPage() {
         }
         const checkAllAsses = await checkAllAssessment(userId, isReceptive ? 5 : 4);
 
-        if (checkAssess?.data || checkAllAsses?.data?.status) {
+        if (!checkAssess?.data || checkAllAsses?.data?.status) {
             const token = await getToken();
             setLoading(false);
             const formData = new FormData();

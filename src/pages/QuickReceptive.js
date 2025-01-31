@@ -7,6 +7,7 @@ import { IMAGE_BASE_URL } from '../components/ApiCreds';
 import LogoQuestionView from '../components/LogoQuestionView';
 import Loader from '../components/Loader';
 import { useDataContext } from '../contexts/DataContext';
+import CustomHeader from '../components/CustomHeader';
 
 // Button Components
 const EndButton = ({ onClick, title }) => (
@@ -52,6 +53,7 @@ function QuickReceptive() {
     const [correctQuestions, setCorrectQuestions] = useState([]);
     const [questions, setQuestions] = useState([]);
     const [currentImages, setCurrentImages] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     // Initialize start time
     useEffect(() => {
@@ -66,7 +68,7 @@ function QuickReceptive() {
     const fetchQuestionData = async () => {
         const userId = localStorage.getItem('userId');
         try {
-            setIsLoading(true);
+            setLoading(true)
             const response = await getQuickReceptiveQuestions(userId);
             if (response) {
                 setQuestions(response);
@@ -75,7 +77,7 @@ function QuickReceptive() {
         } catch (error) {
             console.error('Network request failed:', error);
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
@@ -176,21 +178,8 @@ function QuickReceptive() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <header className="bg-white shadow-sm p-4">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="p-2 hover:bg-gray-100 rounded-full"
-                        >
-                            <ArrowLeft className="w-6 h-6 text-gray-600" />
-                        </button>
-                        <h1 className="text-xl font-semibold">
-                            Quick Receptive Language Disorder Assessment
-                        </h1>
-                    </div>
-                </div>
-            </header>
+
+            <CustomHeader title=" Quick Receptive Language Disorder Assessment" goBack={() => navigate(-1)} />
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto p-5">
@@ -316,6 +305,7 @@ function QuickReceptive() {
                         )}
                     </div>
                 )}
+                <Loader loading={loading} />
             </main>
         </div>
     );

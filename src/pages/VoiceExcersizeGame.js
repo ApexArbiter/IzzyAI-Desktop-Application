@@ -24,7 +24,7 @@ const VoiceExerciseGame = () => {
       <div className="flex flex-col p-12 space-y-4">
         <button
           className="w-full h-20 flex items-center justify-center px-8 py-4 border border-[#0CC8E8] rounded-xl bg-white text-[#0CC8E8] text-lg font-bold cursor-pointer"
-          onClick={() => handleButtonClick(`https://game.izzyai.com/start_blow_game/${userId}/6`)}
+          onClick={() => handleButtonClick(`https://game.izzyai.com/start_blow_game_desktop/${userId}/6`)}
         >
           Start Blow Game
         </button>

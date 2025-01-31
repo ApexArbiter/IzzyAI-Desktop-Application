@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import CustomHeader from '../../components/CustomHeader';
 import { useNavigate } from 'react-router-dom';
 import TherapistImage from '../../assets/images/TherapistImage.png';
+import BottomNavigation from '../../components/BottomNavigation';
 
 function Card({ navigate, isAvatar }) {
   const handleClick = () => {
@@ -45,7 +46,14 @@ export default function TherapistsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <CustomHeader title="Articulation Disorder" goBack={() => navigate("/home")} />
+      <CustomHeader goBack={() => navigate("/home")} />
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+        <img
+          src={require("../../assets/images/logo.png")}
+          alt="Logo"
+          className="w-48 h-16 object-contain"
+        />
+      </div>
       <main className="p-5">
         <h2 className="text-2xl font-medium text-[#111920] my-5">
           List of therapists you can choose from!
@@ -53,6 +61,7 @@ export default function TherapistsPage() {
         <Card navigate={navigate} isAvatar />
         <Card navigate={navigate} />
       </main>
+      <BottomNavigation />
     </div>
   );
 }

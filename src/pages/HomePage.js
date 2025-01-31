@@ -13,9 +13,11 @@ const HomePage = () => {
   const { updateUserDetail } = useDataContext();
   const history = useNavigate();
   const [userDetail, setUserDetail] = useState(null);
+  const userDetails = JSON.parse(localStorage.getItem('userDetails'));
 
   useEffect(() => {
     try {
+
       const storedUserDetail = localStorage.getItem("userDetails");
       if (storedUserDetail) {
         setUserDetail(JSON.parse(storedUserDetail));
@@ -114,7 +116,7 @@ const HomePage = () => {
           className="flex items-center space-x-4 mb-8"
         >
           <img
-            src={userDetail?.avatarUrl || avatarUrlNew}
+            src={userDetails.avatarUrl || avatarUrlNew}
             alt="Avatar"
             className="h-14 w-14 rounded-full bg-yellow-100 object-cover"
           />

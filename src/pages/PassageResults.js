@@ -45,14 +45,14 @@ const CircularProgress = ({ percentage, size = "lg" }) => {
           cx="50%"
           cy="50%"
           r={radius}
-          className="stroke-gray-200 fill-none"
+          className="stroke-green-400 fill-none"
           strokeWidth="8"
         />
         <circle
           cx="50%"
           cy="50%"
           r={radius}
-          className={`${percentage >= 70 ? 'stroke-green-500' : 'stroke-red-500'} fill-none`}
+          className={`stroke-red-500 fill-none`}
           strokeWidth="8"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
@@ -224,17 +224,24 @@ const PassageResults = () => {
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-bold">Passage Assessment Results</h1>
+          <h1 className="text-2xl font-bold">{isQuick ? "Quick Stamering Assessment Result Report" :
+            isExercise ? "Stammering Exercise Result Report" :
+              "Stammering Assessment Result Report"}</h1>
         </motion.div>
 
         <div className={`${expressionsArray ? 'grid md:grid-cols-2 gap-6' : 'flex justify-center w-100'} `}>
           {/* Stuttering Score */}
           <Card className={`${expressionsArray ? '' : "w-full text-center"} `}>
             <CardHeader>
-              <CardTitle>Fluency Score</CardTitle>
+              <div className='flex justify-around' >
+                {/* <CardTitle>Fluency Score</CardTitle> */}
+                {!isQuick && (<CardTitle>Expressions</CardTitle>)}
+
+              </div>
             </CardHeader>
-            <div className="flex justify-center p-6">
-              <CircularProgress percentage={noStutteringPercentage} />
+            <div className="flex justify-around p-6">
+              <CircularProgress percentage={stutteringPercentage} />
+              {!isQuick && (<CircularProgress percentage={expressionpercentage} />)}
             </div>
           </Card>
 
@@ -272,11 +279,11 @@ const PassageResults = () => {
 
         {/* Detailed Analysis */}
         <Card className="mt-6">
-          <CardHeader>
+          {/* <CardHeader>
             <CardTitle>Detailed Analysis</CardTitle>
-          </CardHeader>
+          </CardHeader> */}
           <CardContent>
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <div>
                 <h3 className="font-semibold mb-2">Stuttering Analysis</h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -294,7 +301,67 @@ const PassageResults = () => {
                   </div>
                 </div>
               </div>
+            </div> */}
+
+            {!isQuick && (
+              <>
+                <div className="mb-8">
+                  <p className="text-lg font-medium mb-4">
+                    Facial Expressions: {expressionsArray?.join(", ")}
+                  </p>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Correct Facial Expressions</h3>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-green-500 h-2 rounded-full"
+                          style={{ width: `${correctexpressionPercentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm mt-1">{correctexpressionPercentage.toFixed(1)}%</span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Incorrect Facial Expressions</h3>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-red-500 h-2 rounded-full"
+                          style={{ width: `${expressionpercentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm mt-1">{expressionpercentage.toFixed(1)}%</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+
+            <div className="space-y-6 mb-8">
+              <div>
+                <h3 className="text-lg font-medium mb-2">No Stuttering</h3>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-green-500 h-2 rounded-full"
+                    style={{ width: `${noStutteringPercentage.toFixed(1)}%` }}
+                  />
+                </div>
+                <span className="text-sm mt-1">{noStutteringPercentage.toFixed(1)}%</span>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-2">Stuttering</h3>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-red-500 h-2 rounded-full"
+                    style={{ width: `${stutteringPercentage.toFixed(1)}%` }}
+                  />
+                </div>
+                <span className="text-sm mt-1">{stutteringPercentage.toFixed(1)}%</span>
+              </div>
             </div>
+
           </CardContent>
         </Card>
 

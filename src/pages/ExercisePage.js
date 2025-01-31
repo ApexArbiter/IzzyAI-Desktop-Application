@@ -28,7 +28,7 @@ const DarkButton = ({ isLock, onClick, title }) => {
 };
 const ExerciseCard = ({ title, subtitle, onStart }) => {
   return (
-    <div className="border border-blue-200 rounded-2xl p-4 flex items-center mt-8">
+    <div className=" border border-[#0CC8E8] rounded-2xl p-4 flex flex-row items-center mt-8">
       <div className="flex-1 mr-3">
         <h2 className="text-gray-900 text-xl font-medium">
           {title}
@@ -53,12 +53,13 @@ function ExercisePage() {
   const [receptiveQuestions, setReceptiveQuestions] = useState([]);
   const [expressiveQuestions, setExpressiveQuestions] = useState([]);
 
-  const User = () => localStorage.getItem("userId");
+
   const report = () => localStorage.getItem("questionReport");
-  const userDetails = () => JSON.parse(localStorage.getItem("userDetails"));
-  const userId = User();
+  const userDetail = JSON.parse(localStorage.getItem("userDetails"));
+  const userId = localStorage.getItem("userId")
   const questionReport = JSON.parse(JSON.parse(report()));
-  const userDetail = userDetails();
+  console.log(userId, userDetail)
+
 
 
 
@@ -67,7 +68,7 @@ function ExercisePage() {
       try {
         // Retrieve user details and userId from localStorage
 
-        const storedUserId = User();
+
         // This is synchronous, no need for await
         // console.log("UserDetails", storedUserDetail);
         // console.log("storedUserId", storedUserId);
@@ -87,9 +88,9 @@ function ExercisePage() {
   const fetchReport = async () => {
     const token = await getToken();
     console.log("Token", token)
-    const userId = User();
+
     try {
-      const response = await fetch(`http://154.38.160.197:5000/get_Exercise_word_count/353/1/`, {
+      const response = await fetch(`http://154.38.160.197:5000/get_Exercise_word_count/${userId}/${userDetail.AvatarID}/`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token,
@@ -123,9 +124,6 @@ function ExercisePage() {
 
 
   const getReceptiveQuestions = async () => {
-    const userDetail = await JSON.parse(localStorage.getItem("userDetails"));
-    console.log(userDetail?.AvatarID);
-    console.log(questionReport)
     if ((questionReport?.receptiveYes || questionReport?.receptiveNo) && ((questionReport?.receptiveYes < questionReport?.receptiveNo) || !questionReport?.receptiveYes)) {
       const data = await getReceptiveExerciseQuestions(userId, userDetail?.AvatarID);
       setReceptiveQuestions(data);
@@ -134,7 +132,6 @@ function ExercisePage() {
 
   const getExpressiveData = async () => {
 
-    console.log(userDetail.AvatarID);
 
     const data = await getExpressiveExerciseQuestions(userId, userDetail.AvatarID);
     setExpressiveQuestions(data);
@@ -152,7 +149,6 @@ function ExercisePage() {
       const checkAssess = await checkArticulationAssessment(userId);
       if (checkAssess?.data) {
         const token = await getToken();
-        const userId = User();
         const response = resetArticSession(userId, 1);
         const formData = new FormData();
         formData.append('UserID', userId);
@@ -189,7 +185,7 @@ function ExercisePage() {
 
   const handleButtonClickStammering = async () => {
     const token = await getToken();
-    const userId = User();
+
     const formData = new FormData();
     formData.append('UserID', userId);
     formData.append('SessionTypeID', 2);
@@ -216,7 +212,6 @@ function ExercisePage() {
 
   const handleButtonClickVoice = async () => {
     const token = await getToken();
-    const userId = User();
     setLoading(true);
     const formData = new FormData();
     formData.append('UserID', userId);
@@ -289,10 +284,10 @@ function ExercisePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <CustomHeader title="Exercises" goBack={() => history(-1)} />
+      <CustomHeader title="Exercises" goBack={() => history("/home")} />
 
       {/* Main Content */}
-      <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="w-full px-6   py-6">
         <div className="space-y-6">
           {/* Articulation Disorder Card */}
           {(questionReport?.articulationYes || questionReport?.articulationYes) &&
@@ -350,7 +345,7 @@ function ExercisePage() {
               <ExerciseCard
                 title="Games"
                 subtitle="5 Games"
-                onStart={() => navigate('/voiceExerciseGame')}
+                onStart={() => history('/voiceExerciseGame')}
               />
             )}
         </div>

@@ -119,7 +119,7 @@ function AllAssessmentPage() {
         ].map((item, index) => (
           <div
             key={index}
-            className="border border-blue-500 rounded-xl p-5 flex items-center mt-8"
+            className="border border-[#0CC8E8] rounded-2xl p-4 flex flex-row items-center mt-8"
           >
             <div>
               <h2 className="text-lg font-semibold">{item.title}</h2>

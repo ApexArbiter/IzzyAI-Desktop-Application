@@ -57,6 +57,9 @@ import QuickVoice from './pages/QuickVoice';
 import AvatarTherapistName from './pages/AvatarTharapistPage';
 import Settings from './pages/Settings';
 import UpdateAvatar from './pages/UpdateAvatar';
+import ChangePassword from './pages/ChangePassword';
+import BioDataPage from './pages/BioDataPage';
+import AboutUs from './pages/AboutUs';
 
 function App() {
   return (
@@ -121,6 +124,9 @@ function App() {
           <Route path="/conversationalAvatar" element={<AvatarTherapistName />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/UpdateAvatar" element={<UpdateAvatar />} />
+          <Route path="/ChangePassword" element={<ChangePassword />} />
+          <Route path="/BioData" element={<BioDataPage />} />
+          <Route path="/aboutUs" element={<AboutUs />} />
 
 
         </Routes>

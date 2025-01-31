@@ -52,6 +52,7 @@ const PassagePage = () => {
   const [detectionCount, setDetectionCount] = useState(0);
   const [stutter, setStutter] = useState({});
   const [startTime, setStartTime] = useState(null);
+  const [isStopButtonDisabled, setIsStopButtonDisabled] = useState(false);
 
   const chunks = useRef([]);
   const webcamRef = useRef(null);
@@ -75,6 +76,7 @@ const PassagePage = () => {
   // Fetch avatar video URL
   const getAvatar = async () => {
     try {
+      setLoading(true)
       const userDetail = JSON.parse(storedUserDetail);
       const response = await getStammeringAvatar(userDetail?.AvatarID);
       const video = response?.find(item => item?.avatar_name === 'passsage_2');
@@ -82,6 +84,9 @@ const PassagePage = () => {
       setVideoUrl(video?.path);
     } catch (error) {
       console.error('Error fetching avatar:', error);
+    } finally {
+
+      setLoading(false)
     }
   };
 
@@ -295,6 +300,7 @@ const PassagePage = () => {
   const onStartRecord = () => {
     setStatus('recording');
     setIsVideoEnd(false);
+    setIsStopButtonDisabled(true);
 
     // Clear previous chunks
     chunks.current = [];
@@ -307,6 +313,9 @@ const PassagePage = () => {
       setTimeout(() => takeSnapshot('initial'), 1000);
       setTimeout(() => takeSnapshot('middle'), 3000);
       setTimeout(() => takeSnapshot('last'), 5000);
+      setTimeout(() => {
+        setIsStopButtonDisabled(false);
+      }, 5000);
     }
   };
 
@@ -475,39 +484,13 @@ const PassagePage = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50"
+      className="min-h-screen  bg-gray-50"
     >
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <button
-                onClick={navigateBack}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-              <h1 className="ml-4 text-xl font-semibold">Stammering Assessment</h1>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CustomHeader title="Stammering Assessment" goBack={navigateBack} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 h-[calc(100vh-64px)]">
         {/* Instructions */}
         <motion.p
           initial={{ y: -20, opacity: 0 }}
@@ -518,14 +501,14 @@ const PassagePage = () => {
         </motion.p>
 
         {/* Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 h-[40vh]">
           {/* Left Column: Passage */}
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden h-full"
           >
-            <div className="p-6">
+            <div className="p-6 h-full overflow-y-auto">
               <h2 className="text-xl font-semibold mb-4">Read this Paragraph:</h2>
               <div className="prose max-w-none">
                 <p className="text-lg leading-relaxed text-gray-700">
@@ -650,6 +633,7 @@ const PassagePage = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              disabled={isStopButtonDisabled}
               onClick={onStopRecord}
               className="bg-blue-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-blue-600 transition-colors"
             >

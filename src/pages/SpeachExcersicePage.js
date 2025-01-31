@@ -11,6 +11,7 @@ import Loader from '../components/Loader';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import html2canvas from 'html2canvas';
 import { ArrowLeft } from 'lucide-react';
+import LogoQuestionView from '../components/LogoQuestionView';
 const RecordButton = (props) => {
   return (
     <button
@@ -95,7 +96,8 @@ const SpeechArticulationPage = () => {
   const [audioBlobMain, setAudioBlobMain] = useState('');
   const [voiceResult, setVoiceResult] = useState('');
   const [lipUrl, setLipUrl] = useState('');
-
+  const [loading, setLoading] = useState(false);
+  const [isStopButtonDisabled, setIsStopButtonDisabled] = useState(false);
   // Ref for camera
   const mediaRecorderRef = useRef(null); // Ref for the MediaRecorder API
   const audioChunksRef = useRef([]);
@@ -104,6 +106,7 @@ const SpeechArticulationPage = () => {
   useEffect(() => {
     const fetchData = () => {
       try {
+        setLoading(true)
         // Retrieve user details and userId from localStorage
         const storedUserDetail = localStorage.getItem("userDetails");
         const storedUserId = User(); // This is synchronous, no need for await
@@ -118,6 +121,8 @@ const SpeechArticulationPage = () => {
         }
       } catch (error) {
         console.error("Error retrieving or parsing userDetails from localStorage", error);
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -141,7 +146,8 @@ const SpeechArticulationPage = () => {
     recordingStatus,
     setQuestionCount,
     setQuestionResponse,
-    setRecordingStatus
+    setRecordingStatus,
+    setIncorrectQuestions
   } = dynamicfunctions({})
 
   const webcamRef = useRef(null);
@@ -149,19 +155,29 @@ const SpeechArticulationPage = () => {
   const navigate = useNavigate();
 
   const percentageCompleted = (questionCount / 44) * 100;
+  useEffect(() => {
+    const currentStartTime = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace('T', ' ');
+    setStartTime(currentStartTime);
+  }, []);
 
 
 
   // Update the navigateTo function in SpeechArticulationPage
   const navigateTo = () => {
     const navigationState = {
-      sessionId,
-      isAll,
-      correctAnswers: correctAnswersCount || 0,
-      incorrectAnswers: incorrectQuestions?.length || 0,
-      expressionsArray: expressionsArray || [],
-      incorrectExpressions: incorrectExpressions || [],
-      correctExpressions: correctExpressions || [],
+      SessiontypId: 2,
+      sessionId: sessionId,
+      startTime: startTime,
+      correctAnswers: correctAnswersCount,
+      incorrectAnswers: incorrectQuestions.length,
+      incorrectQuestions: incorrectQuestions,
+      expressionsArray,
+      incorrectExpressions,
+      correctExpressions,
+      totalQuestions: 30,
       isQuick: false
     };
 
@@ -178,10 +194,12 @@ const SpeechArticulationPage = () => {
   const fetchQuestionData = async (id) => {
     const token = await getToken();
     const userDetail = JSON.parse(storedUserDetail());
+    setLoading(true)
     try {
+
       console.log("userId:", id, ",AvatarID:", userDetail?.AvatarID)
       if (questionCount <= 44) {
-        const response = await fetch(`http://154.38.160.197:5000//get_word_texts/353/1/`, {
+        const response = await fetch(`${BaseURL}/${isAll ? "articulation_show_full_exercise" : "get_word_texts"}/${12}/1/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         let data = await response.json();
@@ -199,6 +217,8 @@ const SpeechArticulationPage = () => {
       }
     } catch (error) {
       console.error('Network request failed:', error);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -213,6 +233,10 @@ const SpeechArticulationPage = () => {
   const onStartRecord = async () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
+        setIsStopButtonDisabled(true)
+        setTimeout(() => {
+          setIsStopButtonDisabled(false);
+        }, 2000);
         // Start audio recording
         const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorderRef.current = new MediaRecorder(audioStream);
@@ -223,6 +247,7 @@ const SpeechArticulationPage = () => {
         };
 
         mediaRecorderRef.current.onstop = async () => {
+          setLoading(true)
           const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
           setAudioBlobMain(audioBlob); // Set the audio blob in state
           console.log("audio Blob state", audioBlobMain)
@@ -234,6 +259,8 @@ const SpeechArticulationPage = () => {
           // sendAudio(audioBlob); // Pass the audio blob directly
           const expression = await checkExpression();
           const result = await sendAudio(audioBlob);
+          console.log("expressions", expression)
+          console.log("result of Speech", result)
 
           if (!result) {
             setVoiceResult("Failed to process speech");
@@ -246,10 +273,13 @@ const SpeechArticulationPage = () => {
 
           if (result.message?.toLowerCase() === 'matched' || tries >= 4) {
             setRecordingStatus('stop');
-            if (tries > 4) {
+            if (tries >= 4) {
 
+
+              onWrongAnswer(questionData, questionData?.WordText);
               setVoiceResult("UnMatched");
             } else {
+              onCorrectAnswer(questionData?.WordText);
 
               setVoiceResult("Matched");
             }
@@ -258,6 +288,7 @@ const SpeechArticulationPage = () => {
             setTries(prev => prev + 1);
             setRecordingStatus('idle');
           }
+          setLoading(false)
         };
 
         mediaRecorderRef.current.start();
@@ -522,43 +553,12 @@ const SpeechArticulationPage = () => {
   }, [videoUrl]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-5">
+    <div className="bg-gray-100 mb-0 overflow-hidden min-h-screen">
+      <CustomHeader title="Articulation Disorder Exercise" goBack={navigateBack} />
+
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Header */}
-          <div className="bg-gray-800 text-white p-4 flex items-center">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-700 rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="text-xl font-semibold ml-3">Articulation</h1>
-            // Update the button click handler
-            <button
-              onClick={() => {
-                const navigationState = {
-                  sessionId,
-                  isAll,
-                  correctAnswers: correctAnswersCount || 0,
-                  incorrectAnswers: incorrectQuestions?.length || 0,
-                  expressionsArray: expressionsArray || [],
-                  incorrectExpressions: incorrectExpressions || [],
-                  correctExpressions: correctExpressions || [],
-                  isQuick: false
-                };
-
-                navigate('/resultReport', {
-                  state: navigationState,
-                  replace: true
-                });
-              }}
-            >
-              result page
-            </button>
-          </div>
-
-          <main className="p-6">
+        <div className="mb-0 overflow-hidden">
+          <main className="">
             {/* Instructions */}
             <motion.p
               initial={{ opacity: 0, y: 10 }}
@@ -569,17 +569,17 @@ const SpeechArticulationPage = () => {
             </motion.p>
 
             {/* Question Counter */}
-            <p className="text-center mb-4">
-              Question <span className="font-bold">{questionCount}</span> out of <span className="font-bold">44</span>
+            <p className="text-left ml-0 mb-4">
+              Question <span className="font-bold">{questionCount}</span> out of <span className="font-bold">271</span>
             </p>
 
             {/* Progress Bar */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-orange-200 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${percentageCompleted}%` }}
-                  className="h-full bg-green-500"
+                  className="h-full bg-orange-500"
                   transition={{ duration: 0.5 }}
                 />
               </div>
@@ -595,156 +595,174 @@ const SpeechArticulationPage = () => {
                 animate={{ scale: 1 }}
                 className="flex justify-center mb-6"
               >
-                <div className='flex gap-4'>
+                <div className="flex gap-4">
                   <img
-                    className="w-48 h-48 rounded-xl shadow-lg object-cover"
+                    className="w-48 h-48 border-sky-400 border rounded-xl shadow-lg object-cover"
                     src={`${IMAGE_BASE_URL}${questionData.PictureUrl}`}
                     alt="Question"
                   />
                   <video
                     key={`${videoUrl}-${tries}`}
-                    className="w-48 h-48 rounded-xl shadow-lg object-cover"
+                    className="rounded-xl shadow-lg object-cover"
                     autoPlay
-                    controls
-
+                    width={192}
+                    height={192}
                     playsInline
                   >
                     <source src={`${IMAGE_BASE_URL}${videoUrl}`} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
-
                 </div>
               </motion.div>
             )}
 
+            <div className="flex justify-center items-center">
+              <div className="w-48">
+                {/* Question Text */}
+                {/* <div className="flex justify-start">
+                  <p className="text-xl font-bold">
+                    Say this: {questionData?.WordText}
+                  </p>
+                </div> */}
+                <div className='flex justify-start' >
+                  <LogoQuestionView
+                    first_text={"Say this..."}
+                    second_text={questionData && questionData.WordText}
+                    highlighted={questionData && questionData?.code_color?.[0]
+                      ? JSON.parse(questionData?.code_color?.[0])
+                      : []}
+                  />
+                </div>
+              </div>
 
-
-
-            {/* Question Text */}
-            <p className="text-xl font-bold text-center mb-8">
-              Say this: {questionData?.WordText}
-            </p>
-
-            {/* Loading State */}
-            <Loader loading={recordingStatus === 'loading'} />
-
-            {/* Expression Text */}
-            {/* {recordingStatus === 'stop' && expression && ( */}
-            {expression && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-lg text-red-500 text-center mb-6"
-              >
-                Facial Expression: {expression}
-              </motion.p>
-            )}
-            {voiceResult && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-lg text-red-500 text-center mb-6"
-              >
-                Voice Result: {voiceResult}
-              </motion.p>
-            )}
-
-            {/* Camera View */}
-            <div ref={cameraContainerRef} className="mb-8">
-              <div className="rounded-2xl overflow-hidden shadow-lg mx-auto max-w-md">
-                <Webcam
-                  audio={false}
-                  ref={cameraRef}
-                  screenshotFormat="image/jpeg"
-                  videoConstraints={{
-                    facingMode: "user",
-                    width: 300,
-                    height: 300,
-                  }}
-                  className="w-full"
-                />
+              {/* Expression and Voice Result */}
+              <div className="flex flex-col gap-2 justify-center items-center p-3 w-56 h-20">
+                {voiceResult && (
+                  <LogoQuestionView
+                    second_text={null}
+                    first_text={voiceResult} questionResponse={voiceResult} />
+                )}
+                {expression && (
+                  <p className="text-left">
+                    Facial Expression: {expression}
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Recording Controls */}
-            {recordingStatus === 'idle' && tries <= 4 && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onStartRecord}
-                className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-4 font-semibold transition-colors mb-6"
-              >
-                Start Recording (Try {tries}/4)
-              </motion.button>
-            )}
+            <div className="flex flex-row justify-center gap-7 items-center mt-7">
+              {/* Camera View */}
+              <div ref={cameraContainerRef} className="">
+                <div className="rounded-2xl overflow-hidden flex justify-center align-items-center">
+                  <Webcam
+                    audio={false}
+                    ref={cameraRef}
+                    screenshotFormat="image/jpeg"
+                    videoConstraints={{
+                      facingMode: "user",
+                      width: 220,
+                      height: 220,
+                    }}
+                    className="rounded-2xl shadow-lg"
+                  />
+                </div>
+              </div>
 
+              <div className="w-56">
+                {/* Recording Controls */}
+                <div className="flex justify-center items-center">
+                  {recordingStatus === 'idle' && tries <= 4 && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={onStartRecord}
+                      className="flex items-center justify-center bg-black text-white rounded-full py-2 px-4 font-semibold transition-colors mb-6"
+                    >
+                      <i className="fas fa-record-vinyl text-xl mr-2"></i>
+                      Start Recording
+                    </motion.button>
+                    // <motion.button
+                    //   whileHover={{ scale: 1.02 }}
+                    //   whileTap={{ scale: 0.98 }}
+                    //   onClick={onStartRecord}
+                    //   className="flex items-center justify-center bg-black text-white rounded-full py-2 px-4 font-semibold transition-colors mb-6"
+                    // >
+                    //   <i className="fas fa-record-vinyl text-xl mr-2"></i>
+                    //   Start Recording (Try {tries}/4)
+                    // </motion.button>
+                  )}
 
+                  {recordingStatus === 'recording' && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={onStopRecord}
+                      disabled={isStopButtonDisabled}
+                      className="flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 px-4 font-semibold transition-colors mb-6"
+                    >
+                      <i className="fas fa-stop text-xl mr-2"></i>
+                      Stop Recording
+                    </motion.button>
+                  )}
+                </div>
 
-
-
-            {recordingStatus === 'recording' && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onStopRecord}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-full py-4 font-semibold transition-colors mb-6"
-              >
-                Stop Recording
-              </motion.button>
-            )}
-
-            {/* Navigation Buttons */}
-            {recordingStatus === 'stop' && (
-              <div className="space-y-4">
-                {questionCount < 44 && (
-                  <div className="flex gap-4">
-                    {questionCount !== 1 && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          setRecordingStatus('idle');
-                          setExpression(null);
-                          setQuestionResponse('');
-                          if (questionCount >= 1) {
-                            setQuestionCount(prevCount => prevCount - 1);
-                          }
-                        }}
-                        className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-3 font-semibold transition-colors"
-                      >
-                        Previous
-                      </motion.button>
+                {/* Navigation Buttons */}
+                {recordingStatus === 'stop' && (
+                  <div className="space-y-4">
+                    {questionCount < 271 && (
+                      <div className="flex gap-4">
+                        {questionCount !== 1 && (
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              setRecordingStatus('idle');
+                              setExpression(null);
+                              setQuestionResponse('');
+                              if (questionCount >= 1) {
+                                setQuestionCount(prevCount => prevCount - 1);
+                              }
+                            }}
+                            className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                          >
+                            <i className="fas fa-arrow-left mr-2 text-lg"></i>
+                            Previous
+                          </motion.button>
+                        )}
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            setRecordingStatus('idle');
+                            setExpression(null);
+                            setQuestionResponse('');
+                            setTries(1);
+                            if (questionCount <= 271) {
+                              setQuestionCount(prevCount => prevCount + 1);
+                            } else {
+                              endAssessment();
+                            }
+                          }}
+                          className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                        >
+                          Next
+                        </motion.button>
+                      </div>
                     )}
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setRecordingStatus('idle');
-                        setExpression(null);
-                        setQuestionResponse('');
-                        setTries(1); // Reset tries when moving to the next question
-                        if (questionCount <= 44) {
-                          setQuestionCount(prevCount => prevCount + 1);
-                        } else {
-                          endAssessment();
-                        }
-                      }}
-                      className="flex-1 bg-green-400 hover:bg-green-500 text-gray-900 rounded-full py-3 font-semibold transition-colors"
+                      onClick={() => endAssessment()}
+                      className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
                     >
-                      Next
+                      {questionCount < 271 ? 'End Now' : 'Finish'}
                     </motion.button>
                   </div>
                 )}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => endAssessment()}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-3 font-semibold transition-colors"
-                >
-                  {questionCount < 44 ? 'End Now' : 'Finish'}
-                </motion.button>
+
+                <Loader loading={loading} />
               </div>
-            )}
+            </div>
           </main>
         </div>
       </div>

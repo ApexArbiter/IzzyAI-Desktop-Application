@@ -7,6 +7,7 @@ import Loader from '../components/Loader';
 import DocumentIcon from '../assets/DocumentIcon'; // Assuming it's an SVG or Image
 import { COLORS, fonts } from '../theme'; // Define your colors and fonts
 import CustomHeader from '../components/CustomHeader';
+import BottomNavigation from '../components/BottomNavigation';
 
 const DarkButton = ({ isLock, onClick, title }) => {
   return (
@@ -52,7 +53,7 @@ const AssessmentPage = () => {
         console.error("Error retrieving or parsing data from localStorage:", error);
       }
     };
-    
+
     fetchData();
   }, []); // Empty dependency array ensures this runs only once when the component mounts
 
@@ -194,96 +195,97 @@ const AssessmentPage = () => {
 
   return (
     <div style={styles.safeArea}>
-    <CustomHeader title="Assessments" goBack={() => history(-1)} />
-    <div style={styles.mainView}>
-      <div style={styles.scrollContainer}>
-    {console.log("questionReport set:", questionReport)}
-        {/* Articulation Disorder */}
-        {questionReport && questionReport.articulationYes > 0 && 
-          (questionReport.articulationYes > (questionReport.articulationNo || 0)) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Articulation Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>44 Words</span>
+      <CustomHeader title="Assessments" goBack={() => history(-1)} />
+      <div style={styles.mainView}>
+        <div style={styles.scrollContainer} className='overflow-hidden'>
+          {console.log("questionReport set:", questionReport)}
+          {/* Articulation Disorder */}
+          {questionReport && questionReport.articulationYes > 0 &&
+            (questionReport.articulationYes > (questionReport.articulationNo || 0)) && (
+              <div style={styles.cardContainer}>
+                <div style={styles.textView}>
+                  <h3 style={styles.heading}>Articulation Disorder</h3>
+                  <div style={styles.textRow}>
+                    <DocumentIcon />
+                    <span style={styles.para}>44 Words</span>
+                  </div>
+                </div>
+                <DarkButton onClick={handleButtonClick} title="Start" />
               </div>
-            </div>
-            <DarkButton onClick={handleButtonClick} title="Start" />
-          </div>
-        )}
+            )}
 
-        {/* Stammering */}
-        {questionReport && questionReport.stammeringYes > 0 && 
-          (questionReport.stammeringYes > (questionReport.stammeringNo || 0)) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Stammering</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>2 Passages</span>
+          {/* Stammering */}
+          {questionReport && questionReport.stammeringYes > 0 &&
+            (questionReport.stammeringYes > (questionReport.stammeringNo || 0)) && (
+              <div style={styles.cardContainer}>
+                <div style={styles.textView}>
+                  <h3 style={styles.heading}>Stammering</h3>
+                  <div style={styles.textRow}>
+                    <DocumentIcon />
+                    <span style={styles.para}>2 Passages</span>
+                  </div>
+                </div>
+                <DarkButton onClick={handleButtonClickStammering} title="Start" />
               </div>
-            </div>
-            <DarkButton onClick={handleButtonClickStammering} title="Start" />
-          </div>
-        )}
+            )}
 
-        {/* Voice Disorder */}
-        {questionReport && questionReport.voiceYes > 0 && 
-          (questionReport.voiceYes > (questionReport.voiceNo || 0)) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Voice Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>3 Sounds</span>
+          {/* Voice Disorder */}
+          {questionReport && questionReport.voiceYes > 0 &&
+            (questionReport.voiceYes > (questionReport.voiceNo || 0)) && (
+              <div style={styles.cardContainer}>
+                <div style={styles.textView}>
+                  <h3 style={styles.heading}>Voice Disorder</h3>
+                  <div style={styles.textRow}>
+                    <DocumentIcon />
+                    <span style={styles.para}>3 Sounds</span>
+                  </div>
+                </div>
+                <DarkButton onClick={handleButtonClickVoice} title="Start" />
               </div>
-            </div>
-            <DarkButton onClick={handleButtonClickVoice} title="Start" />
-          </div>
-        )}
+            )}
 
-        {/* Receptive Language Disorder */}
-        {questionReport && questionReport.receptiveNo > 0 && 
-          (questionReport.receptiveNo > (questionReport.receptiveYes || 0)) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Receptive Language Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>20 Questions</span>
+          {/* Receptive Language Disorder */}
+          {questionReport && questionReport.receptiveNo > 0 &&
+            (questionReport.receptiveNo > (questionReport.receptiveYes || 0)) && (
+              <div style={styles.cardContainer}>
+                <div style={styles.textView}>
+                  <h3 style={styles.heading}>Receptive Language Disorder</h3>
+                  <div style={styles.textRow}>
+                    <DocumentIcon />
+                    <span style={styles.para}>20 Questions</span>
+                  </div>
+                </div>
+                <DarkButton onClick={() => handleButtonLanguage(true)} title="Start" />
               </div>
-            </div>
-            <DarkButton onClick={() => handleButtonLanguage(true)} title="Start" />
-          </div>
-        )}
+            )}
 
-        {/* Expressive Language Disorder */}
-        {questionReport && questionReport.expressiveNo > 0 && 
-          (questionReport.expressiveNo > (questionReport.expressiveYes || 0)) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Expressive Language Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>18 Questions</span>
+          {/* Expressive Language Disorder */}
+          {questionReport && questionReport.expressiveNo > 0 &&
+            (questionReport.expressiveNo > (questionReport.expressiveYes || 0)) && (
+              <div style={styles.cardContainer}>
+                <div style={styles.textView}>
+                  <h3 style={styles.heading}>Expressive Language Disorder</h3>
+                  <div style={styles.textRow}>
+                    <DocumentIcon />
+                    <span style={styles.para}>18 Questions</span>
+                  </div>
+                </div>
+                <DarkButton onClick={() => handleButtonLanguage(false)} title="Start" />
               </div>
-            </div>
-            <DarkButton onClick={() => handleButtonLanguage(false)} title="Start" />
-          </div>
-        )}
+            )}
 
-        {loading && <Loader loading={loading} />}
-        <div style={{ height: 20 }} />
+          {loading && <Loader loading={loading} />}
+          <div style={{ height: 20 }} />
+        </div>
+        <button
+          style={styles.bottomButton}
+          onClick={() => history('/allAssessmentPage')}>
+          Show All Assessments
+        </button>
       </div>
-      <button
-        style={styles.bottomButton}
-        onClick={() => history('/allAssessmentPage')}>
-        Show All Assessments
-      </button>
+      <BottomNavigation />
     </div>
-  </div>
-);
+  );
 };
 
 const styles = {
@@ -295,9 +297,7 @@ const styles = {
     flexDirection: 'column',
     padding: '20px',
   },
-  scrollContainer: {
-    overflowY: 'scroll',
-  },
+
   base: {
     fontFamily: fonts.regular,
     color: '#111920',

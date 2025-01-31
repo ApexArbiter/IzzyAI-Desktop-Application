@@ -7,6 +7,7 @@ import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import Loader from '../components/Loader';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import { ArrowLeft } from 'lucide-react';
+import CustomHeader from '../components/CustomHeader';
 
 
 // Button Components
@@ -69,6 +70,7 @@ const SpeechArticulationPage = () => {
     const [recordingStatus, setRecordingStatus] = useState('idle');
     const [startTime, setStartTime] = useState('');
     const [backendResponseText, setBackendResponseText] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const mediaRecorderRef = useRef(null);
 
@@ -177,6 +179,7 @@ const SpeechArticulationPage = () => {
 
     // Send audio for processing
     const sendAudio = async (audioBlob) => {
+        setLoading(true)
         if (!audioBlob) {
             console.error('Audio blob is not defined');
             setRecordingStatus('stop');
@@ -207,6 +210,7 @@ const SpeechArticulationPage = () => {
             console.error('Error in speech processing:', error);
         } finally {
             setRecordingStatus('stop');
+            setLoading(false)
         }
     };
     useEffect(() => {
@@ -219,11 +223,7 @@ const SpeechArticulationPage = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-white">
-            <header className="bg-white py-4 px-6 border-b">
-                <h1 className="text-xl font-semibold text-[#111920]">
-                    Quick Articulation Disorder Assessment
-                </h1>
-            </header>
+            <CustomHeader title="Quick Stammering Assessment" goBack={() => { navigate(-1) }} />
 
             <main className="flex-1 p-5">
                 <div className="max-w-3xl mx-auto">
@@ -283,6 +283,7 @@ const SpeechArticulationPage = () => {
                             </button>
                         </div>
                     )}
+                    <Loader loading={loading} />
 
 
                 </div>

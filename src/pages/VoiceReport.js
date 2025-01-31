@@ -282,9 +282,9 @@ const VoiceDisorderResult = () => {
           >
             <CircularProgress
               percentage={percentage}
-              color={percentage >= 50 ? "success" : "error"}
+              color="error"
             />
-            <p className="mt-4 text-lg font-semibold">Overall Score</p>
+            {/* <p className="mt-4 text-lg font-semibold">Overall Score</p> */}
           </motion.div>
 
           {!isQuick && (

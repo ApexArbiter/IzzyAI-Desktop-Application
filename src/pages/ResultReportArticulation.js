@@ -6,6 +6,7 @@ import { endSession, getToken } from '../utils/functions';
 import BaseURL from '../components/ApiCreds';
 import moment from 'moment';
 import { useDataContext } from '../contexts/DataContext';
+import CustomHeader from '../components/CustomHeader';
 
 // Custom Card Component
 const Card = ({ children, className = "" }) => (
@@ -84,8 +85,9 @@ const ArticulationResult = () => {
   const [loading, setLoading] = useState(false);
   const [endTime, setEndTime] = useState('');
   const location = useLocation();
+  const [soundNames, setSoundNames] = useState([]);
 
-  const { startTime, SessiontypId, totalQuestions: total, expressionsArray, incorrectExpressions, correctExpressions, correctAnswers, isQuick } = location.state || {};
+  const { startTime, SessiontypId, sessionId, totalQuestions: total, expressionsArray, incorrectExpressions, correctExpressions, correctAnswers, isQuick } = location.state || {};
   console.log(location.state)
 
   // Get data from localStorage
@@ -93,7 +95,7 @@ const ArticulationResult = () => {
   // const startTime = localStorage.getItem("startTime");
   // const correctAnswers = parseInt(localStorage.getItem("correctAnswers") || "0");
   const incorrectQuestions = JSON.parse(localStorage.getItem("incorrectQuestions") || "[]");
-  const sessionId = JSON.parse(localStorage.getItem("SessionID") || "[]");
+
   console.log("Incorrect Questions", incorrectQuestions)
   // const expressionsArray = JSON.parse(localStorage.getItem("expressionsArray") || "[]");
   // const correctExpressions = JSON.parse(localStorage.getItem("correctExpressions") || "[]");
@@ -137,39 +139,38 @@ const ArticulationResult = () => {
 
       const validItems = articulationReport?.filter(item => item !== undefined);
 
-      // Extract WordIDs and SoundIDs from valid items
+
       const extractedWordIDs = validItems?.map(item => item?.WordID || item?.id);
       const extractedSoundIDs = validItems?.map(item => item?.SoundID);
 
-      // Set WordIDs and SoundIDs state
 
       if (extractedWordIDs && extractedSoundIDs) {
-        // Append wordIDs array to FormData
+
+        console.log("Extracted", extractedWordIDs, extractedSoundIDs)
         formData.append('WordIDList', JSON.stringify(extractedWordIDs));
 
-        // Append soundIDs array to FormData
+
         formData.append('SoundIDList', JSON.stringify(extractedSoundIDs));
       } else {
-        return; // Exit the function early if wordIDs or soundIDs are empty or not in the correct format
+        return;
       }
 
       formData.append('AssessmentDate', moment(new Date()).format("YYYY-MM-DD hh:mm:ss"));
-      console.log("FormData contents:");
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
 
+      console.log(formData);
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
 
       const response = await fetch(`${BaseURL}/add_assessment_result`, {
         method: 'POST',
         body: formData,
         headers: { 'Authorization': "Bearer " + token }
       });
-      console.log(response)
+
       if (response.ok) {
         // If the response is successful, parse the response body as JSON
         const responseData = await response.json();
-        console.log(responseData)
       } else {
         // Handle error response
         const errorData = await response.json();
@@ -217,6 +218,56 @@ const ArticulationResult = () => {
     fetchReport();
   }, []);
 
+  const submitUserExercise = async () => {
+    const token = await getToken()
+    const obj = {
+      expressions: isQuick ? null : expressionsArray,
+      correct: isQuick ? null : correctexpressionPercentage,
+      incorrect: isQuick ? null : expressionpercentage,
+      questions_array: getIncorrectQuestions()
+    }
+    const formData = new FormData();
+    formData.append('UserID', userId);
+    formData.append('DisorderID', 1);
+    formData.append('SessionID', sessionId);
+    formData.append('ExerciseDate', moment(new Date()).format("YYYY-MM-DD hh:mm:ss")); // Assuming exerciseDate is in 'YYYY-MM-DD' format
+    formData.append('SoundIDList', JSON.stringify(soundNames)); // Use soundNames array
+    formData.append('CompletionStatus', 'complete');
+    formData.append('CompletedQuestions', totalQuestions);
+    formData.append('WordIDList', JSON.stringify([])); // You need to provide word IDs if necessary
+    formData.append('Score', percentage);
+    formData.append('TotalQuestions', totalQuestions);
+    formData.append('emotion', JSON.stringify(obj));
+
+    try {
+      setLoading(true)
+      console.log(formData);
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+      const response = await fetch(`${BaseURL}/artic_user_exercise`, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Authorization': "Bearer " + token }
+      });
+
+      console.log(response)
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log(responseData)
+      } else {
+        const errorData = await response.json();
+        console.log("hello")
+        throw new Error(errorData.error || response.statusText);
+      }
+    } catch (error) {
+      console.log("hello")
+      console.error('ErrorExercise:', error);
+    } finally {
+      console.log("hello")
+      setLoading(false)
+    }
+  };
 
 
 
@@ -233,14 +284,28 @@ const ArticulationResult = () => {
   //   init();
   // }, []);
 
+  // Fix for ArticulationResult component
   useEffect(() => {
-    if (SessiontypId === 1) {
-      addAssessmentResult();
-    }
-    if (SessiontypId === 2) {
-      submitUserExercise();
-    }
-    updateSession();
+    const handleEffects = async () => {
+      try {
+        if (SessiontypId === 1) {
+          await addAssessmentResult();
+        }
+        if (SessiontypId === 2) {
+          await submitUserExercise();
+        }
+        await updateSession();
+      } catch (error) {
+        console.error('Error in effect:', error);
+      }
+    };
+
+    handleEffects();
+
+    // Cleanup function
+    return () => {
+      // Any cleanup needed
+    };
   }, []);
   const updateSession = async () => {
     const response = await endSession(sessionId, startTime, isQuick ? 'quick_assessment_status' : 'Completed', 1)
@@ -325,7 +390,13 @@ const ArticulationResult = () => {
 
 
 
-  console.log("Hello")
+  const onPressBack = () => {
+    if (isQuick) {
+      navigate(-2);
+    } else {
+      navigate('/home');
+    }
+  };
 
 
   return (
@@ -336,19 +407,9 @@ const ArticulationResult = () => {
     >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <motion.div
-          initial={{ y: -20 }}
-          animate={{ y: 0 }}
-          className="flex items-center mb-8"
-        >
-          <button
-            onClick={() => navigate(-1)}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-bold">Articulation Assessment Results</h1>
-        </motion.div>
+        <CustomHeader title={isQuick ? "Quick Articulation Disorder Assessment Result Report" :
+          SessiontypId === 2 ? "Articulation Disorder Exercise Result Report" :
+            "Articulation Disorder Assessment Result Report"} goBack={() => { navigate(-1) }} />
 
         <div className={`${expressionsArray ? 'grid md:grid-cols-2 gap-6' : ''} flex justify-center w-50`}>
           {/* Overall Score */}
@@ -376,9 +437,9 @@ const ArticulationResult = () => {
 
         {/* Detailed Results */}
         <Card className="mt-6">
-          <CardHeader>
+          {/* <CardHeader>
             <CardTitle>Assessment Details</CardTitle>
-          </CardHeader>
+          </CardHeader> */}
           <CardContent className="space-y-6">
             {/* Correct Answers */}
             <div>
@@ -403,7 +464,7 @@ const ArticulationResult = () => {
             {/* Incorrect Words List */}
             {incorrectQuestions?.length > 0 && (
               <div>
-                <h3 className="font-semibold mb-3">Words Needing Practice:</h3>
+                <h3 className="font-semibold mb-3">List of incorrect Pronounciations:</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {incorrectQuestions.map((question, index) => (
                     <div
@@ -420,7 +481,7 @@ const ArticulationResult = () => {
             )}
 
             {/* Correct Words List */}
-            {correctExpressions?.length > 0 && (
+            {/* {correctExpressions?.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-3">Well Pronounced Words:</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -435,7 +496,7 @@ const ArticulationResult = () => {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </CardContent>
         </Card>
 
@@ -446,7 +507,7 @@ const ArticulationResult = () => {
           className="mt-8 flex justify-center"
         >
           <button
-            onClick={() => navigate("/home")}
+            onClick={() => { onPressBack() }}
             className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
           >
             Back to Home

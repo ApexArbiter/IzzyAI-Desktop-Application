@@ -9,6 +9,16 @@ import { IMAGE_BASE_URL } from '../components/ApiCreds';
 import { useDataContext } from '../contexts/DataContext';
 import { ArrowLeft } from 'lucide-react';
 
+
+const LinearProgress = ({ value }) => (
+  <div className="relative w-full h-2 bg-gray-200 rounded-2xl overflow-hidden">
+    <div
+      className="absolute top-0 left-0 h-full bg-[#FF7A2F] transition-all duration-300 ease-in-out rounded-2xl"
+      style={{ width: `${value * 100}%` }}
+    />
+  </div>
+);
+
 const ReceptiveAssessment = () => {
   const location = useLocation();
   const { sessionId, isAll } = location.state || {};
@@ -190,6 +200,7 @@ const ReceptiveAssessment = () => {
 
           <main className="p-6">
             {/* Progress Section */}
+            
             <div className="mb-8">
               <p className="text-center mb-4">
                 Question <span className="font-bold">{Math.min(questionCount, questions?.length || 0)}</span> out of{' '}
@@ -217,8 +228,8 @@ const ReceptiveAssessment = () => {
             {questions?.[questionCount - 1] && (
               <div className="mb-8">
                 <LogoQuestionView
-                  first_text={''}
-                  second_text={questions[questionCount - 1].question_text}
+                  first_text={questions[questionCount - 1].question_text}
+                  second_text={' '}
                 />
               </div>
             )}

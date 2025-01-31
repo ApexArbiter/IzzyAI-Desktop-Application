@@ -98,6 +98,7 @@ function ExpressiveAssessment() {
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0); // Tracks correct attempts
   const [isNextAnswer, setIsNextAnswer] = useState(false); // Indicates moving to next answer part
   const [isDelay, setIsDelay] = useState(false); // Controls delay between attempts
+  const [isStopButtonDisabled, setIsStopButtonDisabled] = useState(false);
 
 
   let question = [];
@@ -201,13 +202,15 @@ function ExpressiveAssessment() {
   const onStartRecord = async () => {
     try {
       setRecordingStatus('recording');
-
+      setIsStopButtonDisabled(true);
       if (!webcamRef.current) {
         console.error('Webcam reference not available');
         setRecordingStatus('idle');
         return;
       }
-
+      setTimeout(() => {
+        setIsStopButtonDisabled(false);
+      }, 5000);
       const imageSrc = webcamRef.current.getScreenshot();
 
       if (!imageSrc) {
@@ -271,8 +274,14 @@ function ExpressiveAssessment() {
     formData.append('expected_expression', questions?.[questionCount - 1]?.expression);
 
     try {
+      console.log('Sending data:', Object.fromEntries(formData));
+      console.log("formData", formData);
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
       const response = await evaluateExpressiveQuestion(formData);
-      console.log(response)
+      console.log("Evaluate question", response)
 
       // let response2 =  await authenticateFace(userDetail?.UserID, file);
       // console.log(response2)
@@ -323,11 +332,9 @@ function ExpressiveAssessment() {
 
         // Final evaluation
         if (consecutiveCorrect > (answers?.length / 2)) {
-          console.log("hello1")
           onCorrectExpression(questions[questionCount - 1]?.question, detectedExpression);
           onCorrectAnswer(questions[questionCount - 1]?.question);
         } else {
-          console.log("hello1")
           onWrongAnswer(questions[questionCount - 1]?.question);
           onWrongExpression(questions[questionCount - 1]?.question, detectedExpression);
         }
@@ -365,7 +372,6 @@ function ExpressiveAssessment() {
 
 
   const onCorrectAnswer = (question) => {
-    console.log("onCorrectAnswer", question)
     setQuestionResponse('Correct!');
     setCorrectAnswersCount(prev => prev + 1);
     if (!correctQuestions.includes(question + questionCount)) {
@@ -380,7 +386,6 @@ function ExpressiveAssessment() {
   };
 
   const onWrongAnswer = (ques) => {
-    console.log("onWrongAnswer", ques)
     if (!incorrectQuestions.some(q => q?.questiontext === ques + questionCount)) {
       setIncorrectQuestions(prevQuestions => [
         ...prevQuestions,
@@ -434,7 +439,7 @@ function ExpressiveAssessment() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <CustomHeader
-        title="Expressive Language Disorder"
+        title="Expressive Language Disorder Excercise"
         goBack={() => navigate(-1)}
       />
 
@@ -446,7 +451,7 @@ function ExpressiveAssessment() {
 
           <div className="mt-5">
             <p className="text-lg text-slate-900">
-              Question{' '}
+              Excercise{' '}
               <span className="font-bold">
                 {questionCount > questions?.length ? questions?.length : questionCount}{' '}
               </span>
@@ -483,7 +488,7 @@ function ExpressiveAssessment() {
           {/* Add this after the progress bar */}
           <div className="flex justify-between items-center mt-3">
             <p className="text-sm font-medium text-slate-900">
-              Attempt: {Math.min(recordCount + 1, 3)}/3
+              Attempt: {Math.min(recordCount, 3)}
             </p>
             <p className="text-sm font-medium text-slate-900">Answer Part: {answerCount + 1}</p>
           </div>
@@ -555,13 +560,13 @@ function ExpressiveAssessment() {
             />
           </div>
 
-          <ReactMic
+          {/* <ReactMic
             record={recordingStatus === 'recording'}
             className="sound-wave mx-auto border rounded-3xl"
             onStop={handleAudioStop}
             strokeColor="#000000"
             backgroundColor="#FF4081"
-          />
+          /> */}
 
           <div className="mt-5">
             {/* Only show Record button when in idle state AND not reached 3 attempts */}
@@ -576,6 +581,7 @@ function ExpressiveAssessment() {
             {/* Only show Play button during recording */}
             {recordingStatus === 'recording' && (
               <PlayButton onPress={onStopRecord} disabled={false} />
+              // <PlayButton onPress={onStopRecord} disabled={isStopButtonDisabled} />
             )}
 
             {/* Show navigation buttons only after 3 attempts or when evaluation is complete */}

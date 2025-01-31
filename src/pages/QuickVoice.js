@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getToken } from "../utils/functions";
 import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import Loader from '../components/Loader';
+import CustomHeader from '../components/CustomHeader';
+import LogoQuestionView from '../components/LogoQuestionView';
 
 // Button Components
 const EndButton = ({ onPress, title }) => (
@@ -61,6 +63,7 @@ const VoiceDisorderPage = () => {
   const [voiceResponse, setVoiceResponse] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const [loading, setLoading] = useState(false);
 
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
@@ -77,6 +80,7 @@ const VoiceDisorderPage = () => {
   const fetchExerciseData = async () => {
     try {
       const token = await getToken();
+      setLoading(true)
       const userDetail = JSON.parse(storedUserDetail);
       const response = await fetch(
         `${BaseURL}/get_voice_disorders/${userDetail?.AvatarID}`,
@@ -92,6 +96,8 @@ const VoiceDisorderPage = () => {
     } catch (error) {
       setError('Failed to fetch exercise data');
       console.error('Error:', error);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -133,6 +139,7 @@ const VoiceDisorderPage = () => {
 
   const checkVoiceDisorder = async (audioBlob) => {
     try {
+      setLoading(true)
       const formData = new FormData();
       formData.append('audio', new File([audioBlob], 'sound.wav', { type: 'audio/wav' }));
 
@@ -152,15 +159,17 @@ const VoiceDisorderPage = () => {
       const data = await response.json();
       setVoiceResponse(data);
       console.log('Voice Response:', data);
+      let array = [...questionScores]
+      let filteredArray = array?.filter(item => item?.wordtext !== exerciseData?.[exerciseCount - 1]?.WordText)
+      filteredArray?.push({ ...data?.predictions, wordtext: exerciseData?.[exerciseCount - 1]?.WordText })
+      setQuestionScores(filteredArray);
 
-      if (data.predictions?.Normal) {
-        setQuestionScores(prev => [...prev, parseFloat(data.predictions.Normal)]);
-      }
     } catch (error) {
       console.error('Error:', error);
       return null;
     } finally {
       setRecordingStatus('result');
+      setLoading(false)
     }
   };
 
@@ -187,11 +196,7 @@ const VoiceDisorderPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <header className="bg-white py-4 px-6 border-b">
-        <h1 className="text-xl font-semibold text-[#111920]">
-          Voice Disorder Assessment
-        </h1>
-      </header>
+      <CustomHeader title="Quick Voice Disorder Assessment" goBack={() => { navigate(-1) }} />
 
       <main className="flex-1 p-5">
         <div className="max-w-3xl mx-auto">
@@ -218,12 +223,12 @@ const VoiceDisorderPage = () => {
             </div>
           )}
 
-          <div className="mb-8">
-            <p className="text-lg mb-2">Say this...</p>
-            <p className="text-xl font-semibold">
-              {exerciseData?.[exerciseCount - 1]?.WordText || 'Loading...'}
-            </p>
-          </div>
+
+          <LogoQuestionView
+            style={{ marginTop: 80 }}
+            first_text={"Say this..."}
+            second_text={exerciseData?.[exerciseCount - 1] ? exerciseData?.[exerciseCount - 1]?.WordText : 'loading'}
+          />
 
           {/* {voiceResponse?.predictions && (
             <div className="p-4 rounded-lg mb-8 bg-green-100">
@@ -275,10 +280,10 @@ const VoiceDisorderPage = () => {
                 onPress={() => navigate('/voiceReport', {
                   state: {
                     date: formattedDate,
+                    isQuick: true,
                     questionScores,
-                    sessionId,
-                    startTime,
-                    totalQuestions: 3
+                    sessionId, startTime
+
                   }
                 })}
                 title="End Now"
@@ -287,6 +292,7 @@ const VoiceDisorderPage = () => {
           )}
         </div>
       </main>
+      <Loader loading={loading} />
     </div>
   );
 };

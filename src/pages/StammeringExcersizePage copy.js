@@ -18,8 +18,6 @@ import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import { getToken, detectExpression, getStammeringWords, capitalize } from '../utils/functions';
 import VideoPlayer from '../components/VideoPlayer';
 import { useDataContext } from '../contexts/DataContext';
-import CustomHeader from '../components/CustomHeader';
-import Loader from '../components/Loader';
 
 const StammeringExercisePage = () => {
   const { setExercisesReport, userId, userDetail } = useDataContext();
@@ -57,15 +55,15 @@ const StammeringExercisePage = () => {
   const [correctExpressions, setCorrectExpressions] = useState([]);
   const [incorrectExpressions, setIncorrectExpressions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isStopButtonDisabled, setIsStopButtonDisabled] = useState(false);
+
   const navigate = useNavigate();
   const sentenceID = [1, 3, 4, 9, 11, 12];
 
   // Fetch exercise data
   const fetchExerciseData = useCallback(async (id) => {
     const token = await getToken();
-    setLoading(true)
     try {
+      setLoading(true)
       // Fetch stammering words
       const questionWords = await getStammeringWords(id);
       setQuestionWordsArray(questionWords?.data || []);
@@ -109,7 +107,6 @@ const StammeringExercisePage = () => {
     console.log('userDetail.AvatarID', userDetail.AvatarID)
     const token = await getToken();
     try {
-      setLoading(true)
       const response = await fetch(
         `${BaseURL}/get_avatar_path/${wordtext?.toLowerCase()}/1`,
         { headers: { 'Authorization': `Bearer ${token}` } }
@@ -121,8 +118,6 @@ const StammeringExercisePage = () => {
       }
     } catch (error) {
       console.error('Failed to fetch avatar path:', error);
-    } finally {
-      setLoading(false)
     }
   };
   const onCorrectExpression = (ques, exp) => {
@@ -159,10 +154,6 @@ const StammeringExercisePage = () => {
       setTimer(5);  // Reset timer
       setCounter(100);  // Reset counter
       audioChunksRef.current = [];
-      setIsStopButtonDisabled(true);
-      setTimeout(() => {
-        setIsStopButtonDisabled(false);
-      }, 5000);
 
       // Create and resume AudioContext after user interaction
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -231,7 +222,6 @@ const StammeringExercisePage = () => {
       return new Promise((resolve) => {
         mediaRecorderRef.current.onstop = async () => {
           try {
-            setLoading(true)
             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
             console.log('Audio blob created:', audioBlob.size, 'bytes');
 
@@ -258,7 +248,7 @@ const StammeringExercisePage = () => {
             console.log("Message:", data.message)
             console.log("isMatched", isMatched)
             console.log("Hello 1")
-            setLoading(false)
+
             handleRecordingResponse(isMatched);
             resolve();
           } catch (error) {
@@ -273,8 +263,6 @@ const StammeringExercisePage = () => {
     } catch (error) {
       console.error('Error stopping recording:', error);
       setRecordingStatus('idle');
-    } finally {
-      setLoading(false)
     }
   };
 
@@ -511,9 +499,10 @@ const StammeringExercisePage = () => {
 
   return (
     <Box sx={{ padding: 2, maxWidth: 600, margin: 'auto' }}>
+      <Typography variant="h5" gutterBottom>
+        Stammering Exercise
+      </Typography>
 
-      <CustomHeader title="Stammering Excercise" goBack={() => { navigate(-1) }} />
-      <div className='mt-4' ></div>
       <Typography variant="body1" paragraph>
         Take a deep long breath and say the answer while exhaling/breathing out.
       </Typography>
@@ -541,7 +530,7 @@ const StammeringExercisePage = () => {
           source={`${IMAGE_BASE_URL}${avatarPath}`}
           onEnd={() => setIsVideoEnd(true)}
           onStart={() => setIsVideoEnd(false)}
-          videoHeight={200}
+          videoHeight={300}
         />
       )}
       {/* Text showing Ready
@@ -599,18 +588,16 @@ const StammeringExercisePage = () => {
       )}
 
       {/* Webcam */}
-
-      <div className=' mt-7 mb-4 flex justify-center'>
+      <Box sx={{ marginTop: 2, marginBottom: 2 }}>
         <Webcam
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
           videoConstraints={{ facingMode: 'user' }}
-          width="50%"
-          height={200}
+          width="100%"
+          height={300}
         />
-      </div>
-
+      </Box>
 
 
 
@@ -631,7 +618,6 @@ const StammeringExercisePage = () => {
             variant="contained"
             color="secondary"
             onClick={onStopRecord}
-            disabled={isStopButtonDisabled}
           >
             Stop Recording
           </Button>
@@ -666,7 +652,7 @@ const StammeringExercisePage = () => {
       </Box>
 
       {/* Loading Indicator */}
-      <Loader loading={loading} />
+
     </Box>
   );
 };

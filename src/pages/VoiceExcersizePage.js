@@ -8,33 +8,69 @@ import VideoPlayer from '../components/VideoPlayer';
 import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import { useDataContext } from '../contexts/DataContext';
 import axios from 'axios';
+import dynamicfunctions from '../utils/dynamicfunctions';
+import LogoQuestionView from '../components/LogoQuestionView';
 
 const VoiceDisorderPage = () => {
-  const location = useLocation(); // Get the location object
-  const { sessionId, SessiontypId, isAll } = location?.state || {}; // Use fallback if state is undefined
+  const location = useLocation();
+  const { sessionId, isAll } = location.state || {};
   console.log(location.state)
   const history = useNavigate();
   const [timer, setTimer] = useState(5);
-  const [counter, setCounter] = useState(5);
+  const [counter, setCounter] = useState(100);
   const [exerciseData, setExerciseData] = useState(null);
   const [exerciseCount, setExerciseCount] = useState(1);
   const [isVideoEnd, setIsVideoEnd] = useState(false);
   const [disableRecordingButton, setDisableRecordingButton] = useState(false);
   const [snapshot, setSnapshot] = useState(null);
+  const [expressionArray, setExpressionArray] = useState([]);
   const [expression, setExpression] = useState('');
   const [questionScores, setQuestionScores] = useState([]);
   const [recordingStatus, setRecordingStatus] = useState('idle');
   const [videoUrl, setVideoUrl] = useState('');
   const [error, setError] = useState(null);
   const [voiceResponse, setVoiceResponse] = useState(null);
-  const [startTime] = useState(new Date().toISOString().slice(0, 19).replace('T', ' '));
+  const [startTime, setStartTime] = useState(null);
+  const [loader, setLoader] = useState(false)
+  const [attempts, setAttempts] = useState(0);
+  const [nextButton, setNextButton] = useState(false);
 
+
+
+  // Formated Date
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const hours = String(currentDate.getHours()).padStart(2, '0');
+  const mins = String(currentDate.getMinutes()).padStart(2, '0');
+  const secs = String(currentDate.getSeconds()).padStart(2, '0');
+
+  const formattedDate = `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
   const videoRef = useRef(null);
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const videoElementRef = useRef(null);
 
   const storedUserDetail = localStorage.getItem("userDetails");
+
+  const {
+    incorrectExpressions,
+    onCorrectExpression,
+    onWrongExpression,
+    correctExpressions,
+    // recordingStatus,
+    // setRecordingStatus
+  } = dynamicfunctions({})
+  useEffect(() => {
+    const currentStartTime = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace('T', ' ');
+    setStartTime(currentStartTime);
+  }, []);
+
 
   // Timer effect for recording
   useEffect(() => {
@@ -45,7 +81,7 @@ const VoiceDisorderPage = () => {
           setTimer(timer - 1);
         }
         if (counter > 0) {
-          setCounter(prevCounter => prevCounter - 1);
+          setCounter(prevCounter => prevCounter - 20);
         }
         if (timer === 0) {
           onStopRecord();
@@ -68,6 +104,7 @@ const VoiceDisorderPage = () => {
 
   const fetchExerciseData = async () => {
     try {
+      setLoader(true);
       const token = await getToken();
       const userDetail = JSON.parse(storedUserDetail);
 
@@ -90,6 +127,8 @@ const VoiceDisorderPage = () => {
     } catch (error) {
       setError('Failed to fetch exercise data');
       console.error('Error fetching exercise data:', error);
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -155,6 +194,7 @@ const VoiceDisorderPage = () => {
 
   const onStopRecord = async () => {
     try {
+      setLoader(true);
       if (!mediaRecorderRef.current) return;
 
       return new Promise((resolve) => {
@@ -163,30 +203,53 @@ const VoiceDisorderPage = () => {
             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
             console.log('Audio blob created:', audioBlob.size, 'bytes');
 
+            const data = await checkVoiceDisorder(audioBlob);
+            console.log('Complete voice disorder response:', voiceResponse);
+
             const expressionResponse = await sendSnapshot();
             console.log('Expression response:', expressionResponse);
+            setExpression(expressionResponse);
 
-            if (expressionResponse) {
-              setExpression(expressionResponse);
-            }
+            // If attempts equals 4, proceed with the existing logic
+            if (attempts >= 5) {
+              let array = [...questionScores];
+              let filteredArray = array?.filter(item => item?.wordtext !== exerciseData?.[exerciseCount - 1]?.WordText);
+              filteredArray?.push({ ...data?.predictions, wordtext: exerciseData?.[exerciseCount - 1]?.WordText });
+              setQuestionScores(filteredArray);
 
-            const [videoResponse, audioResponse] = await Promise.all([
-              sendVideo(),
-              sendAudio(audioBlob)
-            ]);
+              if (expressionResponse) {
+                setExpressionArray(prevArray => [...prevArray, expressionResponse.expression]);
+                if (expressionResponse.expression?.toLowerCase() === 'happy') {
+                  onCorrectExpression(exerciseData?.[exerciseCount - 1]?.WordText, expressionResponse);
+                } else {
+                  onWrongExpression(exerciseData?.[exerciseCount - 1]?.WordText, expressionResponse);
+                }
+              }
+              setAttempts(0)
+              setNextButton(true)
 
-            console.log('Complete audio response:', audioResponse);
-            console.log('Complete video response:', videoResponse);
+              const [videoResponse, audioResponse] = await Promise.all([
+                sendVideo(),
+                sendAudio(audioBlob)
+              ]);
 
-            if (videoResponse && audioResponse) {
-              const voiceResponse = await checkVoiceDisorder(audioBlob);
-              console.log('Complete voice disorder response:', voiceResponse);
+              console.log('Complete audio response:', audioResponse);
+              console.log('Complete video response:', videoResponse);
+            } else {
+              // If attempts is not 4, schedule a restart after 5 seconds
+              setTimeout(() => {
+                restartExercise();
+                // Increment the attempts counter
+                setAttempts(prev => prev + 1);
+              }, 5000);
             }
 
             resolve();
           } catch (error) {
             console.error('Detailed error in stop recording process:', error);
             resolve();
+          } finally {
+            setLoader(false);
           }
         };
 
@@ -196,6 +259,7 @@ const VoiceDisorderPage = () => {
     } catch (error) {
       console.error('Detailed error stopping recording:', error);
       setRecordingStatus('stop');
+      setLoader(false);
     }
   };
 
@@ -287,14 +351,15 @@ const VoiceDisorderPage = () => {
       setVoiceResponse(data);
 
       if (data.predictions?.Normal) {
-        const score = parseFloat(data.predictions.Normal);
-        setQuestionScores(prevScores => [...prevScores, score]);
+
       }
 
       return data;
     } catch (error) {
       console.error('Error checking voice disorder:', error);
       return null;
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -304,6 +369,7 @@ const VoiceDisorderPage = () => {
     localStorage.setItem('questionScores', JSON.stringify(questionScores));
     localStorage.setItem('sessionId', sessionId);
     localStorage.setItem('startTime', startTime);
+    setNextButton(false)
 
     if (exerciseCount < 3) {
       setExerciseCount(exerciseCount + 1);
@@ -315,9 +381,54 @@ const VoiceDisorderPage = () => {
       setCounter(100);
     } else {
       // Navigate to results page
-      history('/voiceReport');
+      history('/voiceReport', {
+        state: {
+          date: formattedDate,
+          expressionArray,
+          questionScores,
+          sessionId,
+          startTime,
+          totalQuestions: 3,
+          incorrectExpressions,
+          correctExpressions
+        }
+      });
+      console.log({
+        date: formattedDate,
+        expressionArray,
+        questionScores,
+        sessionId,
+        startTime,
+        totalQuestions: 3,
+        incorrectExpressions,
+        correctExpressions
+      })
     }
   };
+  const restartExercise = () => {
+    // First, get the actual video element from the VideoPlayer component
+    // We can find it since it's the only video element in our VideoPlayer
+    const videoElement = document.querySelector('video');
+
+    if (videoElement) {
+      // Reset the video time to beginning
+      videoElement.currentTime = 0;
+      // Start playing
+      videoElement.play();
+    }
+
+    // Reset all other states
+    setIsVideoEnd(false);
+    setRecordingStatus('idle');
+    setExpression('');
+    setTimer(5);
+    setCounter(100);
+    setDisableRecordingButton(false);
+    setVoiceResponse(null);
+    setSnapshot(null);
+  };
+
+
 
   const navigateBack = () => {
     history(-1);
@@ -337,7 +448,7 @@ const VoiceDisorderPage = () => {
             >
               Back
             </Button>
-            <h1 className="text-2xl font-semibold">Voice Disorder Assessment</h1>
+            <h1 className="text-2xl font-semibold">Voice Disorder Excercise</h1>
           </div>
         </div>
 
@@ -368,6 +479,7 @@ const VoiceDisorderPage = () => {
           {/* Video Player */}
           {exerciseData && (
             <div className="rounded-xl overflow-hidden shadow-lg">
+              <p>Attemts:{attempts}</p>
               <VideoPlayer
                 ref={videoRef}
                 onEnd={() => {
@@ -384,17 +496,19 @@ const VoiceDisorderPage = () => {
           )}
 
           {/* Exercise Text */}
-          <div className="text-center space-y-2 bg-blue-50 p-6 rounded-xl">
-            <p className="text-blue-600 font-medium">Say this...</p>
-            <h3 className="text-2xl font-bold text-gray-800">
-              {exerciseData?.[exerciseCount - 1]?.WordText || 'loading'}
-            </h3>
+          <div className="flex justify-center">
+            <LogoQuestionView
+              first_text={"Say this..."}
+              second_text={exerciseData?.[exerciseCount - 1]?.WordText || 'loading'}
+
+            />
           </div>
+
 
           {/* Expression Display */}
           {expression && (
             <div className="bg-green-50 text-green-800 p-4 rounded-xl text-center text-lg font-medium">
-              Facial Expression: {typeof expression === 'object' ? JSON.stringify(expression) : expression}
+              Facial Expression: {expression.expression}
             </div>
           )}
 
@@ -461,14 +575,34 @@ const VoiceDisorderPage = () => {
                 />
               </div>
             )}
-            {recordingStatus === 'stop' && voiceResponse?.predictions && (
+            {recordingStatus === 'stop' && voiceResponse?.predictions && nextButton && (
               <div className="space-y-4">
                 <Button
                   onClick={() => {
                     if (exerciseCount < 3) {
                       handleNextExercise();
                     } else {
-                      history('/voiceReport');
+                      history('/voiceReport', {
+                        state: {
+                          startTime, expressionArray: expressionArray,
+                          questionScores: questionScores,
+                          sessionId,
+                          isExercise: true,
+                          totalQuestions: 3,
+                          incorrectExpressions,
+                          correctExpressions
+                        }
+                      });
+                      console.log({
+                        date: formattedDate,
+                        expressionArray,
+                        questionScores,
+                        sessionId,
+                        startTime,
+                        totalQuestions: 3,
+                        incorrectExpressions,
+                        correctExpressions
+                      })
                     }
                   }}
                   variant="contained"
@@ -481,9 +615,10 @@ const VoiceDisorderPage = () => {
             )}
           </div>
 
+
           {/* Loader */}
           <div className="p-4 flex justify-center">
-            <Loader loading={recordingStatus === 'loading'} />
+            <Loader loading={loader} />
           </div>
         </div>
       </div>

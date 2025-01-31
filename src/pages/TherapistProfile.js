@@ -25,7 +25,7 @@ function TherapistProfilePage() {
     <div className="h-screen flex flex-col bg-white">
       <CustomHeader title="IzzyAI Chatbot" goBack={() => navigate(-1)} />
       <div className="flex-1 p-5 overflow-auto">
-        <div className="flex flex-col mt-36">
+        <div className="flex flex-col mt-26">
           <motion.img
             src={TherapistImage}
             alt="Therapist"

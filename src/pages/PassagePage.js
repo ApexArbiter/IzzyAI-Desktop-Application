@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactWebcam from 'react-webcam';
 import { useDataContext } from '../contexts/DataContext'; // Assuming this context exists
 import VideoPlayer from '../components/VideoPlayer'; // Assuming VideoPlayer is already web-compatible
-import Loader from '../components/Loader'; // Assuming Loader is compatible with web
 import { useLocation, useNavigate } from 'react-router-dom'; // React Router for navigation
 import WaveSVG from '../assets/Wave';
 import CustomHeader from '../components/CustomHeader';
@@ -11,6 +10,7 @@ import BaseURL from '../components/ApiCreds';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { IMAGE_BASE_URL } from '../components/ApiCreds';
+import Loader from '../components/Loader';
 
 const PlayButton = (props) => {
   return (
@@ -52,6 +52,8 @@ const PassagePage = () => {
   const [detectionCount, setDetectionCount] = useState(0);
   const [stutter, setStutter] = useState({});
   const [startTime, setStartTime] = useState(null);
+  const [isStopButtonDisabled, setIsStopButtonDisabled] = useState(false);
+
 
   const chunks = useRef([]);
   const webcamRef = useRef(null);
@@ -75,6 +77,7 @@ const PassagePage = () => {
   // Fetch avatar video URL
   const getAvatar = async () => {
     try {
+      setLoading(true)
       const userDetail = JSON.parse(storedUserDetail);
       const response = await getStammeringAvatar(userDetail?.AvatarID);
       const video = response?.find(item => item?.avatar_name === 'passsage_1');
@@ -82,7 +85,7 @@ const PassagePage = () => {
       setVideoUrl(video?.path);
     } catch (error) {
       console.error('Error fetching avatar:', error);
-    }
+    } finally { setLoading(false) }
   };
 
   // Handle snapshot and send to API for expression detection
@@ -295,6 +298,7 @@ const PassagePage = () => {
   const onStartRecord = () => {
     setStatus('recording');
     setIsVideoEnd(false);
+    setIsStopButtonDisabled(true);
 
     // Clear previous chunks
     chunks.current = [];
@@ -307,6 +311,9 @@ const PassagePage = () => {
       setTimeout(() => takeSnapshot('initial'), 1000);
       setTimeout(() => takeSnapshot('middle'), 3000);
       setTimeout(() => takeSnapshot('last'), 5000);
+      setTimeout(() => {
+        setIsStopButtonDisabled(false);
+      }, 5000);
     }
   };
 
@@ -348,6 +355,7 @@ const PassagePage = () => {
 
             console.log("No Stuttering Percentage:", no_stuttering);
             console.log("Stuttering Percentage:", stuttering);
+
 
             // Navigate to results page
             // navigate('/passage-results', {
@@ -478,7 +486,7 @@ const PassagePage = () => {
       className="min-h-screen bg-gray-50"
     >
       {/* Header */}
-      <div className="bg-white shadow">
+      {/* <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -500,11 +508,12 @@ const PassagePage = () => {
                   />
                 </svg>
               </button>
-              <h1 className="ml-4 text-xl font-semibold">Stammering Assessment</h1>
+              <h1 className="ml-4 text-xl font-semibold text-center">Stammering Assessment</h1>
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+      <CustomHeader title="Stammering Assessment" goBack={navigateBack} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -631,19 +640,17 @@ const PassagePage = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onStopRecord}
-              className="bg-blue-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-blue-600 transition-colors"
-            >
-              Stop Recording
+              disabled={isStopButtonDisabled}
+              className={`
+      px-8 py-3 rounded-full font-semibold shadow-lg transition-colors
+      ${isStopButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white`}>
+              {isStopButtonDisabled ? 'Recording...' : 'Stop Recording'}
             </motion.button>
           )}
         </motion.div>
-
         {/* Loading Indicator */}
-        {loading && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <Loader loading={loading} />
-          </div>
-        )}
+        <Loader loading={loading} />
+
       </main>
     </motion.div>
 

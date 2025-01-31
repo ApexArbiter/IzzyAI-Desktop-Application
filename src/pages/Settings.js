@@ -4,11 +4,13 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CustomHeader from '../components/CustomHeader';
 import logo from '../assets/images/logo.png';
+import { IMAGE_BASE_URL } from '../components/ApiCreds';
 
 
 const Settings = () => {
   const navigate = useNavigate();
   const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+  console.log(userDetails);
   // Replace with your context
 
   const containerVariants = {
@@ -35,26 +37,23 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <CustomHeader title="Settings" goBack={() => navigate(-1)} />
+      <CustomHeader goBack={() => navigate(-1)} />
 
       {/* Main Content */}
       <motion.main
-        className="flex-1 container mx-auto px-4 py-6 max-w-2xl"
+        className="flex-1 container mx-auto px-4 py-6 max-w-2xl mt-20"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {/* Logo */}
-        <motion.div
-          className="w-48 h-16 mx-auto mb-8"
-          variants={itemVariants}
-        >
+        <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
           <img
-            src={logo}
+            src={require("../assets/images/logo.png")}
             alt="Logo"
-            className="w-full h-full object-contain"
+            className=" "
           />
-        </motion.div>
+        </div>
 
         {/* Profile Section */}
         <motion.div
@@ -64,7 +63,7 @@ const Settings = () => {
           <div className="flex items-center">
             <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
               <img
-                src={userDetails.avatarUrl}
+                src={`${userDetails.avatarUrl}`}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />

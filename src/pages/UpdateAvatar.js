@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, ArrowLeft } from 'lucide-react';
-import BaseURL from '../components/ApiCreds';
+import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import { getToken } from '../utils/functions';
 import male1 from "../assets/images/male1.png"
 import male2 from "../assets/images/male2.png"
 import logo from '../assets/images/logo.png';
+import CustomHeader from '../components/CustomHeader';
+import { useNavigate } from 'react-router-dom';
 
 const CustomButton = ({ onClick, title, loading, className }) => {
   return (
@@ -50,6 +52,9 @@ const UpdateAvatar = () => {
   const [gender, setGender] = useState('Male');
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const userId = localStorage.getItem('userId');
+  const userDetails = localStorage.getItem('userDetails');
+  const navigate = useNavigate()
 
   const handleUpdateAvatar = async () => {
     if (!selectedAvatar) {
@@ -74,6 +79,19 @@ const UpdateAvatar = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const avatarData = await res.json();
+      console.log(avatarData)
+      let existingData = JSON.parse(localStorage.getItem("userDetails"));
+
+      // Update specific fields
+      existingData.AvatarID = avatarData.AvatarID
+      existingData.avatarUrl = `${IMAGE_BASE_URL}${avatarData.AvatarURL}`
+
+      // Save the updated data back to localStorage
+      localStorage.setItem("userDetails", JSON.stringify(existingData));
+
+      console.log("Updated data:", existingData)
+
+
 
       alert("Avatar Updated Successfully");
     } catch (error) {
@@ -87,37 +105,23 @@ const UpdateAvatar = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <button
-                onClick={() => window.history.back()}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <ArrowLeft className="h-5 w-5 text-gray-600" />
-              </button>
-              <h1 className="ml-3 text-xl font-semibold text-gray-900">Update Avatar</h1>
-            </div>
-          </div>
-        </div>
-      </header>
+      <CustomHeader title="Update Avatar" goBack={() => { navigate(-1) }} />
 
       {/* Main Content */}
       <main className="pt-20 pb-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center space-y-8">
             {/* Logo */}
-            <div className="w-32 h-20 mb-8">
+            <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
               <img
                 src={logo}
                 alt="Logo"
-                className="w-full h-full object-contain"
+                className="w-48 h-16 object-contain"
               />
             </div>
 
             {/* Avatar Selection */}
-            <div className="w-full">
+            <div className="w-full pt-32">
               {gender === 'Male' && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
                   <AvatarOption

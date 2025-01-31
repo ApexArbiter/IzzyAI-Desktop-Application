@@ -52,6 +52,7 @@ function QuickExpressive() {
   const [incorrectQuestions, setIncorrectQuestions] = useState([]);
   const [correctQuestions, setCorrectQuestions] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -78,7 +79,7 @@ function QuickExpressive() {
   useEffect(() => {
     const fetchQuestionData = async () => {
       try {
-        setIsLoading(true);
+        setLoading(true);
         const response = await getQuickExpressiveQuestions(userId);
         if (response) {
           setQuestions(response);
@@ -86,7 +87,7 @@ function QuickExpressive() {
       } catch (error) {
         console.error('Network request failed:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
@@ -195,6 +196,7 @@ function QuickExpressive() {
     formData.append('audio', audioBlob, 'sound.wav');
 
     try {
+      setLoading(true)
       const response = await fetch(`${BaseURL}/api/voice_to_text`, {
         method: 'POST',
         body: formData,
@@ -228,6 +230,7 @@ function QuickExpressive() {
       console.error('Network request failed:', error);
     } finally {
       setRecordingStatus("stop");
+      setLoading(false)
     }
   };
 
@@ -364,6 +367,7 @@ function QuickExpressive() {
                 />
               </div>
             )}
+            <Loader loading={loading} />
           </div>
         </div>
       </div>

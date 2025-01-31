@@ -7,6 +7,8 @@ import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import Loader from '../components/Loader';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import { ArrowLeft } from 'lucide-react';
+import LogoQuestionView from '../components/LogoQuestionView';
+import CustomHeader from '../components/CustomHeader';
 
 
 // Button Components
@@ -80,6 +82,7 @@ const SpeechArticulationPage = () => {
     const [incorrectQuestions, setIncorrectQuestions] = useState([]);
     const [correctQuestions, setCorrectQuestions] = useState([]);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const User = () => localStorage.getItem("userId");
     const storedUserDetail = () => localStorage.getItem("userDetails");
@@ -92,6 +95,7 @@ const SpeechArticulationPage = () => {
     // Initialize user details from localStorage
     useEffect(() => {
         const fetchData = () => {
+            setLoading(true)
             try {
                 const storedUserDetail = localStorage.getItem("userDetails");
                 const storedUserId = User();
@@ -105,6 +109,8 @@ const SpeechArticulationPage = () => {
                 }
             } catch (error) {
                 console.error("Error retrieving user details:", error);
+            } finally {
+                setLoading(false)
             }
         };
 
@@ -130,11 +136,15 @@ const SpeechArticulationPage = () => {
             replace: true
         });
     };
+    const navigateBack = () => {
+        navigate(-1)
+    }
 
     // Fetch question data
     const fetchQuestions = async () => {
         console.log('Fetch Question')
         const token = await getToken();
+        setLoading(true)
         try {
             // setIsLoading(true);
             const response = await fetch(`${BaseURL}/get_artic_quick_assessment`, {
@@ -148,7 +158,7 @@ const SpeechArticulationPage = () => {
         } catch (error) {
             console.error('Error fetching questions:', error);
         } finally {
-            // setIsLoading(false);
+            setLoading(false)
         }
     };
 
@@ -207,6 +217,7 @@ const SpeechArticulationPage = () => {
 
     // Send audio for processing
     const sendAudio = async (audioBlob) => {
+        setLoading(true)
         if (!audioBlob) {
             console.error('Audio blob is not defined');
             setRecordingStatus('stop');
@@ -227,11 +238,11 @@ const SpeechArticulationPage = () => {
                 },
                 body: formData,
             });
-            console.log(response)
+            const result = await response.json();
+            console.log(result)
             console.log(response.ok)
 
             if (response.ok) {
-                const result = await response.json();
                 if (result?.message?.toLowerCase() === 'matched') {
                     setQuestionResponse("Matched");
                     setCorrectAnswersCount(prevCount => prevCount + 1);
@@ -294,6 +305,7 @@ const SpeechArticulationPage = () => {
             console.log(correctQuestions)
             console.log(incorrectQuestions)
             setRecordingStatus('stop');
+            setLoading(false)
         }
     };
 
@@ -307,11 +319,8 @@ const SpeechArticulationPage = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-white">
-            <header className="bg-white py-4 px-6 border-b">
-                <h1 className="text-xl font-semibold text-[#111920]">
-                    Quick Articulation Disorder Assessment
-                </h1>
-            </header>
+            <CustomHeader title=" Quick Articulation Disorder Assessment" goBack={navigateBack} />
+
 
             <main className="flex-1 p-5">
                 <div className="max-w-3xl mx-auto">
@@ -341,21 +350,23 @@ const SpeechArticulationPage = () => {
 
                     {/* Question Text */}
                     {questions && (
-                        <div className="mb-8">
-                            <p className="text-lg mb-2">Say this...</p>
-                            <p className="text-xl font-semibold">
-                                {questions[questionCount - 1]?.wordtext}
-                            </p>
-                        </div>
+                        <LogoQuestionView
+                            first_text={"Say this..."}
+                            second_text={questions && questions?.[questionCount - 1]?.wordtext}
+                            highlighted={questions && questions?.[questionCount - 1]?.highlightword
+                                ? JSON.parse(questions?.[questionCount - 1]?.highlightword)
+                                : []}
+                        />)}
+                    {recordingStatus == 'stop' && questionResponse && (
+                        <LogoQuestionView
+                            first_text={questionResponse}
+                            second_text={null}
+                            questionResponse={questionResponse}
+                        />
                     )}
 
-                    {/* Response */}
-                    {recordingStatus === 'stop' && questionResponse && (
-                        <div className={`p-4 rounded-lg mb-8 ${questionResponse === 'Correct!' ? 'bg-green-100' : 'bg-red-100'
-                            }`}>
-                            <p className="text-lg font-semibold">{questionResponse}</p>
-                        </div>
-                    )}
+
+
 
                     {/* Recording Interface */}
                     {recordingStatus !== 'stop' && (
@@ -414,6 +425,7 @@ const SpeechArticulationPage = () => {
                             />
                         </div>
                     )}
+                    <Loader loading={loading} />
                 </div>
             </main>
         </div>

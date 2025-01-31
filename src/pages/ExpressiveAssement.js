@@ -91,6 +91,7 @@ function ExpressiveAssessment() {
   const [correctExpressions, setCorrectExpressions] = useState([]);
   const [expressionsArray, setExpressionsArray] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [isStopButtonDisabled, setIsStopButtonDisabled] = useState(false);
   let question = [];
   const [expression, setExpression] = useState(null);
   const [snapshot, setSnapshot] = useState(null);
@@ -169,13 +170,15 @@ function ExpressiveAssessment() {
   const onStartRecord = async () => {
     try {
       setRecordingStatus('recording');
-
+      setIsStopButtonDisabled(true);
       if (!webcamRef.current) {
         console.error('Webcam reference not available');
         setRecordingStatus('idle');
         return;
       }
-
+      setTimeout(() => {
+        setIsStopButtonDisabled(false);
+      }, 5000);
       const imageSrc = webcamRef.current.getScreenshot();
 
       if (!imageSrc) {
@@ -479,23 +482,24 @@ function ExpressiveAssessment() {
 
           <ReactMic
             record={recordingStatus === 'recording'}
-            className="sound-wave mx-auto border rounded-3xl"
+            className="sr-only"
             onStop={handleAudioStop}
             strokeColor="#000000"
             backgroundColor="#FF4081"
           />
+
 
           <div className="mt-5">
             {recordingStatus === 'idle' && isVideoEnd && (
               <RecordButton
                 onPress={onStartRecord}
                 title="Record"
-                disabled={disableRecordingButton}
+
               />
             )}
 
             {recordingStatus === 'recording' && (
-              <PlayButton onPress={onStopRecord} disabled={false} />
+              <PlayButton onPress={onStopRecord} disabled={isStopButtonDisabled} />
             )}
 
             {recordingStatus === 'stop' && (

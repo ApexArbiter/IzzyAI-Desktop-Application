@@ -1,26 +1,52 @@
 import React, { useState } from 'react';
-
-import LockIcon from '../assets/LockIcon';
+import { useNavigate } from 'react-router-dom';
+import { Lock } from 'lucide-react';
 import CustomHeader from '../components/CustomHeader';
 import { useDataContext } from '../contexts/DataContext';
-import BaseURL from '../components/ApiCreds';
-import InputField from '../components/InputField';
-import { COLORS, fonts } from '../theme';
-import { changeUserPassword, setToken } from '../utils/functions';
-import { useNavigate } from 'react-router-dom';  // React Router for navigation
+import { changeUserPassword } from '../utils/functions';
 
-const CustomButton = (props) => {
+const CustomButton = ({ onPress, title, loading, className }) => {
   return (
     <button
-      onClick={() => props.onPress()}
-      style={styles.button}
-      disabled={props.loading}>
-      {props.loading ? (
-        <ActivityIndicator color={'white'} size={26} />
+      onClick={onPress}
+      className={`w-full max-w-md px-6 py-3 text-white bg-black rounded-full font-semibold 
+      transition-all duration-300 hover:bg-gray-800 disabled:opacity-50 
+      disabled:cursor-not-allowed ${className}`}
+      disabled={loading}
+    >
+      {loading ? (
+        <div className="flex items-center justify-center">
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+          Processing...
+        </div>
       ) : (
-        <Text style={styles.buttonText}>{props.title}</Text>
+        title
       )}
     </button>
+  );
+};
+
+const InputField = ({ label, placeholder, value, onChangeText, icon, type = "password", required = true }) => {
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        {label}{required && <span className="text-red-500">*</span>}
+      </label>
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          {icon}
+        </div>
+        <input
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChangeText(e.target.value)}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
+          focus:ring-blue-500 focus:border-transparent transition-all duration-300
+          placeholder:text-gray-400"
+        />
+      </div>
+    </div>
   );
 };
 
@@ -29,22 +55,23 @@ function ChangePassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const { userDetail, updateUserDetail } = useDataContext();
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const handleChange = async () => {
     if (!oldPassword || !password) {
-      alert('Old and new password are required');
+      setError('Old and new password are required');
       return;
     }
-    if (password?.length <8) {
-      alert('Password must be at least 8 characters');
+    if (password?.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
 
     if (confirmPassword !== password) {
-      alert('Password & Confirm Password must be the same');
+      setError('Password & Confirm Password must be the same');
       return;
     }
 
@@ -56,173 +83,93 @@ function ChangePassword() {
     formData.append('newPassword', password);
     formData.append('confirmNewPassword', confirmPassword);
 
-    Keyboard.dismiss();
-
     try {
+      setError("")
       const response = await changeUserPassword(formData);
       setIsLoading(false);
+      console.log(response)
       if (response?.status === 200) {
         alert('Password Updated Successfully');
         updateUserDetail({});
-        history('/auth');  // Using React Router to navigate
+        navigate('/');
       } else {
-        alert(response?.response?.data?.error || 'Something went wrong');
+        setError(response?.response?.data?.error || 'Something went wrong');
       }
     } catch (error) {
       setIsLoading(false);
-      alert('Something went wrong');
+      setError('Something went wrong');
     }
   };
 
   return (
-    <SafeAreaView style={styles.safe_area}>
-      <CustomHeader goBack={() => history.goBack()} title="Change Password" />
-      <div style={styles.main_view}>
-        <ScrollView style={styles.scrollView}>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <CustomHeader title="Change Password" goBack={() => navigate(-1)} />
 
-          <div style={styles.image_view}>
-            <Image
-              resizeMode='contain'
-              style={styles.image}
-              src="../assets/images/logo.png"
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4">
+        <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
+          {/* Logo */}
+          <div className="flex justify-center">
+            <img
+              src={require('../assets/images/logo.png')}
               alt="Logo"
+              className="h-16 w-auto object-contain"
             />
           </div>
 
-          <Text style={styles.labelText}>
-            Old Password <span style={{ color: 'red' }}>*</span>
-          </Text>
+          {/* Heading */}
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-center text-gray-900">
+              Change Your Password
+            </h1>
+            <p className="text-center text-gray-500">
+              Please enter your old and new password
+            </p>
+          </div>
 
-          <InputField
-            LeftIcon={<LockIcon />}
-            onChangeText={setOldPassword}
-            placeholder='Old Password'
-            value={oldPassword}
-            isPassword={true}
-          />
+          {/* Form */}
+          <div className="space-y-6">
+            <InputField
+              label="Old Password"
+              placeholder="Enter your old password"
+              value={oldPassword}
+              onChangeText={setOldPassword}
+              icon={<Lock className="w-5 h-5" />}
+            />
 
-          <Text style={styles.labelText}>
-            New Password <span style={{ color: 'red' }}>*</span>
-          </Text>
+            <InputField
+              label="New Password"
+              placeholder="Enter your new password"
+              value={password}
+              onChangeText={setPassword}
+              icon={<Lock className="w-5 h-5" />}
+            />
 
-          <InputField
-            LeftIcon={<LockIcon />}
-            onChangeText={setPassword}
-            placeholder='Password'
-            value={password}
-            isPassword={true}
-          />
+            <InputField
+              label="Confirm New Password"
+              placeholder="Confirm your new password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              icon={<Lock className="w-5 h-5" />}
+            />
 
-          <Text style={styles.labelText}>
-            Confirm Password <span style={{ color: 'red' }}>*</span>
-          </Text>
+            {/* Error Message */}
+            {error && (
+              <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-100">
+                {error}
+              </div>
+            )}
 
-          <InputField
-            LeftIcon={<LockIcon />}
-            onChangeText={setConfirmPassword}
-            placeholder='Confirm Password'
-            value={confirmPassword}
-            isPassword={true}
-          />
-
-        </ScrollView>
-        <CustomButton
-          onPress={handleChange}
-          title="Change"
-          loading={isLoading}
-        />
+            {/* Change Password Button */}
+            <CustomButton
+              onPress={handleChange}
+              title="Change Password"
+              loading={isLoading}
+            />
+          </div>
+        </div>
       </div>
-    </SafeAreaView>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  safe_area: {
-    flex: 1
-  },
-  main_view: {
-    flex: 1,
-    padding: 20
-  },
-  image_view: {
-    height: 80,
-    width: "40%",
-    marginTop: 20,
-    alignSelf: "center"
-  },
-  image: {
-    height: "100%",
-    width: "100%"
-  },
-  labelText: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginTop: 20,
-    fontFamily: fonts.regular,
-    color: COLORS.text_black_color
-  },
-  forgot_password_view: {
-    alignSelf: "flex-end",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 10,
-    paddingVertical: 5,
-  },
-
-  forgotPassword: {
-    marginLeft: 'auto',
-    fontWeight: '600',
-    fontSize: 16,
-    fontFamily: fonts.regular,
-    color: COLORS.text_black_color
-  },
-
-  heading: {
-    paddingTop: 40,
-    fontSize: 24,
-    fontWeight: '500',
-    textAlign: "center",
-    color: COLORS.text_black_color,
-    fontFamily: fonts.regular
-  },
-  para: {
-    paddingTop: 5,
-    fontSize: 16,
-    paddingHorizontal: 30,
-    textAlign: 'center',
-    fontWeight: '400',
-  },
-  button: {
-    borderRadius: 50,
-    alignItems: 'center',
-    backgroundColor: COLORS.text_black_color,
-    padding: 10,
-    height: 50,
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  text: {
-    fontSize: 16,
-    color: COLORS.text_black_color
-  },
-  bold: {
-    fontWeight: '700',
-  },
-  socialAuthBtn: {
-    width: '48%',
-    height: 50,
-    borderColor: '#D0D5DD',
-    borderWidth: 1,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 50,
-    margin: 5,
-  },
-});
 
 export default ChangePassword;

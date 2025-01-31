@@ -12,10 +12,12 @@ import {
 } from '../utils/functions';
 import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import Loader from '../components/Loader';
+import CustomHeader from '../components/CustomHeader';
 
 // LoaderWave Component
 const LoaderWave = ({ isAnimation, isDark }) => (
     <div className={`flex items-center justify-center gap-1 ${isAnimation ? 'animate-pulse' : ''}`}>
+
         {[...Array(5)].map((_, i) => (
             <div
                 key={i}
@@ -31,7 +33,6 @@ const LoaderWave = ({ isAnimation, isDark }) => (
 const AvatarTherapistName = () => {
     const navigate = useNavigate();
     const { userDetail } = useDataContext();
-    const [loading, setLoading] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [allVideos, setAllVideos] = useState([]);
     const [questions, setQuestions] = useState([]);
@@ -43,6 +44,7 @@ const AvatarTherapistName = () => {
     const [timer, setTimer] = useState(5);
     const [counter, setCounter] = useState(100);
     const [correctArticCount, setCorrectArticCount] = useState(1);
+    const [loading, setLoading] = useState(false);
     const mediaRecorderRef = useRef(null);
     const videoRef = useRef(null);
     const mediaStreamRef = useRef(null);
@@ -303,13 +305,14 @@ const AvatarTherapistName = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white">
-            <header className="bg-white py-4 px-6 border-b flex items-center gap-4">
+        <div className="flex flex-col min-h-screen" style={{ backgroundColor: "#fafcf9" }} >
+            {/* <header className="bg-white py-4 px-6 border-b flex items-center gap-4">
                 <button onClick={() => navigate('/therapistsPage')} className="p-2">
                     <ArrowLeft className="w-6 h-6" />
                 </button>
                 <h1 className="text-xl font-semibold">IzzyAI Conversational Avatar</h1>
-            </header>
+            </header> */}
+            <CustomHeader title="IzzyAI Conversational Avatar" goBack={() => { navigate(-1) }} />
 
             <main className="flex-1 p-5">
                 <div className="max-w-3xl mx-auto">
@@ -325,7 +328,7 @@ const AvatarTherapistName = () => {
                                 onEnded={onEndVideo}
                                 autoPlay
                                 playsInline
-                                controls={true}
+                                controls={false}
                             />
                         )}
                     </div>
@@ -351,7 +354,7 @@ const AvatarTherapistName = () => {
                                 <button
                                     disabled={isVideoLoading || disorderVideo !== null}
                                     onClick={onStartRecord}
-                                    className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                    className="w-12 h-12 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition-colors disabled:opacity-50"
                                 >
                                     <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
                                         <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3z" />
@@ -378,7 +381,7 @@ const AvatarTherapistName = () => {
                 </div>
             </main>
 
-            {loading && <Loader />}
+            <Loader loading={loading} />
         </div>
     );
 };

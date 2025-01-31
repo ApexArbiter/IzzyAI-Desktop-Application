@@ -36,6 +36,7 @@ function ReceptiveExercise() {
   // const { sessionId, isAll } = useParams();
   const location = useLocation();
   const { sessionId, isAll } = location.state || {};
+  console.log(location.state)
   const [startTime, setStartTime] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
@@ -290,11 +291,23 @@ function ReceptiveExercise() {
 
   const navigateTo = () => {
     // Your custom navigation method (useNavigate)
-    history(`/result-expressive-language/`);
+    history(`/result-expressive-language/`, {
+      state:
+      {
+        sessionId: sessionId,
+        startTime: startTime,
+        correctAnswers: correctAnswersCount,
+        incorrectAnswers: incorrectQuestions?.length,
+        incorrectQuestions: incorrectQuestions,
+        isExpressive: false,
+        totalQuestions: questions?.length,
+        isExercise: true
+      }
+    });
   };
 
   const navigateBack = () => {
-    history.goBack();
+    history(-1);
   };
 
   useEffect(() => {

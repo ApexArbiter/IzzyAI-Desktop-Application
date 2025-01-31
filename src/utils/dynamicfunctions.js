@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function QuizComponent() {
+export default function dynamicfunctions() {
     const [questionResponse, setQuestionResponse] = useState('');
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [questionCount, setQuestionCount] = useState(1);
@@ -46,29 +46,29 @@ export default function QuizComponent() {
     }
 
     const onCorrectExpression = (ques, exp) => {
-        if (!correctExpressions.includes(ques + exp.expression)) {
+        if (!correctExpressions.includes(ques + exp)) {
             setCorrectExpressions(prevQuestions => [
                 ...prevQuestions,
-                ques + exp.expression,
+                ques + exp,
             ]);
         }
-        if (incorrectExpressions.some(q => q === ques + exp.expression)) {
+        if (incorrectExpressions.some(q => q === ques + exp)) {
             setIncorrectExpressions(prevQuestions =>
-                prevQuestions.filter(q => q !== ques + exp.expression),
+                prevQuestions.filter(q => q !== ques + exp),
             );
         }
     }
 
     const onWrongExpression = (ques, exp) => {
-        if (!incorrectExpressions.some(q => q === ques + exp.expression)) {
+        if (!incorrectExpressions.some(q => q === ques + exp)) {
             setIncorrectExpressions(prevQuestions => [
                 ...prevQuestions,
-                ques + exp.expression,
+                ques + exp,
             ]);
         }
-        if (correctExpressions.includes(ques + exp.expression)) {
+        if (correctExpressions.includes(ques + exp)) {
             setCorrectExpressions(prevQuestions =>
-                prevQuestions.filter(q => q !== (ques + exp.expression)),
+                prevQuestions.filter(q => q !== (ques + exp)),
             );
         }
     }

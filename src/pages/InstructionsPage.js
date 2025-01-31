@@ -7,7 +7,7 @@ import { fonts } from '../theme';
 function InstructionsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const { sessionId, isAll } = location.state || {};  // Access passed state
   console.log(location.state)
 
@@ -16,93 +16,68 @@ function InstructionsPage() {
   };
 
   return (
-    <div style={styles.safe_area}>
-      <CustomHeader title="Articulation Disorder" goBack={() => navigate(-1)} />
 
-      <div style={styles.main_view}>
-        <div style={styles.scrollView}>
-          <img
-            style={styles.image}
-            src={require('../assets/images/mouth.png')}
-            alt="Mouth"
-          />
-          
-          <p style={{ ...styles.base, ...styles.heading, textAlign: 'center' }}>
-            Assessment Instructions
-          </p>
-          <div style={{ height: '20px' }} />
-          
-          <div style={styles.text_row}>
-            <span style={{ ...styles.base, fontSize: 14, fontWeight: 400 }}>•</span>
-            <p style={{ ...styles.base, fontSize: 14, fontWeight: 400 }}>
+    <div className="flex flex-col min-h-screen">
+      <CustomHeader
+        title="Articulation Disorder"
+        goBack={() => navigate(-1)}
+      />
+
+      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg md:m-20 m-0">
+        {/* Image container */}
+        <div className="flex justify-center mb-12">
+          <div className="relative w-56 h-56 bg-teal-50 rounded-full flex items-center justify-center">
+            <img
+              src={require("../assets/images/mouth.png")}
+              alt="Mouth"
+              className="h-44 w-auto transform transition-transform hover:scale-105"
+            />
+          </div>
+        </div>
+
+        {/* Heading */}
+        <h2 className="text-xl font-bold   mt-10 font-serif text-gray-900">
+          Assessment Instructions
+        </h2>
+
+        {/* Instructions list - centered with max-width */}
+        <div className="space-y-4 h-[23vh] mt-6 max-w-md mx-auto w-full pl-4">
+          <div className="flex items-start gap-3 ">
+            <span className="text-teal-500 text-[20px] relative bottom-1 animate-pulse glow">•</span>
+            <p className="text-gray-900 font-serif">
               You will be shown some images of random objects. Say the names of each object loud and clearly.
             </p>
           </div>
 
-          <div style={styles.text_row}>
-            <span style={{ ...styles.base, fontSize: 14, fontWeight: 400 }}>•</span>
-            <p style={{ ...styles.base, fontSize: 14, fontWeight: 400 }}>
+          <div className="flex items-start gap-3 ">
+            <span className="text-teal-500 text-[20px] relative bottom-1 animate-pulse glow">•</span>
+            <p className="text-gray-900 font-serif">
               Hit the "Record" button to start answering.
             </p>
           </div>
 
-          <div style={styles.text_row}>
-            <span style={{ ...styles.base, fontSize: 14, fontWeight: 400 }}>•</span>
-            <p style={{ ...styles.base, fontSize: 14, fontWeight: 400 }}>
+          <div className="flex items-start gap-3 ">
+            <span className="text-teal-500 text-[20px] relative bottom-1 animate-pulse glow">•</span>
+            <p className="text-gray-900 font-serif">
               IzzyAl will respond advising whether your answers are correct or incorrect.
             </p>
           </div>
-
         </div>
-        
-        <CustomButton
-          style={styles.btn}
-          onPress={handleNavigate}
-          title="Start Now"
-        />
-      </div>
+
+        {/* Start button - centered */}
+        <div className=" w-full max-w-xs flex justify-center">
+          <button
+            className="bg-black hover:bg-gray-800 text-white pl-16 pr-16 pt-2 pb-2 rounded-full"
+            onClick={handleNavigate}
+          >
+            Start Now
+          </button>
+        </div>
+      </main>
     </div>
   );
 }
 
-const styles = {
-  safe_area: {
-    flex: 1,
-  },
-  main_view: {
-    flex: 1,
-    padding: '20px',
-  },
-  scrollView: {
-    overflowY: 'scroll',
-  },
-  base: {
-    fontFamily: fonts.regular,
-    color: '#111920',
-  },
-  heading: {
-    paddingTop: '50px',
-    fontSize: '24px',
-    fontWeight: '500',
-  },
-  text_row: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginTop: '10px',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    gap: '10px',
-  },
-  btn: {
-    width: '100%',
-    marginTop: '60px',
-  },
-  image: {
-    marginTop: '40px',
-    display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  }
-};
+
 
 export default InstructionsPage;

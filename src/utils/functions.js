@@ -819,6 +819,7 @@ export const cancelSubscription = async (id, invoiceid) => {
     return error
   }
 };
+
 export const sendFeedback = async (data) => {
   const token = await getToken()
   try {

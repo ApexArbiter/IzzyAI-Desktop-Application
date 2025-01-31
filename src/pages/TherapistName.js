@@ -6,6 +6,8 @@ import styled, { keyframes } from 'styled-components';
 import BaseURL from '../components/ApiCreds';
 import { insertSessionData, capitalize, getToken } from "../utils/functions";
 import CustomHeader from '../components/CustomHeader';
+import '../../src/App.css'
+import Loader from '../components/Loader';
 
 // Define the wave animation keyframe
 const waveAnimation = keyframes`
@@ -19,7 +21,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #ffffff;
+  background-color: #f2f1f1#;
 `;
 
 const ChatContainer = styled.div`
@@ -43,7 +45,7 @@ const AudioMessage = styled.div`
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background-color: ${props => props.isUser ? '#2DEEAA' : '#F8F8F8'};
+  background-color: ${props => props.isUser ? '#2DEEAA' : '#fff'};
   border-radius: 8px;
   max-width: 80%;
 `;
@@ -106,8 +108,9 @@ const IconButton = styled.button`
 const MessageText = styled.div`
   padding: 12px;
   border-radius: 8px;
+  border:1px solid black
   max-width: 80%;
-  background-color: ${props => props.isUser ? '#2DEEAA' : '#F8F8F8'};
+  background-color: ${props => props.isUser ? '#2DEEAA' : '#fff'};
   color: ${props => props.isUser ? '#fff' : '#000'};
 `;
 
@@ -147,6 +150,7 @@ const TherapistName = () => {
   const [modalContent, setModalContent] = useState('');
   const [modalScore, setModalScore] = useState('');
   const userId = localStorage.getItem('userId');
+  const [loader, setLoader] = useState(false)
 
   const mediaRecorderRef = useRef(null);
   const audioRef = useRef(new Audio());
@@ -267,9 +271,10 @@ const TherapistName = () => {
     }
   };
   const navigateto = async (path) => {
+    setLoader(true)
 
     const sessionId = await insertSessionData(userId, 1)
-
+    setLoader(false)
     navigate(`/${path}`, { state: { sessionId } });
   }
 
@@ -362,7 +367,11 @@ const TherapistName = () => {
               <span className="text-sm font-bold">IzzyAI</span>
             </div>
             <MessageText>
-              <CircleLoader size={30} color="#2DEEAA" />
+              <div className="dots-loader">
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+              </div>
             </MessageText>
           </MessageGroup>
         )}
@@ -403,8 +412,9 @@ const TherapistName = () => {
           </IconButton>
         )}
       </InputContainer>
+      <Loader loading={loader} />
 
-      {showModal && (
+      {/* {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg text-center">
             <h3 className="text-lg mb-2">You have</h3>
@@ -412,7 +422,7 @@ const TherapistName = () => {
             <h2 className="text-xl font-bold">Score: {modalScore}</h2>
           </div>
         </div>
-      )}
+      )} */}
     </Container>
   );
 };

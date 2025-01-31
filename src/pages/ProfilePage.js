@@ -4,15 +4,22 @@ import { useDataContext } from '../contexts/DataContext';
 import CustomHeader from '../components/CustomHeader';
 import { motion } from 'framer-motion';
 import { Settings, CreditCard, User, HelpCircle, MessageSquare, LogOut } from 'lucide-react';
+import { IMAGE_BASE_URL } from '../components/ApiCreds';
+import BottomNavigation from '../components/BottomNavigation';
+import FeedbackModal from '../components/FeedbackModal';
+
+
 
 function ProfilePage() {
   const history = useNavigate();
-  const { userDetail, updateUserDetail } = useDataContext();
+  const { updateUserDetail } = useDataContext();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const navigate = useNavigate()
   const navigateBack = () => {
     navigate(-1);
   };
+  let userDetail = JSON.parse(localStorage.getItem('userDetails'))
 
   const handleLogout = () => {
     updateUserDetail({});
@@ -22,9 +29,9 @@ function ProfilePage() {
   const menuItems = [
     { icon: <Settings className="w-6 h-6" />, label: 'Settings', onClick: () => navigate("/settings") },
     { icon: <CreditCard className="w-6 h-6" />, label: 'Manage Subscriptions' },
-    { icon: <User className="w-6 h-6" />, label: 'Bio Data' },
-    { icon: <HelpCircle className="w-6 h-6" />, label: 'About App' },
-    { icon: <MessageSquare className="w-6 h-6" />, label: 'Feedback' },
+    { icon: <User className="w-6 h-6" />, label: 'Bio Data', onClick: () => navigate("/BioData") },
+    { icon: <HelpCircle className="w-6 h-6" />, label: 'About App', onClick: () => navigate("/aboutUs") },
+    { icon: <MessageSquare className="w-6 h-6" />, label: 'Feedback', onClick: () => setShowFeedbackModal(true) },
     { icon: <LogOut className="w-6 h-6" />, label: 'Logout', onClick: () => setShowLogoutModal(true) }
   ];
 
@@ -61,8 +68,9 @@ function ProfilePage() {
               transition={{ type: "spring", stiffness: 200 }}
               className="relative"
             >
+              {console.log(`${userDetail.avatarUrl}`)}
               <img
-                src={userDetail.avatarUrl}
+                src={`${userDetail.avatarUrl}`}
                 alt="Profile"
                 className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
               />
@@ -121,6 +129,11 @@ function ProfilePage() {
           ))}
         </motion.div>
 
+        <FeedbackModal
+          isOpen={showFeedbackModal}
+          onClose={() => setShowFeedbackModal(false)}
+        />
+
         {/* Logout Modal */}
         {showLogoutModal && (
           <motion.div
@@ -154,6 +167,7 @@ function ProfilePage() {
           </motion.div>
         )}
       </div>
+      <BottomNavigation />
     </div>
   );
 }

@@ -1,326 +1,660 @@
-import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import { endSession, getToken } from "../utils/functions"
-import BaseURL from "../components/ApiCreds"
-import moment from "moment"
-import { useDataContext } from "../contexts/DataContext"
-import CustomHeader from "../components/CustomHeader"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { Button } from "../components/ui/button"
-import { Progress } from "../components/ui/progress"
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Webcam from 'react-webcam';
+import { ReactMic } from 'react-mic';
+import { LinearProgress } from '@mui/material';
+import { useDataContext } from '../contexts/DataContext';
+import { getExpressiveQuestions, evaluateExpressiveQuestion, getToken, authenticateFace, getExpressiveAllExerciseQuestions, getExpressiveExerciseQuestions } from "../utils/functions";
+import CustomHeader from '../components/CustomHeader';
+import VideoPlayer2 from '../components/VideoPlayer2';
+import Loader from '../components/Loader';
+import LogoQuestionView from '../components/LogoQuestionView';
+import WaveIcon from '../assets/Wave'; // Make sure to convert your WaveSVG to React component
+import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 
-const CircularProgress = ({ percentage, size = "lg" }) => {
-  const radius = 45
-  const circumference = 2 * Math.PI * radius
-  const offset = circumference - (percentage / 100) * circumference
+// Button Components
+const RecordButton = ({ onPress, title, disabled }) => (
+  <button
+    onClick={onPress}
+    disabled={disabled}
+    className={`w-full rounded-full bg-slate-900 py-3 px-4 h-12 flex items-center justify-center mt-5 mb-[10%] transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-800 active:bg-slate-700'}`}
+  >
+    <span className="text-white font-semibold flex items-center gap-2">
+      <span className="text-red-500">●</span> {title}
+    </span>
+  </button>
+);
 
-  const sizes = {
-    sm: "w-32 h-32",
-    lg: "w-48 h-48",
-    xl: "w-64 h-64",
-  }
+const EndButton = ({ onPress, title }) => (
+  <button
+    onClick={onPress}
+    className="w-[42%] rounded-full bg-red-500 py-3 px-4 h-12 flex items-center justify-center transition-all hover:bg-red-600 active:bg-red-700"
+  >
+    <span className="text-white font-semibold">{title}</span>
+  </button>
+);
 
-  return (
-    <div className={`relative ${sizes[size]} flex items-center justify-center`}>
-      <svg className="transform -rotate-90 w-full h-full">
-        <circle cx="50%" cy="50%" r={radius} className="stroke-gray-200 fill-none" strokeWidth="8" />
-        <circle
-          cx="50%"
-          cy="50%"
-          r={radius}
-          className={`${percentage >= 70 ? "stroke-green-500" : "stroke-red-500"} fill-none`}
-          strokeWidth="8"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className="absolute text-2xl font-bold">{percentage.toFixed(1)}%</span>
-    </div>
-  )
-}
+const NextButton = ({ onPress, title }) => (
+  <button
+    onClick={onPress}
+    className="w-[42%] rounded-full bg-green-400 py-3 px-4 h-12 flex items-center justify-center transition-all hover:bg-green-500 active:bg-green-600"
+  >
+    <span className="text-slate-900 font-semibold">{title}</span>
+  </button>
+);
 
-const ArticulationResult = () => {
-  const navigate = useNavigate()
-  const { updateUserDetail, articulationReport } = useDataContext()
-  const userId = localStorage.getItem("userId")
-  const [loading, setLoading] = useState(false)
-  const [soundNames, setSoundNames] = useState([])
-  const location = useLocation()
+const PrevButton = ({ onPress, title }) => (
+  <button
+    onClick={onPress}
+    className="w-[42%] rounded-full border border-slate-900 py-3 px-4 h-12 flex items-center justify-center transition-all hover:bg-slate-50 active:bg-slate-100"
+  >
+    <span className="text-slate-900 font-semibold">{title}</span>
+  </button>
+);
 
-  const {
-    startTime,
-    SessiontypId,
-    sessionId,
-    totalQuestions: total,
-    expressionsArray,
-    incorrectExpressions,
-    correctExpressions,
-    correctAnswers,
-    isQuick,
-  } = location.state || {}
+const PlayButton = ({ onPress, disabled }) => (
+  <div className="border-2 border-red-500 mb-[10%] p-1 rounded-full mt-5">
+    <button
+      disabled={disabled}
+      onClick={onPress}
+      className={`w-full rounded-full bg-red-500 py-3 px-4 h-12 flex items-center justify-center transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600 active:bg-red-700'}`}
+    >
+      <WaveIcon />
+    </button>
+  </div>
+);
 
-  const incorrectQuestions = JSON.parse(localStorage.getItem("incorrectQuestions") || "[]")
+function ExpressiveAssessment() {
+  const location = useLocation();
+  const { sessionId, isAll } = location.state || {};
+  console.log(location.state)
+  const navigate = useNavigate();
+  const { setExpressiveReport } = useDataContext();
+  const webcamRef = useRef(null);
+  const videoRef = useRef(null);
 
-  const totalQuestions = correctAnswers + incorrectQuestions?.length
-  const percentage = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0
-  const expressionScore =
-    expressionsArray?.length > 0 ? (correctExpressions?.length / expressionsArray?.length) * 100 : 0
-  const expressionpercentage = (incorrectExpressions?.length / totalQuestions) * 100
-  const correctexpressionPercentage = (correctExpressions?.length / totalQuestions) * 100
+  // // Get params from router state or localStorage
+  // const sessionId = localStorage.getItem("sessionId");
+  // const isAll = localStorage.getItem("isAll") === "true";
 
-  const getIncorrectQuestions = () => {
-    if (SessiontypId == 1) return incorrectQuestions?.filter((item) => item && (item.WordText || item?.wordtext))
-    return incorrectQuestions
-  }
+  // State management
+  const [startTime, setStartTime] = useState('');
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [questionResponse, setQuestionResponse] = useState('');
+  const [questionCount, setQuestionCount] = useState(1);
+  const [recordingStatus, setRecordingStatus] = useState('idle');
+  const [incorrectQuestions, setIncorrectQuestions] = useState([]);
+  const [correctQuestions, setCorrectQuestions] = useState([]);
+  const [incorrectExpressions, setIncorrectExpressions] = useState([]);
+  const [disableRecordingButton, setDisableRecordingButton] = useState(false);
+  const [correctExpressions, setCorrectExpressions] = useState([]);
+  const [expressionsArray, setExpressionsArray] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [isComplete, setIsComplete] = useState(false);
+  // Add these new states at the start of your component
+  const [answerCount, setAnswerCount] = useState(0);  // Tracks which part of the answer we're on
+  const [recordCount, setRecordCount] = useState(0);  // Tracks number of attempts
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0); // Tracks correct attempts
+  const [isNextAnswer, setIsNextAnswer] = useState(false); // Indicates moving to next answer part
+  const [isDelay, setIsDelay] = useState(false); // Controls delay between attempts
 
-  const addAssessmentResult = async () => {
-    const token = await getToken()
-    try {
-      const obj = {
-        expressions: isQuick ? null : expressionsArray,
-        correct: isQuick ? null : correctexpressionPercentage,
-        incorrect: isQuick ? null : expressionpercentage,
-        questions_array: getIncorrectQuestions(),
-      }
-      setLoading(true)
-      const formData = new FormData()
-      formData.append("UserID", userId)
-      formData.append("Score", percentage)
-      formData.append("SessionID", sessionId)
-      formData.append("DisorderID", 1)
-      if (isQuick) {
-        formData.append("quick_assessment", "quick_assessment")
-      }
-      formData.append("emotion", JSON.stringify(obj))
 
-      const validItems = articulationReport?.filter((item) => item !== undefined)
+  let question = [];
+  const [expression, setExpression] = useState(null);
+  const [snapshot, setSnapshot] = useState(null);
+  const [isVideoEnd, setIsVideoEnd] = useState(false);
+  const [categorywiseReport, setCategoryWiseReport] = useState({
+    category1: 0,
+    category2: 0,
+    category3: 0,
+    category4: 0
+  });
 
-      const extractedWordIDs = validItems?.map((item) => item?.WordID || item?.id)
-      const extractedSoundIDs = validItems?.map((item) => item?.SoundID)
-
-      if (extractedWordIDs && extractedSoundIDs) {
-        formData.append("WordIDList", JSON.stringify(extractedWordIDs))
-        formData.append("SoundIDList", JSON.stringify(extractedSoundIDs))
-      } else {
-        return
-      }
-
-      formData.append("AssessmentDate", moment(new Date()).format("YYYY-MM-DD hh:mm:ss"))
-
-      const response = await fetch(`${BaseURL}/add_assessment_result`, {
-        method: "POST",
-        body: formData,
-        headers: { Authorization: "Bearer " + token },
-      })
-
-      if (response.ok) {
-        const responseData = await response.json()
-        console.log("Assessment result added successfully", responseData)
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.message || response.statusText)
-      }
-    } catch (error) {
-      console.error("Error in addAssessmentResult:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchReport = async () => {
-    const token = await getToken()
-    try {
-      const response = await fetch(`${BaseURL}/get_Exercise_word_count/${userId}/1/`, {
-        method: "GET",
-        headers: { Authorization: "Bearer " + token },
-      })
-      if (response.ok) {
-        const reportData = await response.json()
-        let sum = 0
-        const names = []
-        for (const key in reportData) {
-          if (reportData.hasOwnProperty(key)) {
-            sum += reportData[key].Count / 4
-            names.push(reportData[key].SoundName)
-          }
-        }
-        updateUserDetail({ totalQuestion: sum })
-        setSoundNames(names)
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.message || response.statusText)
-      }
-    } catch (error) {
-      console.error("Error fetching report:", error)
-    }
-  }
-
-  const submitUserExercise = async () => {
-    const token = await getToken()
-    const obj = {
-      expressions: isQuick ? null : expressionsArray,
-      correct: isQuick ? null : correctexpressionPercentage,
-      incorrect: isQuick ? null : expressionpercentage,
-      questions_array: getIncorrectQuestions(),
-    }
-    const formData = new FormData()
-    formData.append("UserID", userId)
-    formData.append("DisorderID", 1)
-    formData.append("SessionID", sessionId)
-    formData.append("ExerciseDate", moment(new Date()).format("YYYY-MM-DD hh:mm:ss"))
-    formData.append("SoundIDList", JSON.stringify(soundNames))
-    formData.append("CompletionStatus", "complete")
-    formData.append("CompletedQuestions", totalQuestions)
-    formData.append("WordIDList", JSON.stringify([]))
-    formData.append("Score", percentage)
-    formData.append("TotalQuestions", totalQuestions)
-    formData.append("emotion", JSON.stringify(obj))
-
-    try {
-      setLoading(true)
-      const response = await fetch(`${BaseURL}/artic_user_exercise`, {
-        method: "POST",
-        body: formData,
-        headers: { Authorization: "Bearer " + token },
-      })
-
-      if (response.ok) {
-        const responseData = await response.json()
-        console.log("User exercise submitted successfully", responseData)
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.error || response.statusText)
-      }
-    } catch (error) {
-      console.error("Error in submitUserExercise:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Get user details from localStorage
+  const userId = localStorage.getItem("userId");
+  const userDetail = JSON.parse(localStorage.getItem("userDetails"));
 
   useEffect(() => {
-    fetchReport()
-  }, [userId, articulationReport]) // Added articulationReport to dependencies
+    const currentStartTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    setStartTime(currentStartTime);
 
+
+    // Add beforeunload event listener
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
   useEffect(() => {
-    const handleEffects = async () => {
-      try {
-        if (SessiontypId === 1) {
-          await addAssessmentResult()
-        }
-        if (SessiontypId === 2) {
-          await submitUserExercise()
-        }
-        await updateSession()
-      } catch (error) {
-        console.error("Error in effect:", error)
+    if (questions.length > 0) {
+      console.log("Questions state updated:", questions);
+    }
+  }, [questions]);
+
+  const fetchQuestionData = async () => {
+    try {
+      setIsLoading(true);
+      console.log("isALL", isAll)
+      const response = isAll ? await getExpressiveAllExerciseQuestions(userId, userDetail?.AvatarID) : await getExpressiveExerciseQuestions(userId, userDetail?.AvatarID)
+      console.log(response)
+      if (response) {
+        console.log("Questions from response", response?.[questionCount - 1]?.question);
+        setQuestions(prevQuestions => [...prevQuestions, ...response]);
+        // questions.push(response)
+        question = response
+        console.log(question)
+
       }
+    } catch (error) {
+      console.error('Network request failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  // Add this at the component level
+  useEffect(() => {
+    const resetAndPlayVideo = () => {
+      if (videoRef.current) {
+        videoRef.current.stop();
+        videoRef.current.seek(0.1);
+        setTimeout(() => {
+          if (recordCount < 3 && !isDelay && recordingStatus === 'idle') {
+            videoRef.current.resume();
+            setIsVideoEnd(false);
+          }
+        }, 200);
+      }
+    };
+
+    if (recordingStatus === 'idle' && !isDelay) {
+      resetAndPlayVideo();
+    }
+  }, [recordingStatus, isDelay, recordCount]);
+
+  // Call fetchQuestionData
+  useEffect(() => {
+    fetchQuestionData();
+  }, []);
+  const navigateTo = () => {
+    setExpressiveReport(incorrectQuestions);
+    navigate('/result-expressive-language', {
+      state: {
+        sessionId,
+        startTime,
+        correctAnswers: correctAnswersCount,
+        incorrectAnswers: incorrectQuestions?.length,
+        incorrectQuestions,
+        isExpressive: true,
+        totalQuestions: questions?.length,
+        isExercise: true, // Add this
+        expressionsArray,
+        incorrectExpressions,
+        correctExpressions
+      }
+    });
+  };
+
+  const onStartRecord = async () => {
+    try {
+      setRecordingStatus('recording');
+
+      if (!webcamRef.current) {
+        console.error('Webcam reference not available');
+        setRecordingStatus('idle');
+        return;
+      }
+
+      const imageSrc = webcamRef.current.getScreenshot();
+
+      if (!imageSrc) {
+        console.error('No image captured');
+        return;
+      }
+
+      // // Convert base64 to blob and create a File object
+      // const blob = await fetch(imageSrc).then(r => r.blob());
+      // console.log("blob",blob)
+      // setSnapshot(blob);
+      // console.log("",snapshot)
+
+
+
+      setDisableRecordingButton(false);
+
+    } catch (error) {
+      console.error('Error capturing image:', error);
+      setRecordingStatus('idle');
+    }
+  };
+
+  const processImage = async () => {
+    if (!webcamRef.current) {
+      console.error('Webcam reference not available');
+      setRecordingStatus('idle');
+      return;
     }
 
-    handleEffects()
-  }, [])
+    const imageSrc = webcamRef.current.getScreenshot();
 
-  const updateSession = async () => {
-    const response = await endSession(sessionId, startTime, isQuick ? "quick_assessment_status" : "Completed", 1)
-    console.log("Session updated:", response)
-  }
-
-  const onPressBack = () => {
-    if (isQuick) {
-      navigate(-2)
-    } else {
-      navigate("/home")
+    if (!imageSrc) {
+      console.error('No image captured');
+      return;
     }
+
+    // Convert base64 to blob and create a File object
+    const blob = await fetch(imageSrc).then(r => r.blob());
+
+    const file = new File([blob], 'webcam-snapshot.jpg', { type: 'image/jpeg' });
+
+    console.log(file)
+    console.log("snapshot", snapshot)
+    return file
   }
+
+  const onStopRecord = async () => {
+    setRecordingStatus('loading');
+    // Stop recording will trigger ReactMic's onStop callback
+  };
+
+  const evaluateQuestion = async (transcription) => {
+    const file = await processImage()
+    console.log(file)
+
+    const formData = new FormData();
+    formData.append('image', file, 'webcam-snapshot.jpg');
+    formData.append('transcription', transcription);
+    formData.append('answers', question?.[questionCount - 1]?.answers);
+    formData.append('expected_expression', question?.[questionCount - 1]?.expression);
+
+    try {
+      const response = await evaluateExpressiveQuestion(formData);
+      console.log(response)
+
+      setRecordingStatus("stop");
+
+      if (response?.expression) {
+        setExpression(response.expression);
+        return response.expression;
+      }
+    } catch (error) {
+      console.error('Error evaluating question:', error);
+    }
+
+    return null;
+  };
+
+  const handleAudioStop = async (recordedBlob) => {
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('audio', recordedBlob.blob, 'sound.wav');
+
+      const response = await fetch(`${BaseURL}/api/voice_to_text`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      const result = await response.text();
+      const data = JSON.parse(result);
+      const detectedExpression = await evaluateQuestion(data?.transcription);
+
+      // Get current answer parts
+      const answers = question[questionCount - 1]?.answers?.split(";");
+      console.log("Answers", answers)
+      console.log("Question", question)
+
+      const currentAnswer = answers?.[answerCount]?.trim()?.toLowerCase();
+      const isCorrect = data?.transcription?.toLowerCase() === currentAnswer?.replace(/\.$/, "");
+
+      setExpressionsArray(prev => [...prev, detectedExpression]);
+      setRecordCount(prevCount => prevCount + 1);
+
+      if (recordCount + 1 >= 3) {
+        // Check if there's another answer part available
+        if (answers?.[answerCount + 1]) {
+          // Move to next answer part
+          setIsDelay(true);
+          setIsNextAnswer(true);
+          setTimeout(() => {
+            setAnswerCount(prev => prev + 1);
+            setRecordCount(0);
+            setIsDelay(false);
+            setIsNextAnswer(false);
+            setExpression(null);
+            setRecordingStatus('idle');
+            if (videoRef.current) {
+              videoRef.current.stop();
+              videoRef.current.seek(0.1);
+              videoRef.current.resume();
+            }
+          }, 2000);
+        } else {
+          // No more answer parts, evaluate overall performance
+          setRecordingStatus('stop');
+          if (consecutiveCorrect > (answers?.length / 2)) {
+            onCorrectExpression(questions[questionCount - 1]?.question, detectedExpression);
+            onCorrectAnswer(questions[questionCount - 1]?.question);
+          } else {
+            onWrongAnswer(questions[questionCount - 1]?.question);
+            onWrongExpression(questions[questionCount - 1]?.question, detectedExpression);
+          }
+        }
+      } else {
+        // Still within attempts for current answer part
+        if (isCorrect) {
+          setConsecutiveCorrect(prev => prev + 1);
+        }
+
+        setIsDelay(true);
+        setTimeout(() => {
+          setIsDelay(false);
+          setExpression(null);
+          setRecordingStatus('idle');
+          if (videoRef.current) {
+            videoRef.current.stop();
+            videoRef.current.seek(0.1);
+            videoRef.current.resume();
+          }
+        }, 2000);
+      }
+
+    } catch (error) {
+      console.error('Error processing audio:', error);
+      setRecordingStatus('idle');
+    }
+  };
+
+  const getCurrentAnswer = () => {
+    let answers = questions?.[questionCount - 1]?.answers?.split(";")
+    return answers?.[answerCount]?.trim()
+  }
+
+
+
+  const onCorrectAnswer = (question) => {
+    setQuestionResponse('Correct!');
+    setCorrectAnswersCount(prev => prev + 1);
+    if (!correctQuestions.includes(question + questionCount)) {
+      setCorrectQuestions(prev => [...prev, question + questionCount]);
+    }
+    if (incorrectQuestions.some(q => q?.questiontext === question + questionCount)) {
+      setIncorrectQuestions(prev =>
+        prev.filter(q => q?.questiontext !== question + questionCount)
+      );
+    }
+    setRecordingStatus("stop");
+  };
+
+  const onWrongAnswer = (ques) => {
+    if (!incorrectQuestions.some(q => q?.questiontext === ques + questionCount)) {
+      setIncorrectQuestions(prevQuestions => [
+        ...prevQuestions,
+        { ...questions?.[questionCount - 1], questiontext: ques + ques + questionCount },
+      ]);
+    }
+    if (correctQuestions.includes(ques + ques + questionCount)) {
+      setCorrectAnswersCount(prevCount => prevCount - 1);
+      setCorrectQuestions(prevQuestions =>
+        prevQuestions.filter(q => q !== ques + questionCount),
+      );
+    }
+
+    setQuestionResponse('Incorrect!');
+
+    let obj = { ...categorywiseReport }
+    if (questionCount > 0 && questionCount <= 10) obj.category1 = obj.category1 + 1
+    else if (questionCount > 10 && questionCount <= 18) obj.category2 = obj.category2 + 1
+    setCategoryWiseReport(obj)
+  }
+
+  const onCorrectExpression = (question, exp) => {
+    if (!correctExpressions.includes(question + exp + questionCount)) {
+      setCorrectExpressions(prev => [...prev, question + exp + questionCount]);
+    }
+    if (incorrectExpressions.some(q => q === question + exp + questionCount)) {
+      setIncorrectExpressions(prev =>
+        prev.filter(q => q !== question + exp + questionCount)
+      );
+    }
+  };
+
+  const onWrongExpression = (question, exp) => {
+    if (!incorrectExpressions.includes(question + exp + questionCount)) {
+      setIncorrectExpressions(prev => [...prev, question + exp + questionCount]);
+    }
+    if (correctExpressions.includes(question + exp)) {
+      setCorrectExpressions(prev =>
+        prev.filter(q => q !== (question + exp + questionCount))
+      );
+    }
+  };
+
+  const endAssessment = () => {
+    setExpressiveReport(incorrectQuestions);
+    navigateTo();
+  };
+
+  const percentageCompleted = ((questionCount) / questions?.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <CustomHeader
-          title={
-            isQuick
-              ? "Quick Articulation Disorder Assessment Result Report"
-              : SessiontypId === 2
-                ? "Articulation Disorder Exercise Result Report"
-                : "Articulation Disorder Assessment Result Report"
-          }
-          goBack={() => navigate(-1)}
-        />
+    <div className="min-h-screen flex flex-col bg-white">
+      <CustomHeader
+        title="Expressive Language Disorder"
+        goBack={() => navigate(-1)}
+      />
 
-        <div className={`${expressionsArray ? "grid md:grid-cols-2 gap-6" : ""} flex justify-center w-full`}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Overall Score</CardTitle>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <CircularProgress percentage={percentage} />
-            </CardContent>
-          </Card>
+      <div className="flex-1 px-5">
+        <div className="max-w-6xl mx-auto w-full pb-8">
+          <p className="text-center mt-4 text-slate-900 text-sm">
+            Place your face in the middle of the camera frame while speaking
+          </p>
 
-          {expressionsArray?.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Expression Analysis</CardTitle>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                <CircularProgress percentage={expressionScore} />
-              </CardContent>
-            </Card>
-          )}
-        </div>
+          <div className="mt-5">
+            <p className="text-lg text-slate-900">
+              Question{' '}
+              <span className="font-bold">
+                {questionCount > questions?.length ? questions?.length : questionCount}{' '}
+              </span>
+              out of
+              <span className="font-bold"> {questions?.length}</span>
+            </p>
+          </div>
 
-        <Card className="mt-6">
-          <CardContent className="space-y-6">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-medium">Correct Pronunciations</span>
-                <span className="font-semibold">
-                  {correctAnswers}/{totalQuestions}
-                </span>
-              </div>
-              <Progress value={(correctAnswers / totalQuestions) * 100} />
+          {percentageCompleted.toString() !== "Infinity" && (
+            <div className="flex items-center mt-3">
+              {(questionCount > 0 && questions?.length > 0) && (
+                <div className="flex-1 bg-slate-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${percentageCompleted}%` }}
+                  />
+                </div>
+              )}
+              <span className="ml-4 text-sm font-medium text-slate-900">
+                {percentageCompleted > 0 ? percentageCompleted.toFixed(1) : 0}%
+              </span>
             </div>
+          )}
 
-            {expressionsArray?.length > 0 && (
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">Correct Expressions</span>
-                  <span className="font-semibold">
-                    {correctExpressions?.length}/{expressionsArray?.length}
-                  </span>
-                </div>
-                <Progress value={expressionScore} />
-              </div>
+          <div className="border border-cyan-500 rounded-2xl flex justify-center items-center mt-3 px-5">
+            {questions?.[questionCount - 1] && (
+              <img
+                className="my-5 w-56 h-56 object-contain"
+                src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
+                alt="Question"
+              />
+            )}
+          </div>
+          {/* Add this after the progress bar */}
+          <div className="flex justify-between items-center mt-3">
+            <p className="text-sm font-medium text-slate-900">
+              Attempt: {Math.min(recordCount + 1, 3)}/3
+            </p>
+            <p className="text-sm font-medium text-slate-900">Answer Part: {answerCount + 1}</p>
+          </div>
+
+          {/* Add this to show the delay message */}
+          {isDelay && (
+            <p className="text-center mt-5 text-slate-900">
+              {isNextAnswer ? "Please be ready for next answer part" : "Please be ready for next attempt"}
+            </p>
+          )}
+
+
+          <div className="flex gap-5 mt-5 justify-center">
+            <div className="flex align-center">
+              {questions?.[questionCount - 1] && (
+                <LogoQuestionView
+                  first_text={questions?.[questionCount - 1] && questions?.[questionCount - 1]?.question}
+                  second_text={getCurrentAnswer()}
+                />
+              )}
+            </div>
+            {console.log(`${IMAGE_BASE_URL}/${questions?.[questionCount - 1]?.avatar_exercise?.split(",")?.[answerCount]?.trim()}`)}
+            <div className="">
+              <VideoPlayer2
+                source={`${IMAGE_BASE_URL}/${questions?.[questionCount - 1]?.avatar_exercise?.split(",")?.[answerCount]?.trim()}`}
+                onEnd={() => {
+                  setIsVideoEnd(true);
+                  if (!isDelay && recordCount < 3) {
+                    setDisableRecordingButton(false);
+                  }
+                }}
+                onStart={() => {
+                  setIsVideoEnd(false);
+                  setDisableRecordingButton(true);
+                }}
+                ref={videoRef}
+                style={{ width: '100%' }}
+                videoHeight={200}
+              />
+            </div>
+          </div>
+
+          <Loader loading={isLoading || recordingStatus === 'loading'} />
+
+          {recordingStatus === 'stop' && questionResponse && (
+            <LogoQuestionView
+              className="mt-5"
+              second_text={null}
+              questionResponse={questionResponse}
+              first_text={questionResponse}
+            />
+          )}
+
+          {recordingStatus === 'stop' && expression && (
+            <p className="text-base text-center mt-3 font-semibold text-slate-900">
+              Facial Expression: {expression}
+            </p>
+          )}
+
+          <div className="w-1/2 h- mt-5 rounded-2xl mx-auto mb-2 overflow-hidden">
+            <Webcam
+              audio={false}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              className="w-full h-full object-cover "
+              videoConstraints={{
+                facingMode: "user"
+              }}
+            />
+          </div>
+
+          <ReactMic
+            record={recordingStatus === 'recording'}
+            className="sr-only"
+            onStop={handleAudioStop}
+            strokeColor="#000000"
+            backgroundColor="#FF4081"
+          />
+
+          <div className="mt-5">
+            {/* Only show Record button when in idle state AND not reached 3 attempts */}
+            {recordingStatus === 'idle' && isVideoEnd && recordCount < 3 && !isDelay && (
+              <RecordButton
+                onPress={onStartRecord}
+                title="Record"
+                disabled={disableRecordingButton}
+              />
             )}
 
-            {incorrectQuestions?.length > 0 && (
-              <div>
-                <h3 className="font-semibold mb-3">List of incorrect Pronunciations:</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {incorrectQuestions.map((question, index) => (
-                    <div key={index} className="p-2 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
-                      <span>{isQuick ? question.wordtext : question.WordText}</span>
-                    </div>
-                  ))}
-                </div>
+            {/* Only show Play button during recording */}
+            {recordingStatus === 'recording' && (
+              <PlayButton onPress={onStopRecord} disabled={false} />
+            )}
+
+            {/* Show navigation buttons only after 3 attempts or when evaluation is complete */}
+            {((recordingStatus === 'stop' && recordCount >= 3) || recordCount >= 3) && (
+              <div className="flex justify-between items-center mt-5 gap-3">
+                {questionCount !== 1 && (
+                  <PrevButton
+                    onPress={() => {
+                      setRecordingStatus('idle');
+                      setExpression(null);
+                      setQuestionResponse('');
+                      setRecordCount(0); // Reset attempt count when going back
+                      if (questionCount >= 1) {
+                        setIsVideoEnd(false);
+                        if (videoRef.current) {
+                          videoRef.current.stop();
+                          videoRef.current.seek(0.1);
+                          videoRef.current.resume();
+                        }
+                        setQuestionCount(prev => prev - 1);
+                      }
+                    }}
+                    title="Previous"
+                  />
+                )}
+
+                {questionCount < questions?.length && (
+                  <NextButton
+                    onPress={() => {
+                      setRecordingStatus('idle');
+                      setExpression(null);
+                      setQuestionResponse('');
+                      setAnswerCount(0);
+                      setRecordCount(0);
+                      setConsecutiveCorrect(0);
+                      setIsDelay(false);
+                      setIsNextAnswer(false);
+                      if (questionCount < questions?.length) {
+                        setIsVideoEnd(false);
+                        if (videoRef.current) {
+                          videoRef.current.stop();
+                          videoRef.current.seek(0.1);
+                          videoRef.current.resume();
+                        }
+                        setQuestionCount(prev => prev + 1);
+                      } else {
+                        navigateTo();
+                      }
+                    }}
+                    title="Next"
+                  />
+                )}
+
+                <EndButton
+                  onPress={endAssessment}
+                  title={questionCount < questions?.length ? "End Now" : "Finish"}
+                />
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        <div className="mt-8 flex justify-center">
-          <Button
-            onClick={onPressBack}
-            className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            Back to Home
-          </Button>
+          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ArticulationResult
-
+export default ExpressiveAssessment;

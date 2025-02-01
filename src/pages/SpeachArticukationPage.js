@@ -493,6 +493,7 @@ const SpeechArticulationPage = () => {
       }
     } finally {
       // Always ensure we stop recording
+      setLoader(false)
       setRecordingStatus('stop');
     }
   };

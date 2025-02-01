@@ -1,36 +1,15 @@
 import React, { useState } from 'react';
-import CustomHeader from '../components/CustomHeader';
-import { COLORS, fonts } from '../theme';
-import { info_icon, tick_icon } from '../assets/icons';
-import { useDataContext } from '../contexts/DataContext';
-import CustomButton from '../components/Button';
+import { motion } from 'framer-motion';
 import moment from 'moment';
-import { cancelSubscription, getUserInfo } from '../utils/functions';
-import LoaderModal from '../components/LoaderModal';
+import { useDataContext } from '../contexts/DataContext';
+import CustomHeader from '../components/CustomHeader';
+import { useNavigate } from 'react-router-dom';
 
 const ManageSubscriptions = ({ history }) => {
+    const navigate = useNavigate()
     const { userDetail, updateUserDetail } = useDataContext();
-
     const [loader, setLoader] = useState(false);
-
-    const getPrice = () => {
-        if (!userDetail?.SubscriptionDetails || (userDetail?.SubscriptionDetails && userDetail?.SubscriptionDetails?.Status === 'Free Trial')) {
-            return {
-                price: "0",
-                toFixed: "00"
-            };
-        }
-        if (userDetail?.SubscriptionDetails?.Plan?.toLowerCase() === 'monthly') {
-            return {
-                price: "152",
-                toFixed: "00"
-            };
-        }
-        return {
-            price: "881",
-            toFixed: "00"
-        };
-    };
+    console.log(userDetail);
 
     const onCancelSubscription = async () => {
         try {
@@ -38,7 +17,6 @@ const ManageSubscriptions = ({ history }) => {
             const response = await cancelSubscription(userDetail?.UserID, userDetail?.SubscriptionDetails?.SubscriptionID);
             if (response?.status === 200) {
                 const responseData = await getUserInfo(userDetail?.UserID);
-                console.log("responseData", responseData);
                 updateUserDetail({
                     UserID: userDetail?.UserID,
                     FullName: responseData?.data?.UserProfile?.FullName,
@@ -53,7 +31,7 @@ const ManageSubscriptions = ({ history }) => {
                 });
             }
         } catch (error) {
-            console.error("Error cancelling subscription", error);
+            console.error("Error cancelling subscription:", error);
         } finally {
             setLoader(false);
         }
@@ -67,249 +45,149 @@ const ManageSubscriptions = ({ history }) => {
     };
 
     const onPressCancel = () => {
-        // Alert.alert('Cancel Subscription', 'Are you sure you want to cancel subscription?', [
-        //     {
-        //         text: 'Cancel',
-        //         onPress: () => { },
-        //         style: 'cancel',
-        //     },
-        //     { text: 'OK', onPress: () => onCancelSubscription() },
-        // ]);
-        alert('Cancel Subscription')
+        if (window.confirm('Are you sure you want to cancel subscription?')) {
+            onCancelSubscription();
+        }
     };
 
     return (
-        <div style={styles.safeArea}>
-            <CustomHeader goBack={() => history.goBack()} title={"Manage Subscriptions"} />
-            <div style={styles.mainView}>
-                <div style={styles.scrollContainer}>
-                    <h2 style={styles.heading}>My Current Plan</h2>
+        <div className="min-h-screen bg-white">
+            {/* Header */}
+            {/* <div className="bg-white shadow-sm p-4 flex items-center">
+                <button
+                    onClick={() => history.goBack()}
+                    className="text-gray-600 hover:text-gray-800"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 className="text-xl font-semibold ml-4">Manage Subscriptions</h1>
+            </div> */}
+            <CustomHeader title="Manage Subscriptions" goBack={() => { navigate(-1) }} />
 
-                    <div style={styles.detailView}>
-                        <p style={styles.currentText}>Current Plan</p>
-                        <div style={styles.row}>
-                            <p style={styles.planText}>{userDetail?.SubscriptionDetails?.Plan?.toUpperCase() ?? "NO PLAN"}</p>
-                            <p style={styles.priceText}>$ <span style={styles.planText}>{userDetail?.Amount}</span>/month</p>
+            {/* Main Content */}
+            <div className="max-w-3xl mx-auto px-4 py-6">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-6">My Current Plan</h2>
+
+                    {/* Plan Details Card */}
+                    <motion.div
+                        className="bg-white rounded-lg shadow-md p-6 border border-gray-200"
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <div className="flex justify-between items-center mb-4">
+                            <div>
+                                <p className="text-sm text-gray-600 font-medium">Current Plan</p>
+                                <p className="text-2xl font-semibold text-blue-600">
+                                    {userDetail?.SubscriptionDetails?.Plan?.toUpperCase() ?? "NO PLAN"}
+                                </p>
+                            </div>
+                            <p className="text-xl font-medium text-gray-900">
+                                ${userDetail?.Amount}<span className="text-gray-600">/month</span>
+                            </p>
                         </div>
 
-                        {
-                            userDetail?.SubscriptionDetails &&
+                        {userDetail?.SubscriptionDetails && (
                             <>
-                                <div style={{ marginTop: 6 }}>
-                                    <p style={styles.keyText}>Status</p>
-                                    <p style={{ ...styles.valueText, color: COLORS.primary }}>{userDetail?.SubscriptionDetails?.Status?.toUpperCase()}</p>
+                                <div className="border-t border-gray-200 pt-4 mt-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p className="text-sm text-gray-600">Purchased on</p>
+                                            <p className="font-medium">
+                                                {moment(userDetail?.SubscriptionDetails?.PaymentDate).format("MMM D, YYYY")}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Expires on</p>
+                                            <div className="flex items-center">
+                                                <p className="font-medium">
+                                                    {moment(userDetail?.SubscriptionDetails?.SubscriptionEndDate ?? new Date()).format("MMM D, YYYY")}
+                                                </p>
+                                                <span className="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-600 rounded">
+                                                    {userDetail?.DaysLeft ?? 0} days left
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style={styles.paymentRow}>
-                                    <div>
-                                        <p style={styles.keyText}>Purchased on</p>
-                                        <p style={styles.valueText}>{moment(userDetail?.SubscriptionDetails?.PaymentDate).format("MMM D, YYYY")}</p>
-                                    </div>
-                                    <div style={{ width: 50 }} />
-                                    <div>
-                                        <p style={styles.keyText}>Expires on</p>
-                                        <p style={styles.valueText}>{moment(userDetail?.SubscriptionDetails?.SubscriptionEndDate ?? new Date()).format("MMM D, YYYY")}</p>
-                                    </div>
-                                    <div style={styles.daysView}>
-                                        <p style={styles.dayText}>{`${userDetail?.DaysLeft ?? 0} days`}</p>
-                                    </div>
+
+                                <div className="flex gap-4 mt-6">
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-full font-medium hover:bg-red-100 transition-colors"
+                                        onClick={onPressCancel}
+                                    >
+                                        Cancel Plan
+                                    </motion.button>
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="flex-1 px-4 py-2 border border-gray-300 text-blue-600 rounded-full font-medium hover:bg-gray-50 transition-colors"
+                                        onClick={() => history.push("/plans")}
+                                    >
+                                        {userDetail?.SubscriptionDetails ? "Upgrade Plan" : "Purchase Plan"}
+                                    </motion.button>
                                 </div>
                             </>
-                        }
+                        )}
+                    </motion.div>
 
-                        <div style={{ height: 12 }} />
-
-                        <div style={styles.row}>
-                            {
-                                userDetail?.SubscriptionDetails &&
-                                <button onClick={onPressCancel} style={styles.cancelPlanBtn}>
-                                    <img src={info_icon} alt="info" />
-                                    <span style={styles.cancelPlanText}>Cancel Plan</span>
-                                </button>
-                            }
-
-                            <button onClick={() => history("Plans")} style={styles.upgradePlanBtn}>
-                                <span style={styles.upgradePlanText}>{userDetail?.SubscriptionDetails ? "Upgrade Plan" : "Purchase Plan"}</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div style={{ height: 20 }} />
-                    {
-                        userDetail?.SubscriptionDetails &&
-                        <>
-                            <div style={styles.textRow}>
-                                <img src={tick_icon} alt="tick" />
-                                <span style={styles.rowText}>Unlimited 24/7 Access: Get round-the-clock availability to therapy whenever you need it.</span>
-                            </div>
-                            <div style={styles.textRow}>
-                                <img src={tick_icon} alt="tick" />
-                                <span style={styles.rowText}>Comprehensive Tools: Explore and use the full suite of speech therapy assessments and exercises</span>
-                            </div>
-                            <div style={styles.textRow}>
-                                <img src={tick_icon} alt="tick" />
-                                <span style={styles.rowText}>Innovative Therapy: Engage in interactive, avatar-led therapy sessions for a personalized experience</span>
-                            </div>
-                            <div style={styles.textRow}>
-                                <img src={tick_icon} alt="tick" />
-                                <span style={styles.rowText}>{getRenewalText()}</span>
-                            </div>
-
-                            <div style={{ height: 20 }} />
-                        </>
-                    }
-
-                </div>
-                <LoaderModal visible={loader} />
+                    {/* Features Section */}
+                    {userDetail?.SubscriptionDetails && (
+                        <motion.div
+                            className="mt-8 space-y-4"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <FeatureRow text="Unlimited 24/7 Access: Get round-the-clock availability to therapy whenever you need it." />
+                            <FeatureRow text="Comprehensive Tools: Explore and use the full suite of speech therapy assessments and exercises" />
+                            <FeatureRow text="Innovative Therapy: Engage in interactive, avatar-led therapy sessions for a personalized experience" />
+                            <FeatureRow text={getRenewalText()} />
+                        </motion.div>
+                    )}
+                </motion.div>
             </div>
 
-            {
-                userDetail?.SubscriptionDetails &&
-                <CustomButton
-                    onPress={onPressCancel}
-                    textStyle={{ color: COLORS.cancelBtnText }}
-                    style={styles.cancelBtn} title={"Cancel Subscription"} />
-            }
-            <CustomButton onPress={() => history("Plans")} style={styles.upgradeBtn} title={userDetail?.SubscriptionDetails ? "Upgrade Plan" : "Purchase Plan"} />
+            {/* Loading Overlay */}
+            {loader && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+                </div>
+            )}
         </div>
     );
 };
 
-export default ManageSubscriptions;
+// Feature Row Component
+const FeatureRow = ({ text }) => (
+    <motion.div
+        className="flex items-start gap-3"
+        whileHover={{ x: 5 }}
+        transition={{ duration: 0.2 }}
+    >
+        <svg
+            className="w-5 h-5 text-green-500 mt-1 flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+            />
+        </svg>
+        <p className="text-gray-700">{text}</p>
+    </motion.div>
+);
 
-const styles = {
-    safeArea: {
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: COLORS.white,
-        minHeight: '100vh',
-    },
-    mainView: {
-        flex: 1,
-        padding: '20px',
-    },
-    scrollContainer: {
-        overflowY: 'scroll',
-    },
-    heading: {
-        fontFamily: fonts.semibold,
-        color: COLORS.black,
-        fontSize: 20,
-        marginTop: 20,
-    },
-    detailView: {
-        borderWidth: '1px',
-        borderColor: COLORS.borderColor,
-        borderRadius: 12,
-        marginTop: 20,
-        padding: 20,
-        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
-        backgroundColor: COLORS.white,
-    },
-    currentText: {
-        color: COLORS.black,
-        fontSize: 14,
-        fontFamily: fonts.semibold,
-    },
-    row: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 6,
-    },
-    planText: {
-        color: COLORS.primary,
-        fontSize: 24,
-        fontFamily: fonts.medium,
-    },
-    priceText: {
-        fontSize: 16,
-        fontFamily: fonts.medium,
-        color: COLORS.black,
-    },
-    paymentRow: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        marginTop: 12,
-    },
-    keyText: {
-        color: COLORS.textDarkGreyColor,
-        fontSize: 12,
-        fontFamily: fonts.medium,
-    },
-    valueText: {
-        fontSize: 14,
-        fontFamily: fonts.medium,
-        color: COLORS.black,
-    },
-    daysView: {
-        borderColor: COLORS.borderColor,
-        borderWidth: '1px',
-        height: 20,
-        padding: '5px',
-        backgroundColor: COLORS.orangeBackgroundColor,
-        borderRadius: 4,
-        marginLeft: 12,
-        marginTop: 5,
-    },
-    dayText: {
-        color: COLORS.textOrangeColor,
-        fontFamily: fonts.medium,
-        fontSize: 10,
-    },
-    cancelPlanBtn: {
-        backgroundColor: COLORS.lightRedBackgroundColor,
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        width: '45%',
-        height: '50px',
-        borderRadius: '40px',
-    },
-    cancelPlanText: {
-        color: COLORS.textRedColor,
-        fontSize: 14,
-        fontFamily: fonts.medium,
-    },
-    upgradePlanBtn: {
-        borderWidth: '1px',
-        borderColor: COLORS.greyBorderColor,
-        width: '45%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '50px',
-        borderRadius: '40px',
-    },
-    upgradePlanText: {
-        color: COLORS.primary,
-        fontSize: 14,
-        fontFamily: fonts.medium,
-    },
-    textRow: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginTop: 20,
-        gap: '12px',
-    },
-    rowText: {
-        fontFamily: fonts.medium,
-        color: COLORS.textBlackColor,
-        flex: 1,
-        marginTop: -4,
-    },
-    cancelBtn: {
-        width: '90%',
-        margin: 'auto',
-        backgroundColor: COLORS.cancelBtnColor,
-    },
-    upgradeBtn: {
-        width: '90%',
-        margin: 'auto',
-        marginTop: '12px',
-        marginBottom: '20px',
-    },
-};
+export default ManageSubscriptions;

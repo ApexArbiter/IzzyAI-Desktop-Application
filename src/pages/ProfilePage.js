@@ -25,10 +25,9 @@ function ProfilePage() {
     updateUserDetail({});
     navigate('/');
   };
-
   const menuItems = [
     { icon: <Settings className="w-6 h-6" />, label: 'Settings', onClick: () => navigate("/settings") },
-    { icon: <CreditCard className="w-6 h-6" />, label: 'Manage Subscriptions' },
+    { icon: <CreditCard className="w-6 h-6" />, label: 'Manage Subscriptions', onClick: () => navigate("/ManageSubcription") },
     { icon: <User className="w-6 h-6" />, label: 'Bio Data', onClick: () => navigate("/BioData") },
     { icon: <HelpCircle className="w-6 h-6" />, label: 'About App', onClick: () => navigate("/aboutUs") },
     { icon: <MessageSquare className="w-6 h-6" />, label: 'Feedback', onClick: () => setShowFeedbackModal(true) },

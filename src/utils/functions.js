@@ -703,6 +703,23 @@ export const checkAllAssessment = async (userId, disorderid) => {
   } catch (error) {
     return error
   }
+}; export const cancelSubscription = async (id, invoiceid) => {
+  const token = await getToken()
+  const url = invoiceid ? `/cancel_subscription/${id}/${invoiceid}` : `/cancel_subscription/${id}`
+  try {
+    const response = await axios.post(
+      `${BaseURL}${url}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+      },
+    );
+    return response
+  } catch (error) {
+    return error
+  }
 };
 export const resendOtp = async (data) => {
   const token = await getToken()
@@ -789,24 +806,6 @@ export const googleLogin = async (access_token) => {
     const response = await axios.post(
       `${BaseURL}/google_login`,
       data,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-      },
-    );
-    return response
-  } catch (error) {
-    return error
-  }
-};
-export const cancelSubscription = async (id, invoiceid) => {
-  const token = await getToken()
-  const url = invoiceid ? `/cancel_subscription/${id}/${invoiceid}` : `/cancel_subscription/${id}`
-  try {
-    const response = await axios.post(
-      `${BaseURL}${url}`,
       {
         headers: {
           'Content-Type': 'application/json',

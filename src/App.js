@@ -60,6 +60,11 @@ import UpdateAvatar from './pages/UpdateAvatar';
 import ChangePassword from './pages/ChangePassword';
 import BioDataPage from './pages/BioDataPage';
 import AboutUs from './pages/AboutUs';
+import ManageSubscriptions from './pages/ManageSubcriptions';
+import SplashScreen from './pages/SplashScreen';
+import GettingStartedPageOne from './pages/GettingStartedPageOne';
+import GettingStartedPageTwo from './pages/GettingStartedPageTwo';
+import GettingStartedPageThree from './pages/GettingStartedPageThree';
 
 function App() {
   return (
@@ -67,7 +72,13 @@ function App() {
     <DataProvider> {/* Wrap your entire app or relevant component in DataProvider */}
       <Router>
         <Routes>
-          <Route path="/" element={<SignInPage />} />
+
+          {/* <Route path="/splash" element={<SplashScreen />} /> */}
+          <Route path="/" element={<SplashScreen />} />
+          <Route path="/gettingstartone" element={<GettingStartedPageOne />} />
+          <Route path="/gettingstarttwo" element={<GettingStartedPageTwo />} />
+          <Route path="/gettingstarthree" element={<GettingStartedPageThree />} />
+          <Route path="/SignIn" element={<SignInPage />} />
           <Route path="/signUpPage" element={<SignUpPage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/setupProfile4" element={<SetupProfilePage4 />} />
@@ -127,6 +138,7 @@ function App() {
           <Route path="/ChangePassword" element={<ChangePassword />} />
           <Route path="/BioData" element={<BioDataPage />} />
           <Route path="/aboutUs" element={<AboutUs />} />
+          <Route path="/ManageSubcription" element={<ManageSubscriptions />} />
 
 
         </Routes>

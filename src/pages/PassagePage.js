@@ -486,58 +486,38 @@ const PassagePage = () => {
       className="min-h-screen bg-gray-50"
     >
       {/* Header */}
-      {/* <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <button
-                onClick={navigateBack}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-              <h1 className="ml-4 text-xl font-semibold text-center">Stammering Assessment</h1>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <CustomHeader title="Stammering Assessment" goBack={navigateBack} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Instructions */}
         <motion.p
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-center text-gray-600 mb-8"
+          className="text-center text-gray-600 mb-4 text-sm"
         >
           Place your face in the middle of the camera frame while speaking
         </motion.p>
 
-        {/* Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        {/* First Row: Passage and Video */}
+        <div className="grid lg:grid-cols-2 gap-4 mb-4">
           {/* Left Column: Passage */}
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            className="bg-white rounded-xl shadow-md overflow-hidden"
           >
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Read this Paragraph:</h2>
-              <div className="prose max-w-none">
-                <p className="text-lg leading-relaxed text-gray-700">
+            <div className="p-4">
+              <h2 className="text-lg font-semibold mb-2">Read this Paragraph:</h2>
+              <div
+                className="prose max-w-none h-[230px] overflow-y-auto custom-scrollbar"
+                style={{
+                  fontSize: '16px',
+                  lineHeight: '1.5',
+                  paddingRight: '10px'
+                }}
+              >
+                <p className="text-gray-700">
                   Well, he is nearly 93 years old, yet he still thinks as
                   swiftly as ever. He dresses himself in an old black frock
                   coat, usually several buttons missing. A long beard clings to
@@ -558,7 +538,7 @@ const PassagePage = () => {
           <motion.div
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            className="bg-white rounded-xl shadow-md overflow-hidden"
           >
             <div className="aspect-w-16 aspect-h-9">
               <VideoPlayer
@@ -572,86 +552,128 @@ const PassagePage = () => {
         </div>
 
         {/* Expressions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {initialExpression && (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white p-4 rounded-lg shadow"
-            >
-              <p className="text-gray-700">Initial Expression: {initialExpression}</p>
-            </motion.div>
-          )}
-          {middleExpression && (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white p-4 rounded-lg shadow"
-            >
-              <p className="text-gray-700">Middle Expression: {middleExpression}</p>
-            </motion.div>
-          )}
-          {lastExpression && (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white p-4 rounded-lg shadow"
-            >
-              <p className="text-gray-700">Last Expression: {lastExpression}</p>
-            </motion.div>
-          )}
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-2 min-h-[64px]">
+          {/* Initial Expression */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{
+              scale: initialExpression ? 1 : 0.9,
+              opacity: initialExpression ? 1 : 0
+            }}
+            className="bg-white p-2 rounded-lg shadow min-h-[64px] flex items-center justify-center"
+          >
+            <p className="text-gray-700 text-sm">
+              {initialExpression ? `Initial Expression: ${initialExpression}` : 'Waiting for initial expression...'}
+            </p>
+          </motion.div>
+
+          {/* Middle Expression */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{
+              scale: middleExpression ? 1 : 0.9,
+              opacity: middleExpression ? 1 : 0
+            }}
+            className="bg-white p-2 rounded-lg shadow min-h-[64px] flex items-center justify-center"
+          >
+            <p className="text-gray-700 text-sm">
+              {middleExpression ? `Middle Expression: ${middleExpression}` : 'Waiting for middle expression...'}
+            </p>
+          </motion.div>
+
+          {/* Last Expression */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{
+              scale: lastExpression ? 1 : 0.9,
+              opacity: lastExpression ? 1 : 0
+            }}
+            className="bg-white p-2 rounded-lg shadow min-h-[64px] flex items-center justify-center"
+          >
+            <p className="text-gray-700 text-sm">
+              {lastExpression ? `Last Expression: ${lastExpression}` : 'Waiting for last expression...'}
+            </p>
+          </motion.div>
         </div>
 
-        {/* Camera View */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="mt-8 bg-white rounded-2xl shadow-lg overflow-hidden"
-        >
-          <div className="aspect-w-16 aspect-h-9 flex justify-center">
-            <ReactWebcam
-              ref={webcamRef}
-              videoConstraints={{ facingMode: 'user' }}
-              audio={false}
-              screenshotFormat="image/jpeg"
-              className="w-50 h-full object-cover" />
-          </div>
-        </motion.div>
+        {/* Second Row: Webcam and Controls */}
+        <div className="grid lg:grid-cols-2 gap-4 mt-4 ">
+          {/* Left Column: Webcam */}
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="bg-white rounded-xl shadow-md  overflow-hidden h-[350px]"
+          >
+            <div className=" ">
+              <ReactWebcam
+                ref={webcamRef}
+                videoConstraints={{ facingMode: 'user' }}
+                audio={false}
+                screenshotFormat="image/jpeg"
+                height={"20px"}
+              // className="w-auto h-full object-center"
+              />
+            </div>
+          </motion.div>
 
-        {/* Controls */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="mt-8 flex justify-center"
-        >
-          {isVideoEnd && status === 'idle' && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onStartRecord}
-              className="bg-red-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-red-600 transition-colors flex items-center gap-2"
-            >
-              <span className="block w-3 h-3 rounded-full bg-white animate-pulse" />
-              Record
-            </motion.button>
-          )}
-          {status === 'recording' && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onStopRecord}
-              disabled={isStopButtonDisabled}
-              className={`
-      px-8 py-3 rounded-full font-semibold shadow-lg transition-colors
-      ${isStopButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white`}>
-              {isStopButtonDisabled ? 'Recording...' : 'Stop Recording'}
-            </motion.button>
-          )}
-        </motion.div>
+          {/* Right Column: Controls */}
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="bg-white rounded-xl shadow-md overflow-hidden flex items-center justify-center"
+          >
+            <div className="p-8 flex flex-col items-center gap-4">
+              {isVideoEnd && status === 'idle' && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onStartRecord}
+                  className="bg-red-500 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-red-600 transition-colors flex items-center gap-2"
+                >
+                  <span className="block w-2 h-2 rounded-full bg-white animate-pulse" />
+                  Record
+                </motion.button>
+              )}
+              {status === 'recording' && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onStopRecord}
+                  disabled={isStopButtonDisabled}
+                  className={`
+                  px-6 py-2 rounded-full font-semibold shadow-lg transition-colors
+                  ${isStopButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
+                  text-white
+                `}
+                >
+                  {isStopButtonDisabled ? 'Recording...' : 'Stop Recording'}
+                </motion.button>
+              )}
+            </div>
+          </motion.div>
+        </div>
+
         {/* Loading Indicator */}
         <Loader loading={loading} />
-
       </main>
+
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    `}</style>
     </motion.div>
 
   );

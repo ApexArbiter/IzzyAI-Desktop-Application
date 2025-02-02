@@ -10,6 +10,7 @@ import { useDataContext } from '../contexts/DataContext';
 import axios from 'axios';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import LogoQuestionView from '../components/LogoQuestionView';
+import CustomHeader from '../components/CustomHeader';
 
 const VoiceDisorderPage = () => {
   const location = useLocation();
@@ -395,187 +396,117 @@ const VoiceDisorderPage = () => {
   const percentageCompleted = (exerciseCount / 3) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg">
-        {/* Header */}
-        <div className="bg-gray-800 text-white p-4 flex items-center justify-between rounded-t-2xl">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={navigateBack}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Back
-            </Button>
-            <h1 className="text-2xl font-semibold">Voice Disorder Assessment</h1>
-          </div>
-        </div>
-
-        <div className="p-6 space-y-6">
-          {/* Instructions */}
-          <p className="text-gray-600 text-center text-lg">
-            Place your face in the middle of the camera frame while speaking
-          </p>
-
-          {/* Assessment Progress */}
-          <div className="bg-gray-50 p-4 rounded-xl">
-            <p className="text-xl text-center mb-4">
-              Assessment <strong className="text-blue-600">{exerciseCount}</strong> out of <strong className="text-blue-600">3</strong>
-            </p>
-
-            <div className="flex items-center gap-4">
-              <LinearProgress
-                variant="determinate"
-                value={percentageCompleted}
-                className="flex-1"
-              />
-              <span className="text-sm font-medium text-gray-600 min-w-[4rem]">
-                {percentageCompleted.toFixed(1)}%
-              </span>
-            </div>
-          </div>
-
-          {/* Video Player */}
-          {exerciseData && (
-            <div className="rounded-xl overflow-hidden shadow-lg">
-              <VideoPlayer
-                ref={videoRef}
-                onEnd={() => {
-                  setIsVideoEnd(true);
-                  setRecordingStatus('idle');
-                }}
-                onStart={() => {
-                  setIsVideoEnd(false);
-                  setRecordingStatus('idle');
-                }}
-                source={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
-              />
-            </div>
-          )}
-
-          {/* Exercise Text */}
-          <div className="flex justify-center">
-            <LogoQuestionView
-              first_text={"Say this..."}
-              second_text={exerciseData?.[exerciseCount - 1]?.WordText || 'loading'}
-
-            />
-          </div>
-
-
-          {/* Expression Display */}
-          {expression && (
-            <div className="bg-green-50 text-green-800 p-4 rounded-xl text-center text-lg font-medium">
-              Facial Expression: {expression.expression}
-            </div>
-          )}
-
-          {/* Voice Disorder Prediction Display */}
-          {recordingStatus === 'stop' && voiceResponse?.predictions && (
-            <div className="bg-white p-4 rounded-xl shadow-sm border mt-4">
-              <div className="space-y-2">
-                <p className="text-lg font-medium">Label: Normal</p>
-                <p className="text-green-600 font-medium">
-                  Score: {voiceResponse.predictions.Normal}
-                </p>
+    <div className="h-screen flex flex-col bg-gray-50">
+      <CustomHeader title="Voice Disorder Assessment" goBack={navigateBack} />
+      <div className="flex-grow overflow-hidden flex flex-col">
+        <p className="text-center mt-2 text-sm">
+          Place your face in the middle of the camera frame while speaking
+        </p>
+        <div className="flex-grow overflow-auto px-4 pb-4">
+          <div className="max-w-6xl mx-auto space-y-4">
+            <div className=" p-3 rounded-xl shadow">
+              <p className="text-lg text-center">
+                Assessment <strong className="">{exerciseCount}</strong> out of{" "}
+                <strong className="">3</strong>
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <LinearProgress variant="determinate" value={percentageCompleted} className="flex-1" />
+                <span className="text-sm font-medium text-gray-600 min-w-[3rem]">
+                  {percentageCompleted.toFixed(1)}%
+                </span>
               </div>
             </div>
-          )}
 
-          {/* Camera View */}
-          <div className="camera-view rounded-xl overflow-hidden shadow-lg mx-auto max-w-2xl">
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={{
-                facingMode: 'user',
-              }}
-              className="w-full"
-            />
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="bg-red-50 text-red-800 p-4 rounded-xl">
-              <p>{error}</p>
-            </div>
-          )}
-
-          {/* Recording Controls */}
-          <div className="space-y-4">
-            {recordingStatus === 'idle' && isVideoEnd && (
-              <Button
-                onClick={() => {
-                  setDisableRecordingButton(true);
-                  setExpression('');
-                  onStartRecord();
-                }}
-                variant="contained"
-                color="primary"
-                className="w-full py-4 text-lg font-semibold rounded-xl"
-              >
-                Record
-              </Button>
-            )}
-
-            {recordingStatus === 'recording' && (
-              <div className="text-center space-y-4">
-                <p className="text-xl font-semibold text-red-500">
-                  0:0{timer > 0 ? timer : 0} Seconds Left
-                </p>
-                <CircularProgress
-                  variant="determinate"
-                  value={counter}
-                  color="error"
-                  size={60}
-                  thickness={4}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-xl shadow h-[250px] flex justify-center flex-col items-center overflow-auto">
+                <LogoQuestionView
+                  first_text={"Say this..."}
+                  second_text={exerciseData?.[exerciseCount - 1]?.WordText || "loading"}
                 />
+                {expression && (
+                  <div className="bg-green-50 text-green-800 p-2  rounded-xl text-center text-sm mt-4">
+                    Facial Expression: {expression.expression}
+                  </div>
+                )}
+                {/* {recordingStatus === "stop" && voiceResponse?.predictions && (
+                  <div className="bg-gray-50 p-2 rounded-xl mt-2">
+                    <p className="text-sm font-medium">Label: Normal</p>
+                    <p className="text-green-600 text-sm">Score: {voiceResponse.predictions.Normal}</p>
+                  </div>
+                )} */}
+              </div>
+              <div className="bg-white rounded-xl shadow overflow-hidden h-[250px]">
+                {exerciseData && (
+                  <VideoPlayer
+                    ref={videoRef}
+                    onEnd={() => {
+                      setIsVideoEnd(true);
+                      setRecordingStatus("idle");
+                    }}
+                    onStart={() => {
+                      setIsVideoEnd(false);
+                      setRecordingStatus("idle");
+                    }}
+                    source={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl shadow w-[400px] mx-auto  flex justify-center">
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={{
+                  facingMode: "user",
+                }}
+                className=" rounded-lg w-[400px]"
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 text-red-800 p-2 rounded-xl text-sm">
+                <p>{error}</p>
               </div>
             )}
-            {recordingStatus === 'stop' && voiceResponse?.predictions && (
-              <div className="space-y-4">
+
+            <div className="flex justify-center items-center h-16">
+              {recordingStatus === "idle" && isVideoEnd && (
                 <Button
-                  onClick={() => {
-                    if (exerciseCount < 3) {
-                      handleNextExercise();
-                    } else {
-                      history('/voiceReport', {
-                        state: {
-                          date: formattedDate,
-                          expressionArray,
-                          questionScores,
-                          sessionId,
-                          startTime,
-                          totalQuestions: 3,
-                          incorrectExpressions,
-                          correctExpressions
-                        }
-                      });
-                      console.log({
-                        date: formattedDate,
-                        expressionArray,
-                        questionScores,
-                        sessionId,
-                        startTime,
-                        totalQuestions: 3,
-                        incorrectExpressions,
-                        correctExpressions
-                      })
-                    }
-                  }}
+                  onClick={onStartRecord}
                   variant="contained"
                   color="primary"
-                  className="w-full py-3 text-lg font-semibold rounded-xl"
+                  className="w-full max-w-xs py-2 text-base font-semibold rounded-full"
                 >
-                  {exerciseCount < 3 ? 'Next Exercise' : 'Finish'}
+                  Record
                 </Button>
-              </div>
-            )}
-          </div>
+              )}
 
-          {/* Loader */}
-          <div className="p-4 flex justify-center">
-            <Loader loading={loader} />
+              {recordingStatus === "recording" && (
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-red-500 mb-2">
+                    0:0{timer > 0 ? timer : 0} Seconds Left
+                  </p>
+                  <CircularProgress variant="determinate" value={counter} color="error" size={40} thickness={4} />
+                </div>
+              )}
+
+              {recordingStatus === "stop" && voiceResponse?.predictions && (
+                <Button
+                  onClick={handleNextExercise}
+                  variant="contained"
+                  color="primary"
+                  className="w-full max-w-xs py-2 text-base font-semibold rounded-full"
+                >
+                  {exerciseCount < 3 ? "Next Exercise" : "Finish"}
+                </Button>
+              )}
+            </div>
+
+            <div className="flex justify-center">
+              <Loader loading={loader} />
+            </div>
           </div>
         </div>
       </div>

@@ -21,14 +21,14 @@ function LanguageInstructions() {
   };
 
   return (
-   
+
     <div className="flex flex-col min-h-screen">
       <CustomHeader
         title="Receptive Language Disorder"
         goBack={() => history(-1)}
       />
 
-      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg md:m-20 m-0">
+      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg md:m-10 m-0">
         {/* Image container */}
         <div className="flex justify-center mb-12">
           <div className="relative w-56 h-56 bg-teal-50 rounded-full flex items-center justify-center">

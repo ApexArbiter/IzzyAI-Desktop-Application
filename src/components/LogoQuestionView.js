@@ -10,14 +10,14 @@ const LogoQuestionView = ({
   image = null,
   style = {},
 }) => {
-  const isMatched = questionResponse === 'Matched';
+  const isMatched = questionResponse === 'Matched' || questionResponse === "Correct!";
 
   return (
     <div
       className={`
         flex 
         ${questionResponse ? 'justify-center' : 'justify-start'} 
-        items-center 
+        items-start 
         mt-3 md:mt-4 
         ${style}
         max-w-full
@@ -89,7 +89,7 @@ const LogoQuestionView = ({
               <HighlightedText indexes={highlighted} text={second_text} />
             </div>
           ) : (
-            <p className="text-sm md:text-base lg:text-lg font-normal text-gray-900 
+            <p className="text-sm  md:text-base lg:text-lg font-normal text-gray-900 
                          break-words leading-relaxed">
               {second_text}
             </p>

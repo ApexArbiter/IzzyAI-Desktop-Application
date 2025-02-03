@@ -8,6 +8,7 @@ import LogoQuestionView from '../components/LogoQuestionView';
 import { IMAGE_BASE_URL } from '../components/ApiCreds';
 import { useDataContext } from '../contexts/DataContext';
 import { ArrowLeft } from 'lucide-react';
+import CustomHeader from '../components/CustomHeader';
 
 
 const LinearProgress = ({ value }) => (
@@ -182,25 +183,16 @@ const ReceptiveAssessment = () => {
   const percentageCompleted = (questionCount / (questions?.length || 1)) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-5">
+    <div className="min-h-screen overflow-hidden bg-gray-50 px-5 py-3">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <button
-                onClick={() => navigate(-1)}
-                className="p-2 hover:bg-gray-700 rounded-full transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h1 className="text-xl font-semibold ml-3">Receptive Language Assessment</h1>
-            </div>
-          </div>
+          <CustomHeader title="Receptive Language Assessment" goBack={() => { navigate(-1) }} />
+
 
           <main className="p-6">
             {/* Progress Section */}
-            
+
             <div className="mb-8">
               <p className="text-center mb-4">
                 Question <span className="font-bold">{Math.min(questionCount, questions?.length || 0)}</span> out of{' '}
@@ -226,10 +218,10 @@ const ReceptiveAssessment = () => {
 
             {/* Question Section */}
             {questions?.[questionCount - 1] && (
-              <div className="mb-8">
+              <div className="mb-2">
                 <LogoQuestionView
-                  first_text={questions[questionCount - 1].question_text}
-                  second_text={' '}
+                  first_text={""}
+                  second_text={questions[questionCount - 1].question_text}
                 />
               </div>
             )}
@@ -241,10 +233,10 @@ const ReceptiveAssessment = () => {
                   <button
                     disabled={questionResponse !== '' || !isVideoEnd}
                     onClick={onPressImage}
-                    className="w-full transition-transform hover:scale-105 disabled:opacity-50"
+                    className="w-3/4 h-auto transition-transform hover:scale-105 disabled:opacity-50"
                   >
                     <img
-                      className="w-full h-64 object-cover rounded-xl shadow-lg"
+                      className="w-full h-auto object-cover rounded-xl shadow-lg"
                       src={`${IMAGE_BASE_URL}${questions[questionCount - 1].image_url}`}
                       alt="question"
                     />
@@ -256,10 +248,10 @@ const ReceptiveAssessment = () => {
                         key={index}
                         disabled={questionResponse !== '' || !isVideoEnd}
                         onClick={(evt) => onPressImage(item, evt)}
-                        className="relative aspect-square transition-transform hover:scale-105 disabled:opacity-50"
+                        className="relative w-1/2 mx-auto aspect-square transition-transform hover:scale-105 disabled:opacity-50"
                       >
                         <img
-                          className="w-full h-full object-cover rounded-xl shadow-lg"
+                          className="w-full mx-auto h-auto object-cover rounded-xl shadow-lg"
                           src={`${IMAGE_BASE_URL}${item}`}
                           alt={`option ${index + 1}`}
                         />
@@ -269,27 +261,29 @@ const ReceptiveAssessment = () => {
                 )}
               </div>
             ) : (
-              <p className="text-xl text-center text-gray-500 my-8">No Questions Found</p>
+              <p className="text-xl text-center text-gray-500 my-4">No Questions Found</p>
             )}
 
             {/* Response Message */}
-            {questionResponse && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`text-center p-4 rounded-lg mb-8 ${questionResponse === 'Correct!' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}
-              >
-                <LogoQuestionView
-                  second_text={null}
-                  first_text={questionResponse}
-                  questionResponse={questionResponse}
-                />
-              </motion.div>
-            )}
+            <div className='h-6'>
+              {questionResponse && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`relative  pb-1 items-center rounded-lg  ${questionResponse === 'Correct!' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}
+                >
+                  <LogoQuestionView
+                    second_text={""}
+                    first_text={questionResponse}
+                    questionResponse={questionResponse}
+                  />
+                </motion.div>
+              )}
+            </div>
 
             {/* Video Player */}
-            <div className="mb-8">
+            <div className="mb-4">
               <VideoPlayer
                 ref={videoRef}
                 videoHeight={210}
@@ -317,7 +311,7 @@ const ReceptiveAssessment = () => {
                           setQuestionCount(prev => prev - 1);
                           setCurrentImages(shuffleArray(questions?.[questionCount - 2]?.images));
                         }}
-                        className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-3 font-semibold transition-colors"
+                        className="flex-1 border border-black hover:bg-gray-50 rounded-full py-2 font-semibold transition-colors"
                       >
                         Previous
                       </motion.button>
@@ -335,7 +329,7 @@ const ReceptiveAssessment = () => {
                           navigateTo();
                         }
                       }}
-                      className="flex-1 bg-green-400 hover:bg-green-500 text-gray-900 rounded-full py-3 font-semibold transition-colors"
+                      className="flex-1 bg-green-400 hover:bg-green-500 text-gray-900 rounded-full py-2 font-semibold transition-colors"
                     >
                       Next
                     </motion.button>
@@ -345,7 +339,7 @@ const ReceptiveAssessment = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={navigateTo}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-3 font-semibold transition-colors"
+                  className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 font-semibold transition-colors"
                 >
                   {questionCount < questions?.length ? 'End Now' : 'Finish'}
                 </motion.button>

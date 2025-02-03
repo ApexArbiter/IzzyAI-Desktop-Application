@@ -386,14 +386,14 @@ function ExpressiveAssessment() {
         goBack={() => navigate(-1)}
       />
 
-      <div className="flex-1 px-5">
-        <div className="max-w-6xl mx-auto w-full pb-8">
-          <p className="text-center mt-4 text-slate-900 text-sm">
+      <div className="flex-1 p-3 md:p-4">
+        <div className="max-w-4xl mx-auto w-full pb-4">
+          <p className="text-center mt-2 text-slate-900 text-xs sm:text-sm">
             Place your face in the middle of the camera frame while speaking
           </p>
 
-          <div className="mt-5">
-            <p className="text-lg text-slate-900">
+          <div className="mt-3">
+            <p className="text-sm sm:text-base text-slate-900">
               Question{' '}
               <span className="font-bold">
                 {questionCount > questions?.length ? questions?.length : questionCount}{' '}
@@ -404,76 +404,79 @@ function ExpressiveAssessment() {
           </div>
 
           {percentageCompleted.toString() !== "Infinity" && (
-            <div className="flex items-center mt-3">
+            <div className="flex items-center mt-2">
               {(questionCount > 0 && questions?.length > 0) && (
-                <div className="flex-1 bg-slate-200 rounded-full h-2">
+                <div className="flex-1 bg-slate-200 rounded-full h-1.5">
                   <div
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
                     style={{ width: `${percentageCompleted}%` }}
                   />
                 </div>
               )}
-              <span className="ml-4 text-sm font-medium text-slate-900">
+              <span className="ml-2 text-xs font-medium text-slate-900">
                 {percentageCompleted > 0 ? percentageCompleted.toFixed(1) : 0}%
               </span>
             </div>
           )}
 
-          <div className="border border-cyan-500 rounded-2xl flex justify-center items-center mt-3 px-5">
-            {questions?.[questionCount - 1] && (
-              <img
-                className="my-5 w-56 h-56 object-contain"
-                src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
-                alt="Question"
-              />
-            )}
-          </div>
-
-          <div className="flex gap-5 mt-5 justify-center">
-            <div className="flex align-center">
-              {questions?.[questionCount - 1] && (
-                <LogoQuestionView
-                  first_text="Answer this..."
-                  second_text={questions[questionCount - 1]?.question}
+          <div className="border grid grid-cols-1 sm:grid-cols-2 border-cyan-500 rounded-lg mt-2 p-2 sm:p-3">
+            <div className="">
+              <div className="px-20">
+                <div>
+                  {questions?.[questionCount - 1] && (
+                    <LogoQuestionView
+                      first_text="Answer this..."
+                      second_text={questions[questionCount - 1]?.question}
+                    />
+                  )}
+                </div>
+                <VideoPlayer
+                  source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
+                  onEnd={() => setIsVideoEnd(true)}
+                  onStart={() => setIsVideoEnd(false)}
+                  ref={videoRef}
+                  // style={{ width: '100%' }}
+                  videoHeight={150}
                 />
-              )}
+              </div>
             </div>
 
-            <div className="">
-              <VideoPlayer
-                source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
-                onEnd={() => setIsVideoEnd(true)}
-                onStart={() => setIsVideoEnd(false)}
-                ref={videoRef}
-                style={{ width: '100%' }}
-                videoHeight={200}
-              />
+            <div className="flex justify-center items-center">
+              {questions?.[questionCount - 1] && (
+                <img
+                  className="my-2 w-60 h-60 object-contain"
+                  src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
+                  alt="Question"
+                />
+              )}
             </div>
           </div>
 
           <Loader loading={isLoading || recordingStatus === 'loading'} />
 
-          {recordingStatus === 'stop' && questionResponse && (
-            <LogoQuestionView
-              className="mt-5"
-              second_text={null}
-              questionResponse={questionResponse}
-              first_text={questionResponse}
-            />
-          )}
+          <div className='h-14'>
+            {recordingStatus === 'stop' && questionResponse && (
+              <LogoQuestionView
+                className="mt-3"
+                second_text={null}
+                questionResponse={questionResponse}
+                first_text={questionResponse}
+              />
+            )}
 
-          {recordingStatus === 'stop' && expression && (
-            <p className="text-base text-center mt-3 font-semibold text-slate-900">
-              Facial Expression: {expression}
-            </p>
-          )}
+            {recordingStatus === 'stop' && expression && (
+              <p className="text-sm text-center mt-2 font-semibold text-slate-900">
+                Facial Expression: {expression}
+              </p>
+            )}
+          </div>
 
-          <div className="w-1/2 h- mt-5 rounded-2xl mx-auto mb-2 overflow-hidden">
+          <div className="w-32 h-32 sm:w-60 sm:h-60 mt-3 rounded-lg mx-auto mb-2 overflow-hidden">
             <Webcam
               audio={false}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
-              className="w-full h-full object-cover "
+              className="w-full h-full object-cover"
               videoConstraints={{
                 facingMode: "user"
               }}
@@ -488,25 +491,35 @@ function ExpressiveAssessment() {
             backgroundColor="#FF4081"
           />
 
-
-          <div className="mt-5">
+          <div className="mt-3">
             {recordingStatus === 'idle' && isVideoEnd && (
-              <RecordButton
-                onPress={onStartRecord}
-                title="Record"
-
-              />
+              <button
+                onClick={onStartRecord}
+                className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+              >
+                <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                  <span className="text-red-500">●</span> Record
+                </span>
+              </button>
             )}
 
             {recordingStatus === 'recording' && (
-              <PlayButton onPress={onStopRecord} disabled={isStopButtonDisabled} />
+              <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-2">
+                <button
+                  disabled={isStopButtonDisabled}
+                  onClick={onStopRecord}
+                  className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                >
+                  <WaveIcon />
+                </button>
+              </div>
             )}
 
             {recordingStatus === 'stop' && (
-              <div className="flex justify-between items-center mt-5 gap-3">
+              <div className="flex justify-between items-center mt-3 gap-2">
                 {questionCount !== 1 && (
-                  <PrevButton
-                    onPress={() => {
+                  <button
+                    onClick={() => {
                       setRecordingStatus('idle');
                       setExpression(null);
                       setQuestionResponse('');
@@ -520,13 +533,15 @@ function ExpressiveAssessment() {
                         setQuestionCount(prev => prev - 1);
                       }
                     }}
-                    title="Previous"
-                  />
+                    className="w-[42%] rounded-full border border-slate-900 py-2 px-3 h-10 flex items-center justify-center transition-all hover:bg-slate-50 active:bg-slate-100"
+                  >
+                    <span className="text-slate-900 font-semibold text-sm">Previous</span>
+                  </button>
                 )}
 
                 {questionCount < questions?.length && (
-                  <NextButton
-                    onPress={() => {
+                  <button
+                    onClick={() => {
                       setRecordingStatus('idle');
                       setExpression(null);
                       setQuestionResponse('');
@@ -542,14 +557,20 @@ function ExpressiveAssessment() {
                         navigateTo();
                       }
                     }}
-                    title="Next"
-                  />
+                    className="w-[42%] rounded-full bg-green-400 py-2 px-3 h-10 flex items-center justify-center transition-all hover:bg-green-500 active:bg-green-600"
+                  >
+                    <span className="text-slate-900 font-semibold text-sm">Next</span>
+                  </button>
                 )}
 
-                <EndButton
-                  onPress={endAssessment}
-                  title={questionCount < questions?.length ? "End Now" : "Finish"}
-                />
+                <button
+                  onClick={endAssessment}
+                  className="w-[42%] rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all hover:bg-red-600 active:bg-red-700"
+                >
+                  <span className="text-white font-semibold text-sm">
+                    {questionCount < questions?.length ? "End Now" : "Finish"}
+                  </span>
+                </button>
               </div>
             )}
           </div>

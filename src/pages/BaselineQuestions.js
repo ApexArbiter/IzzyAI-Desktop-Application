@@ -387,12 +387,21 @@ function BaselineQuestions() {
     const updatedResponses = [...responses];
     updatedResponses[index] = value;
     setResponses(updatedResponses);
+    
     let obj = { ...questionsObj };
-    obj[type + value] = obj?.[type + value] + 1 || 1;
-    setQuestionsObj({
-      ...questionsObj,
-      ...obj,
-    });
+    
+    // Initialize both Yes and No counters if they don't exist
+    if (!obj[type + 'Yes']) obj[type + 'Yes'] = 0;
+    if (!obj[type + 'No']) obj[type + 'No'] = 0;
+    
+    // Increment the selected counter (Yes/No)
+    if (value === 'Yes') {
+      obj[type + 'Yes'] = (obj[type + 'Yes'] || 0) + 1;
+    } else {
+      obj[type + 'No'] = (obj[type + 'No'] || 0) + 1;
+    }
+    
+    setQuestionsObj(obj);
   };
 
   const navigate = () => {
@@ -414,6 +423,7 @@ function BaselineQuestions() {
       .then(async (response) => {
         setIsLoading(false);
         if (response.ok) {
+          localStorage.setItem('questionReport', JSON.stringify(data))
           const responseData = await response.json();
           setIsLoading(false);
           navigate();
@@ -429,9 +439,11 @@ function BaselineQuestions() {
   };
 
   const handleSubmit = async () => {
-    if (responses.includes(null)) {
+    if (responses.includes(null)) 
+      {
       alert("Please answer all questions before submitting")
-    } else {
+    } else
+     {
       const token = await getToken();
       const formData = new FormData();
       setIsLoading(true);
@@ -448,6 +460,7 @@ function BaselineQuestions() {
           if (response.ok) {
             const responseData = await response.json();
             setQuestionReport(questionsObj);
+            console.log("Questtions result",questionsObj);
             updateQuestionReport(questionsObj);
           } else {
             const responseData = await response.json();

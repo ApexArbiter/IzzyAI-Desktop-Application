@@ -115,7 +115,7 @@ function ReportDetails({ closeDetails, detailsOpen, navigation, reportData, item
                 <p className="text-base font-medium text-gray-900 mb-2">
                   {data?.DisorderName === 'Articulation'
                     ? "Incorrect Pronunciations:"
-                    : "Incorrect Questions:"}
+                    : "Incorrect Pronunciations:"}
                 </p>
               )}
 

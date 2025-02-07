@@ -396,7 +396,7 @@ const SpeechArticulationPage = () => {
       console.error('Failed to take snapshot or detect expression:', error);
       return null;
     } finally {
-      setLoader(false)
+      // setLoader(false)
     }
   };
 

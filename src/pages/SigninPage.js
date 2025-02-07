@@ -87,6 +87,7 @@ function SignInPage() {
         headers: { 'Authorization': 'Bearer ' + data?.access_token }
       });
       const responseData = await response.json();
+      console.log("userdata_info",responseData)
 
       localStorage.setItem("isTerms", JSON.stringify(true));
       const quesReport = localStorage.getItem("questionReport");
@@ -121,7 +122,7 @@ function SignInPage() {
       } else if (!responseData?.InitialQuestions?.Answer) {
         navigateAfterLogin(false, "/baselineQuestions");
       } else {
-        localStorage.setItem("questionReport", JSON.stringify(responseData?.InitialquestionLogic?.InitialquestionLogic));
+        localStorage.setItem("questionReport", responseData?.InitialquestionLogic?.InitialquestionLogic);
         setQuestionReport(JSON.parse(responseData?.InitialquestionLogic?.InitialquestionLogic));
 
         if (responseData?.SubscriptionDetails?.Plan === 'annual' && responseData?.DaysLeft <= 14) {
@@ -226,7 +227,7 @@ function SignInPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 overflow-hidden">
    
 
-      <div className="flex bg-gray-500 flex-col  items-center justify-center min-h-screen px-4">
+      <div className="flex flex-col  items-center justify-center min-h-screen px-4">
 
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
           <div className="space-y-2">

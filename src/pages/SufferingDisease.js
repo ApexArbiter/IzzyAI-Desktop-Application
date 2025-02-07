@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDataContext } from '../contexts/DataContext';
 import { motion } from 'framer-motion';
@@ -37,8 +37,27 @@ const CustomButton = ({ onClick, title, loading }) => (
 );
 
 const SufferingDisease = () => {
-  const { questionReport } = useDataContext();
+
+  const [questionReport, setQuestionReport] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const questions = JSON.parse(localStorage.getItem('questionReport'));
+    if (questions) {
+      setQuestionReport(questions);
+    }
+  }, []); // Empty dependency array means this only runs once when component mounts
+
+  useEffect(() => {
+    if (questionReport) {
+      console.log('Articulation:', questionReport.articulationYes > (questionReport.articulationNo || 0));
+      console.log('Stammering:', questionReport.stammeringYes > (questionReport.stammeringNo || 0));
+      console.log('Voice:', questionReport.voiceYes > (questionReport.voiceNo || 0));
+      console.log('Receptive:', questionReport.receptiveNo > (questionReport.receptiveYes || 0));
+      console.log('Expressive:', questionReport.expressiveNo > (questionReport.expressiveYes || 0));
+    }
+    console.log(questionReport)
+  }, [questionReport]);
 
   const handleGetStarted = () => {
     navigate('/profileSetupSuccess');
@@ -47,30 +66,26 @@ const SufferingDisease = () => {
   const conditions = [
     {
       condition: 'Articulation Disorder',
-      show: (questionReport?.articulationYes || questionReport?.articulationYes) &&
-            ((questionReport?.articulationYes > questionReport?.articulationNo) || !questionReport?.articulationNo)
+      show: questionReport?.articulationYes > questionReport?.articulationNo
     },
     {
       condition: 'Stammering',
-      show: (questionReport?.stammeringYes || questionReport?.stammeringNo) &&
-            ((questionReport?.stammeringYes > questionReport?.stammeringNo) || !questionReport?.stammeringNo)
+      show: questionReport?.stammeringYes > questionReport?.stammeringNo
     },
     {
       condition: 'Voice Disorder',
-      show: (questionReport?.voiceYes || questionReport?.voiceNo) &&
-            ((questionReport?.voiceYes > questionReport?.voiceNo) || !questionReport?.voiceNo)
+      show: questionReport?.voiceYes > questionReport?.voiceNo
     },
     {
       condition: 'Receptive Language Disorder',
-      show: (questionReport?.receptiveYes || questionReport?.receptiveNo) &&
-            ((questionReport?.receptiveYes < questionReport?.receptiveNo) || !questionReport?.receptiveYes)
+      show: questionReport?.receptiveYes > questionReport?.receptiveNo
     },
     {
       condition: 'Expressive Language Disorder',
-      show: (questionReport?.expressiveYes || questionReport?.expressiveNo) &&
-            ((questionReport?.expressiveYes < questionReport?.expressiveNo) || !questionReport?.expressiveYes)
+      show: questionReport?.expressiveYes > questionReport?.expressiveNo
     }
   ];
+
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center">

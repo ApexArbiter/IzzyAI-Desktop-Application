@@ -57,7 +57,7 @@ function ExercisePage() {
   const report = () => localStorage.getItem("questionReport");
   const userDetail = JSON.parse(localStorage.getItem("userDetails"));
   const userId = localStorage.getItem("userId")
-  const questionReport = JSON.parse(JSON.parse(report()));
+  const questionReport = JSON.parse(report());
   console.log(userId, userDetail)
 
 
@@ -283,63 +283,56 @@ function ExercisePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <CustomHeader title="Exercises" goBack={() => history("/home")} />
 
-      {/* Main Content */}
-      <div className="w-full px-6   py-6">
+      <div className="w-full px-6 py-6">
         <div className="space-y-6">
           {/* Articulation Disorder Card */}
-          {(questionReport?.articulationYes || questionReport?.articulationYes) &&
-            ((questionReport?.articulationYes > questionReport?.articulationNo) || !questionReport?.articulationNo) && (
-              <ExerciseCard
-                title="Articulation Disorder"
-                subtitle={`${userDetail.totalQuestion} Words`}
-                onStart={handleButtonClick}
-              />
-            )}
+          {questionReport && questionReport.articulationYes > questionReport.articulationNo && (
+            <ExerciseCard
+              title="Articulation Disorder"
+              subtitle={`${userDetail.totalQuestion} Words`}
+              onStart={handleButtonClick}
+            />
+          )}
 
           {/* Stammering Card */}
-          {(questionReport?.stammeringYes || questionReport?.stammeringNo) &&
-            ((questionReport?.stammeringYes > questionReport?.stammeringNo) || !questionReport?.stammeringNo) && (
-              <ExerciseCard
-                title="Stammering"
-                subtitle="5 Statements"
-                onStart={handleButtonClickStammering}
-              />
-            )}
+          {questionReport && questionReport.stammeringYes > questionReport.stammeringNo && (
+            <ExerciseCard
+              title="Stammering"
+              subtitle="5 Statements"
+              onStart={handleButtonClickStammering}
+            />
+          )}
 
           {/* Voice Disorder Card */}
-          {(questionReport?.voiceYes || questionReport?.voiceNo) &&
-            ((questionReport?.voiceYes > questionReport?.voiceNo) || !questionReport?.voiceNo) && (
-              <ExerciseCard
-                title="Voice Disorder"
-                subtitle="3 Sounds"
-                onStart={handleButtonClickVoice}
-              />
-            )}
+          {questionReport && questionReport.voiceYes > questionReport.voiceNo && (
+            <ExerciseCard
+              title="Voice Disorder"
+              subtitle="3 Sounds"
+              onStart={handleButtonClickVoice}
+            />
+          )}
 
           {/* Receptive Language Disorder Card */}
-          {(questionReport?.receptiveYes || questionReport?.receptiveNo) &&
-            ((questionReport?.receptiveYes < questionReport?.receptiveNo) || !questionReport?.receptiveYes) && (
-              <ExerciseCard
-                title="Receptive Language Disorder"
-                subtitle={`${receptiveQuestions?.length || 0} Questions`}
-                onStart={() => handleButtonLanguage(true)}
-              />
-            )}
+          {questionReport && questionReport.receptiveYes > questionReport.receptiveNo && (
+            <ExerciseCard
+              title="Receptive Language Disorder"
+              subtitle={`${receptiveQuestions?.length || 0} Questions`}
+              onStart={() => handleButtonLanguage(true)}
+            />
+          )}
 
           {/* Expressive Language Disorder Card */}
-          {(questionReport?.expressiveYes || questionReport?.expressiveNo) &&
-            ((questionReport?.expressiveYes < questionReport?.expressiveNo) || !questionReport?.expressiveYes) && (
-              <ExerciseCard
-                title="Expressive Language Disorder"
-                subtitle={`${expressiveQuestions?.length || 0} Questions`}
-                onStart={() => handleButtonLanguage()}
-              />
-            )}
+          {questionReport && questionReport.expressiveYes > questionReport.expressiveNo && (
+            <ExerciseCard
+              title="Expressive Language Disorder"
+              subtitle={`${expressiveQuestions?.length || 0} Questions`}
+              onStart={() => handleButtonLanguage()}
+            />
+          )}
 
-          {/* Games Card */}
+          {/* Games Card - unchanged */}
           {userDetail?.SubscriptionDetails &&
             userDetail?.SubscriptionDetails?.Status !== 'Free Trial' && (
               <ExerciseCard
@@ -347,17 +340,17 @@ function ExercisePage() {
                 subtitle="5 Games"
                 onStart={() => history('/voiceExerciseGame')}
               />
-            )}
+          )}
         </div>
 
-        {/* Loading Indicator */}
+        {/* Loading Indicator - unchanged */}
         {loading && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
           </div>
         )}
 
-        {/* Bottom Button */}
+        {/* Bottom Button - unchanged */}
         <button
           onClick={() => history("/AllExercisesPage")}
           className="w-full mt-8 bg-gray-900 text-white py-3 px-6 rounded-full hover:bg-gray-800 

@@ -35,16 +35,18 @@ const AssessmentPage = () => {
         const storedUserDetail = localStorage.getItem("userDetails");
         const storedQuestionReport = localStorage.getItem("questionReport");
         const storedUserId = User();
+        console.log(storedQuestionReport)
 
         if (storedUserDetail) {
           setUserDetail(JSON.parse(storedUserDetail));
         }
 
         if (storedQuestionReport) {
-          const parsedReport = JSON.parse(JSON.parse(storedQuestionReport));
+          const parsedReport = JSON.parse(storedQuestionReport);
           setQuestionReport(parsedReport); // Set the questionReport state
           console.log("questionReport set:", parsedReport);
         }
+
 
         if (storedUserId) {
           setUserId(storedUserId);
@@ -195,96 +197,90 @@ const AssessmentPage = () => {
 
   return (
     <div style={styles.safeArea}>
-      <CustomHeader title="Assessments" goBack={() => history(-1)} />
-      <div style={styles.mainView}>
-        <div style={styles.scrollContainer} className='overflow-hidden'>
-          {console.log("questionReport set:", questionReport)}
-          {/* Articulation Disorder */}
-          {questionReport && questionReport.articulationYes > 0 &&
-            (questionReport.articulationYes > (questionReport.articulationNo || 0)) && (
-              <div style={styles.cardContainer}>
-                <div style={styles.textView}>
-                  <h3 style={styles.heading}>Articulation Disorder</h3>
-                  <div style={styles.textRow}>
-                    <DocumentIcon />
-                    <span style={styles.para}>44 Words</span>
-                  </div>
-                </div>
-                <DarkButton onClick={handleButtonClick} title="Start" />
+    <CustomHeader title="Assessments" goBack={() => history(-1)} />
+    <div style={styles.mainView}>
+      <div style={styles.scrollContainer} className='overflow-hidden'>
+        {/* Articulation Disorder */}
+        {questionReport && questionReport.articulationYes > questionReport.articulationNo && (
+          <div style={styles.cardContainer}>
+            <div style={styles.textView}>
+              <h3 style={styles.heading}>Articulation Disorder</h3>
+              <div style={styles.textRow}>
+                <DocumentIcon />
+                <span style={styles.para}>44 Words</span>
               </div>
-            )}
+            </div>
+            <DarkButton onClick={handleButtonClick} title="Start" />
+          </div>
+        )}
 
-          {/* Stammering */}
-          {questionReport && questionReport.stammeringYes > 0 &&
-            (questionReport.stammeringYes > (questionReport.stammeringNo || 0)) && (
-              <div style={styles.cardContainer}>
-                <div style={styles.textView}>
-                  <h3 style={styles.heading}>Stammering</h3>
-                  <div style={styles.textRow}>
-                    <DocumentIcon />
-                    <span style={styles.para}>2 Passages</span>
-                  </div>
-                </div>
-                <DarkButton onClick={handleButtonClickStammering} title="Start" />
+        {/* Stammering */}
+        {questionReport && questionReport.stammeringYes > questionReport.stammeringNo && (
+          <div style={styles.cardContainer}>
+            <div style={styles.textView}>
+              <h3 style={styles.heading}>Stammering</h3>
+              <div style={styles.textRow}>
+                <DocumentIcon />
+                <span style={styles.para}>2 Passages</span>
               </div>
-            )}
+            </div>
+            <DarkButton onClick={handleButtonClickStammering} title="Start" />
+          </div>
+        )}
 
-          {/* Voice Disorder */}
-          {questionReport && questionReport.voiceYes > 0 &&
-            (questionReport.voiceYes > (questionReport.voiceNo || 0)) && (
-              <div style={styles.cardContainer}>
-                <div style={styles.textView}>
-                  <h3 style={styles.heading}>Voice Disorder</h3>
-                  <div style={styles.textRow}>
-                    <DocumentIcon />
-                    <span style={styles.para}>3 Sounds</span>
-                  </div>
-                </div>
-                <DarkButton onClick={handleButtonClickVoice} title="Start" />
+        {/* Voice Disorder */}
+        {questionReport && questionReport.voiceYes > questionReport.voiceNo && (
+          <div style={styles.cardContainer}>
+            <div style={styles.textView}>
+              <h3 style={styles.heading}>Voice Disorder</h3>
+              <div style={styles.textRow}>
+                <DocumentIcon />
+                <span style={styles.para}>3 Sounds</span>
               </div>
-            )}
+            </div>
+            <DarkButton onClick={handleButtonClickVoice} title="Start" />
+          </div>
+        )}
 
-          {/* Receptive Language Disorder */}
-          {questionReport && questionReport.receptiveNo > 0 &&
-            (questionReport.receptiveNo > (questionReport.receptiveYes || 0)) && (
-              <div style={styles.cardContainer}>
-                <div style={styles.textView}>
-                  <h3 style={styles.heading}>Receptive Language Disorder</h3>
-                  <div style={styles.textRow}>
-                    <DocumentIcon />
-                    <span style={styles.para}>20 Questions</span>
-                  </div>
-                </div>
-                <DarkButton onClick={() => handleButtonLanguage(true)} title="Start" />
+        {/* Receptive Language Disorder */}
+        {questionReport && questionReport.receptiveYes > questionReport.receptiveNo && (
+          <div style={styles.cardContainer}>
+            <div style={styles.textView}>
+              <h3 style={styles.heading}>Receptive Language Disorder</h3>
+              <div style={styles.textRow}>
+                <DocumentIcon />
+                <span style={styles.para}>20 Questions</span>
               </div>
-            )}
+            </div>
+            <DarkButton onClick={() => handleButtonLanguage(true)} title="Start" />
+          </div>
+        )}
 
-          {/* Expressive Language Disorder */}
-          {questionReport && questionReport.expressiveNo > 0 &&
-            (questionReport.expressiveNo > (questionReport.expressiveYes || 0)) && (
-              <div style={styles.cardContainer}>
-                <div style={styles.textView}>
-                  <h3 style={styles.heading}>Expressive Language Disorder</h3>
-                  <div style={styles.textRow}>
-                    <DocumentIcon />
-                    <span style={styles.para}>18 Questions</span>
-                  </div>
-                </div>
-                <DarkButton onClick={() => handleButtonLanguage(false)} title="Start" />
+        {/* Expressive Language Disorder */}
+        {questionReport && questionReport.expressiveYes > questionReport.expressiveNo && (
+          <div style={styles.cardContainer}>
+            <div style={styles.textView}>
+              <h3 style={styles.heading}>Expressive Language Disorder</h3>
+              <div style={styles.textRow}>
+                <DocumentIcon />
+                <span style={styles.para}>18 Questions</span>
               </div>
-            )}
+            </div>
+            <DarkButton onClick={() => handleButtonLanguage(false)} title="Start" />
+          </div>
+        )}
 
-          {loading && <Loader loading={loading} />}
-          <div style={{ height: 20 }} />
-        </div>
-        <button
-          style={styles.bottomButton}
-          onClick={() => history('/allAssessmentPage')}>
-          Show All Assessments
-        </button>
+        {loading && <Loader loading={loading} />}
+        <div style={{ height: 20 }} />
       </div>
-      <BottomNavigation />
+      <button
+        style={styles.bottomButton}
+        onClick={() => history('/allAssessmentPage')}>
+        Show All Assessments
+      </button>
     </div>
+    <BottomNavigation />
+  </div>
   );
 };
 

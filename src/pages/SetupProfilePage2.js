@@ -287,6 +287,10 @@ const SetupProfilePage2 = () => {
       formData.append('MicQualityPrecent', quality.audioQuality.toString());
       formData.append('CamQualityPrecent', quality.videoQuality.toString());
       formData.append('TestDate', new Date().toISOString().split('T')[0]);
+      console.log(formData);
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
 
       const response = await fetch(`${BaseURL}/add_mic_camera_test_report`, {
         method: 'POST',

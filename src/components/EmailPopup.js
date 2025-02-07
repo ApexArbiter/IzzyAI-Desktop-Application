@@ -1,93 +1,59 @@
-import React, {useState} from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  Text,
-  Modal,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import React, { useState } from 'react';
 
-const EmailPopup = ({visible, error, onClose, onConfirm, loading}) => {
+const EmailPopup = ({ visible, error, onClose, onConfirm, loading }) => {
   const [email, setEmail] = useState('');
+
+  if (!visible) return null;
 
   const handleConfirm = () => {
     onConfirm(email);
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}>
-      <View style={styles.container}>
-        <View style={styles.popup}>
-          <Text style={styles.title}>Email:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email..."
-            placeholderTextColor={'grey'}
-            value={email}
-            onChangeText={setEmail}
-          />
-          {error ? (
-            <Text style={{color: 'red', marginTop: 10, textAlign: 'center'}}>
-              {error}
-            </Text>
-          ) : null}
-          <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-            {loading ? (
-              <ActivityIndicator size={20} color={'white'} />
-            ) : (
-              <Text style={styles.buttonText}>Submit</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
+    <div 
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div 
+        className="w-4/5 max-w-lg bg-white p-5 rounded-lg"
+        onClick={e => e.stopPropagation()}
+      >
+        <p className="text-base font-semibold mb-1.5 text-black">
+          Email:
+        </p>
+        
+        <input
+          type="email"
+          className="w-full px-2.5 py-2.5 border border-gray-300 rounded 
+            text-black mb-2.5 focus:outline-none focus:border-gray-400
+            placeholder:text-gray-500"
+          placeholder="Enter your email..."
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        {error && (
+          <p className="text-red-500 mt-2.5 text-center">
+            {error}
+          </p>
+        )}
+
+        <button
+          onClick={handleConfirm}
+          disabled={loading}
+          className="w-full bg-black text-white font-bold py-2.5 px-2.5 
+            rounded mt-7 flex items-center justify-center"
+        >
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent 
+              rounded-full animate-spin" />
+          ) : (
+            'Submit'
+          )}
+        </button>
+      </div>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  popup: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 5,
-    color: 'black',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    color: 'black',
-  },
-  button: {
-    backgroundColor: 'black',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 30,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-});
 
 export default EmailPopup;

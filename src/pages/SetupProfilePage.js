@@ -1,262 +1,165 @@
 import React, { useState } from 'react';
-import Select from 'react-select'; // Using 'react-select' for dropdown selection
-import { useDataContext } from '../contexts/DataContext';
-import { getToken, updateUserId } from '../utils/functions';
-import InputField from '../components/InputField';
-import CheckBox from '../components/CheckBox';
-import BaseURL from '../components/ApiCreds';
 import { useNavigate } from 'react-router-dom';
+import { useDataContext } from '../contexts/DataContext';
+import BaseURL from '../components/ApiCreds';
+import { getToken } from '../utils/functions';
+import CustomHeader from '../components/CustomHeader';
 
-const genders = ['Male', 'Female', 'Transgender', 'Prefer not to say'];
+// Progress Bar Components
+const BarFilled = () => (
+  <div className="h-2 w-16 md:w-24 bg-gray-900 rounded-full"></div>
+);
 
-const CustomButton = (props) => {
+const Bar = () => (
+  <div className="h-2 w-16 md:w-24 bg-gray-200 rounded-full"></div>
+);
+
+const CustomButton = ({ onClick, title, loading }) => {
   return (
-    <button onClick={props.onPress} style={styles.button}>
-      {props.loading ? (
-        <div style={{ color: 'white' }}>Loading...</div> // Simple loading text for demo
+    <button
+      onClick={onClick}
+      disabled={loading}
+      className="w-full h-[50px] bg-[#111920] text-white rounded-full font-semibold
+        transition-all duration-300 hover:bg-gray-800 disabled:opacity-50 
+        disabled:cursor-not-allowed flex items-center justify-center mt-5"
+    >
+      {loading ? (
+        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
       ) : (
-        <span style={styles.buttonText}>{props.title}</span>
+        title
       )}
     </button>
   );
 };
 
-function SetupProfilePage({ navigate }) {
-  const { userId, updateUserDetail } = useDataContext();
-const navigation = useNavigate();
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [selectedGender, setSelectedGender] = useState('Male');
+const CheckBox = ({ checked, onPress, title }) => {
+  return (
+    <label className="flex items-center space-x-3 cursor-pointer py-2 select-none">
+      <div 
+        onClick={onPress}
+        className={`w-6 h-6 border-2 rounded flex items-center justify-center
+          ${checked ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`}
+      >
+        {checked && (
+          <svg className="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        )}
+      </div>
+      <span className="text-gray-900 text-base">{title}</span>
+    </label>
+  );
+};
+
+const SetupProfilePage = () => {
+  const { userId } = useDataContext();
   const [improvementPreferences, setImprovementPreferences] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [type, setType] = useState(null);
+  const navigate = useNavigate();
 
-  const handleCheckboxChange = (preference) => {
-    const updatedPreferences = improvementPreferences.includes(preference)
-      ? improvementPreferences.filter((item) => item !== preference)
-      : [...improvementPreferences, preference];
-    setImprovementPreferences(updatedPreferences);
-  };
-
-  const handleSubmit = async () => {
-    if (name.trim() === '' || age.trim() === '') {
-      alert('Please fill out all required fields.');
-      return;
-    }
-    if (!type) {
-      alert('Please select User Type.');
-      return;
-    }
-
+  const handleNavigate = async () => {
     setIsLoading(true);
     const profileData = {
-      name,
-      age,
-      gender: selectedGender,
       improvementPreferences,
     };
-    const token = await getToken();
-    const formData = new FormData();
-    formData.append('UserID', userId);
-    formData.append('FullName', profileData.name);
-    formData.append('Age', profileData.age);
-    formData.append('Gender', profileData.gender);
-    formData.append('checkboxes', profileData.improvementPreferences.join(','));
 
-    const typeForm = new FormData();
-    typeForm.append("UserID", userId);
-    typeForm.append("NewUserType", type);
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('UserID', userId);
+      formData.append('checkboxes', improvementPreferences.join(','));
 
-    fetch(`${BaseURL}/insert_user_profile`, {
-      method: 'POST',
-      headers: { 'Authorization': "Bearer " + token },
-      body: formData,
-    })
-      .then(async (response) => {
-        const res = await updateUserId(typeForm);
-        setIsLoading(false);
-        updateUserDetail({
-          FullName: profileData.name,
-          Age: profileData.age,
-          Gender: profileData.gender,
-          UserType: type,
-        });
-        navigation('setupProfile1', profileData);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.error('Error:', error);
+      const response = await fetch(`${BaseURL}/insert_user_profile`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
       });
+
+      const data = await response.json();
+      console.log(data);
+      setIsLoading(false);
+      navigate('/setupProfile1', { state: profileData });
+    } catch (error) {
+      console.error('Error:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const handleCheckboxChange = (preference) => {
+    setImprovementPreferences(prev => 
+      prev.includes(preference)
+        ? prev.filter(item => item !== preference)
+        : [...prev, preference]
+    );
   };
 
   return (
-    <div style={styles.safeArea}>
-      <header style={styles.header}>
-        <h1>Setup Profile</h1>
-      </header>
+    <div className="min-h-screen bg-white">
+      <CustomHeader title="Setup Profile" />
+      
+      <div className="flex flex-col min-h-[calc(100vh-64px)]">
+        <div className="flex-1 px-4 py-6 md:px-6 lg:px-8 max-w-3xl mx-auto w-full">
+          <div className="flex flex-col h-full">
+            {/* Logo */}
+            <div className="h-20 w-40 mx-auto mb-8">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
 
-      <div style={styles.mainView}>
-        <div style={styles.scrollView}>
-          <div style={styles.imageView}>
-          <img
-            src={require('../assets/images/logo.png')}
-            alt="Logo"
-            style={styles.image}
-          />
+            {/* Progress Bar */}
+            <div className="flex justify-between items-center gap-2 mb-8">
+              <BarFilled />
+              <Bar />
+              <Bar />
+              <Bar />
+              <Bar />
+            </div>
+
+            {/* Content */}
+            <div className="flex-1">
+              <h1 className="text-2xl font-medium text-gray-900 mb-8">
+                Setup your profile to continue
+              </h1>
+
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900 mb-4">
+                    What do you want to improve?
+                  </h2>
+
+                  <div className="space-y-2">
+                    {[
+                      { id: 'articulation', label: 'Articulation' },
+                      { id: 'stammering', label: 'Stammering' },
+                      { id: 'voice', label: 'Voice' },
+                      { id: 'receptive', label: 'Receptive Language' },
+                      { id: 'expressive', label: 'Expressive Language' },
+                    ].map(({ id, label }) => (
+                      <CheckBox
+                        key={id}
+                        checked={improvementPreferences.includes(id)}
+                        onPress={() => handleCheckboxChange(id)}
+                        title={label}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <CustomButton
+                  onClick={handleNavigate}
+                  title="Next"
+                  loading={isLoading}
+                />
+              </div>
+            </div>
           </div>
-
-          <div style={styles.progressBar}>
-            <div style={styles.barFilled}></div>
-            <div style={styles.bar}></div>
-            <div style={styles.bar}></div>
-            <div style={styles.bar}></div>
-            <div style={styles.bar}></div>
-          </div>
-
-          <h2 style={styles.heading}>Setup your profile to continue</h2>
-          <div style={styles.labelText}>
-            Your Name <span style={{ color: 'red' }}>*</span>
-          </div>
-          <InputField
-            value={name}
-            onChange={setName}
-            placeholder="e.g., John Doe"
-          />
-          <div style={styles.labelText}>
-            Your Age <span style={{ color: 'red' }}>*</span>
-          </div>
-          <InputField
-            value={age}
-            onChange={setAge}
-            placeholder="e.g., 28"
-            type="number"
-          />
-          <div style={styles.labelText}>
-            Your Gender <span style={{ color: 'red' }}>*</span>
-          </div>
-          <Select
-            defaultValue="Male"
-            options={genders.map((gender) => ({ label: gender, value: gender }))}
-            onChange={(selectedOption) => setSelectedGender(selectedOption.value)}
-          />
-
-          <div style={styles.labelText}>User Type:</div>
-          <CheckBox
-            checked={type === 'Clinic'}
-            onPress={() => setType('Clinic')}
-            title="Clinic"
-          />
-          <CheckBox
-            checked={type === 'SLP'}
-            onPress={() => setType('SLP')}
-            title="SLP"
-          />
-          <CheckBox
-            checked={type === 'Parent'}
-            onPress={() => setType('Parent')}
-            title="Parent"
-          />
-          <CheckBox
-            checked={type === 'Self'}
-            onPress={() => setType('Self')}
-            title="Self"
-          />
-
-          <div style={styles.labelText}>What do you want to improve?</div>
-          <CheckBox
-            checked={improvementPreferences.includes('articulation')}
-            onPress={() => handleCheckboxChange('articulation')}
-            title="Articulation"
-          />
-          <CheckBox
-            checked={improvementPreferences.includes('stammering')}
-            onPress={() => handleCheckboxChange('stammering')}
-            title="Stammering"
-          />
-          <CheckBox
-            checked={improvementPreferences.includes('voice')}
-            onPress={() => handleCheckboxChange('voice')}
-            title="Voice"
-          />
-          <CheckBox
-            checked={improvementPreferences.includes('receptive')}
-            onPress={() => handleCheckboxChange('receptive')}
-            title="Receptive Language"
-          />
-          <CheckBox
-            checked={improvementPreferences.includes('expressive')}
-            onPress={() => handleCheckboxChange('expressive')}
-            title="Expressive Language"
-          />
-
-          <CustomButton onPress={handleSubmit} title="Next" loading={isLoading} />
         </div>
       </div>
     </div>
   );
-}
-
-const styles = {
-  safeArea: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '20px',
-  },
-  header: {
-    textAlign: 'center',
-  },
-  mainView: {
-    padding: '20px',
-  },
-  scrollView: {
-    maxHeight: '80vh',
-    overflowY: 'auto',
-  },
-  imageView: {
-    width: '40%',
-    margin: 'auto',
-  },
-  image: {
-    width: '100%',
-    height: 'auto',
-  },
-  progressBar: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: '30px',
-  },
-  barFilled: {
-    flex: 1,
-    height: '10px',
-    backgroundColor: '#111920',
-  },
-  bar: {
-    flex: 1,
-    height: '10px',
-    backgroundColor: '#ccc',
-  },
-  heading: {
-    fontSize: '24px',
-    fontWeight: '500',
-  },
-  labelText: {
-    fontSize: '16px',
-    marginTop: '20px',
-  },
-  button: {
-    backgroundColor: '#111920',
-    padding: '12px',
-    borderRadius: '50px',
-    color: '#fff',
-    cursor: 'pointer',
-    width: '100%',
-    marginTop: '20px',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
 };
 
 export default SetupProfilePage;

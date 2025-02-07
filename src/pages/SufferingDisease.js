@@ -1,136 +1,148 @@
 import React from 'react';
-import { useHistory, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDataContext } from '../contexts/DataContext';
+import { motion } from 'framer-motion';
+
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
+
+const containerVariants = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
+
+const CustomButton = ({ onClick, title, loading }) => (
+  <motion.button
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    onClick={onClick}
+    className="w-full md:w-auto px-8 py-3 bg-gray-900 text-white rounded-full 
+               font-semibold hover:bg-gray-800 transition-colors duration-300
+               min-w-[200px] h-[50px] flex items-center justify-center"
+  >
+    {loading ? (
+      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+    ) : (
+      title
+    )}
+  </motion.button>
+);
 
 const SufferingDisease = () => {
-
   const { questionReport } = useDataContext();
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    history('/profileSetupSuccess'); // Using react-router-dom for navigation
-  };
-  const CustomButton = (props) => {
-    return (
-      <button onClick={() => props.onClick()} style={styles.button}>
-        {props.loading ? (
-          <div className="spinner" style={styles.spinner}></div> // You can replace with actual spinner component
-        ) : (
-          <span style={styles.buttonText}>{props.title}</span>
-        )}
-      </button>
-    );
+    navigate('/profileSetupSuccess');
   };
 
+  const conditions = [
+    {
+      condition: 'Articulation Disorder',
+      show: (questionReport?.articulationYes || questionReport?.articulationYes) &&
+            ((questionReport?.articulationYes > questionReport?.articulationNo) || !questionReport?.articulationNo)
+    },
+    {
+      condition: 'Stammering',
+      show: (questionReport?.stammeringYes || questionReport?.stammeringNo) &&
+            ((questionReport?.stammeringYes > questionReport?.stammeringNo) || !questionReport?.stammeringNo)
+    },
+    {
+      condition: 'Voice Disorder',
+      show: (questionReport?.voiceYes || questionReport?.voiceNo) &&
+            ((questionReport?.voiceYes > questionReport?.voiceNo) || !questionReport?.voiceNo)
+    },
+    {
+      condition: 'Receptive Language Disorder',
+      show: (questionReport?.receptiveYes || questionReport?.receptiveNo) &&
+            ((questionReport?.receptiveYes < questionReport?.receptiveNo) || !questionReport?.receptiveYes)
+    },
+    {
+      condition: 'Expressive Language Disorder',
+      show: (questionReport?.expressiveYes || questionReport?.expressiveNo) &&
+            ((questionReport?.expressiveYes < questionReport?.expressiveNo) || !questionReport?.expressiveYes)
+    }
+  ];
+
   return (
-    <div style={styles.safeArea}>
-      <div style={styles.mainView}>
-        <div style={styles.imageView}>
+    <div className="min-h-screen bg-white flex flex-col items-center">
+      <motion.div 
+        className="w-full max-w-4xl px-4 md:px-6 py-6 flex flex-col min-h-screen"
+        variants={containerVariants}
+        initial="initial"
+        animate="animate"
+      >
+        {/* Logo Section */}
+        <motion.div 
+          className="w-40 h-16 mx-auto mb-8 mt-16"
+          variants={fadeIn}
+        >
           <img
             src={require('../assets/images/logo.png')}
             alt="Izzy AI Logo"
-            style={styles.image}
+            className="w-full h-full object-contain"
           />
+        </motion.div>
+
+        {/* Content Section */}
+        <div className="flex-1 flex flex-col">
+          <motion.h2 
+            variants={fadeIn}
+            className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
+          >
+            Suspected Conditions
+          </motion.h2>
+
+          {/* Conditions List */}
+          <motion.div 
+            className="space-y-4 mb-8"
+            variants={containerVariants}
+          >
+            {conditions.map((item, index) => (
+              item.show && (
+                <motion.p
+                  key={index}
+                  variants={fadeIn}
+                  className="text-xl md:text-2xl font-semibold text-gray-900"
+                >
+                  {item.condition}
+                </motion.p>
+              )
+            ))}
+          </motion.div>
+
+          {/* Description */}
+          <motion.p 
+            variants={fadeIn}
+            className="text-base md:text-lg text-gray-700 mb-8 max-w-2xl"
+          >
+            Explore our app to find personalized exercise plans, assessments,
+            and informative content designed to address common disorder
+            concerns. With easy-to-use tools and comprehensive solutions, you can take charge of your linguistic well-being today.
+          </motion.p>
+
+          {/* Button */}
+          <motion.div 
+            variants={fadeIn}
+            className="flex justify-center mt-auto pb-8"
+          >
+            <CustomButton
+              onClick={handleGetStarted}
+              title="Get Started"
+            />
+          </motion.div>
         </div>
-
-        <h2 style={styles.text1}>Suspected Conditions</h2>
-
-        {
-          (questionReport?.articulationYes || questionReport?.articulationYes) &&
-          ((questionReport?.articulationYes > questionReport?.articulationNo) || !questionReport?.articulationNo) &&
-          <p style={styles.text2}>Articulation Disorder</p>
-        }
-        {
-          (questionReport?.stammeringYes || questionReport?.stammeringNo) &&
-          ((questionReport?.stammeringYes > questionReport?.stammeringNo) || !questionReport?.stammeringNo) &&
-          <p style={styles.text2}>Stammering</p>
-        }
-        {
-          (questionReport?.voiceYes || questionReport?.voiceNo) &&
-          ((questionReport?.voiceYes > questionReport?.voiceNo) || !questionReport?.voiceNo) &&
-          <p style={styles.text2}>Voice Disorder</p>
-        }
-        {
-          (questionReport?.receptiveYes || questionReport?.receptiveNo) &&
-          ((questionReport?.receptiveYes < questionReport?.receptiveNo) || !questionReport?.receptiveYes) &&
-          <p style={styles.text2}>Receptive Language Disorder</p>
-        }
-        {
-          (questionReport?.expressiveYes || questionReport?.expressiveNo) &&
-          ((questionReport?.expressiveYes < questionReport?.expressiveNo) || !questionReport?.expressiveYes) &&
-          <p style={styles.text2}>Expressive Language Disorder</p>
-        }
-
-        <p style={styles.text3}>
-          Explore our app to find personalized exercise plans, assessments,
-          and informative content designed to address common disorder
-          concerns. With easy-to-use tools and comprehensive solutions, you can take charge of your linguistic well-being today.
-        </p>
-
-        <CustomButton
-          onClick={handleGetStarted}
-          title="Get Started"
-        />
-      </div>
+      </motion.div>
     </div>
   );
-}
-
-// Defining styles in a constant object
-const styles = {
-  safeArea: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px',
-  },
-  mainView: {
-    width: '100%',
-    maxWidth: '800px',
-  },
-  imageView: {
-    width: '40%',
-    marginTop: '60px',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    height: '60px',
-  },
-  button: {
-    borderRadius: 50,
-    alignItems: 'center',
-    backgroundColor: '#111920',
-    padding: 10,
-    height: 50,
-    justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  text1: {
-    marginTop: '25px',
-    fontSize: '30px',
-    fontWeight: '700',
-    color: '#111920',
-  },
-  text2: {
-    marginTop: '16px',
-    fontSize: '25px',
-    fontWeight: '600',
-    color: '#111920',
-  },
-  text3: {
-    marginTop: '20px',
-    fontSize: '15px',
-    marginBottom: '30px',
-    color: '#111920',
-  },
 };
 
 export default SufferingDisease;

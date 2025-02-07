@@ -7,8 +7,8 @@ export const IOS_WEB_CLIENT_ID = '706390797729-snqc8gd1oj6fu0dcul3i11haf3idgilq.
 export const ANDROID_WEB_CLIENT_ID = '706390797729-85md6jkel2bjls4n0pr7fjhaarcorltg.apps.googleusercontent.com'
 export const WEB_CLIENT_ID = '706390797729-qor82i4f9qlecrg5tdb4mmipleethu7r.apps.googleusercontent.com'
 
-export const getToken = () => localStorage.getItem("access_token")
-export const setToken = (token) => localStorage.setItem("access_token")
+export const getToken = () => localStorage.getItem("token")
+export const setToken = (token) => localStorage.setItem("token",token)
 
 export const getExpressiveQuestions = async (id, avatar) => {
   const token = await getToken()
@@ -761,6 +761,24 @@ export const verifySignupOtp = async (data) => {
     return error
   }
 };
+// export const signup = async (data) => {
+//   try {
+//     const response = await axios.post(
+//       `${BaseURL}/new_signup`,
+//       data,
+//       {
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         data
+//       },
+
+//     );
+//     return response
+//   } catch (error) {
+//     return error
+//   }
+// };
 export const getCheckoutUrl = async (id, plan, invoiceid) => {
   const token = await getToken()
   const url = invoiceid ? `/get_checkout_url/${id}?invoice_id=${invoiceid}?plan=${plan}` : `/get_checkout_url/${id}?plan=${plan}`
@@ -874,6 +892,58 @@ export const getGoogleToken = async () => {
   } catch (error) {
     return null
   }
+}
+export const registerGuardian = async (data) => {
+  const token = await getToken()
+  try {
+    const response = await axios.post(
+      `${BaseURL}/register_guardian_user`,
+      data,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+      },
+
+    );
+    return response
+  } catch (error) {
+    return error
+  }
+};
+
+export const signup = async (data) => {
+  try {
+    const response = await axios.post(
+      `${BaseURL}/new_signup`,
+      data,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data
+      },
+
+    );
+    return response
+  } catch (error) {
+    return error
+  }
+};
+export const calculateAge = (dob) => {
+  let birthDate = new Date(dob);
+  let today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  let monthDiff = today.getMonth() - birthDate.getMonth();
+  let dayDiff = today.getDate() - birthDate.getDate();
+
+  // Adjust age if the birthday hasn't occurred yet this year
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+  return age;
 }
 
 

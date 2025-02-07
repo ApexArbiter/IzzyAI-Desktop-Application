@@ -358,24 +358,22 @@ function BaselineQuestions() {
   useEffect(() => {
     const fetchData = () => {
       try {
-        // Retrieve user details and userId from localStorage
         const storedUserDetail = localStorage.getItem("userDetails");
-        const storedUserId = User(); // This is synchronous, no need for await
+        const storedUserId = User(); 
 
-        // Check if user details exist in localStorage
         if (storedUserDetail) {
-          setUserDetail(JSON.parse(storedUserDetail)); // Parse JSON and set in state
+          setUserDetail(JSON.parse(storedUserDetail)); 
         }
 
         if (storedUserId) {
-          setUserId(storedUserId); // Set userId (no need to parse if it's a string)
+          setUserId(storedUserId);
         }
       } catch (error) {
         console.error("Error retrieving or parsing userDetails from localStorage", error);
       }
     };
 
-    fetchData(); // Call the function inside useEffect
+    fetchData(); 
     console.log(User());
   }, []);
   const questions = Number(userDetail?.Age) < 12 ? baselineQuestionsArray : baselineQuestionsArray.slice(10);
@@ -432,7 +430,6 @@ function BaselineQuestions() {
 
   const handleSubmit = async () => {
     if (responses.includes(null)) {
-      // Alert.alert('Incomplete', 'Please answer all questions before submitting.');
       alert("Please answer all questions before submitting")
     } else {
       const token = await getToken();
@@ -469,7 +466,6 @@ function BaselineQuestions() {
       <CustomHeader title="Setup Profile" goBack={() => history.goBack()} />
       <div style={styles.mainView}>
         <div style={{ marginVertical: 15 }}>
-          <button className='justify-center p-2 border bg-gray-500 ' onClick={() => { history("/home") }} >Direct ShortCut to Home</button>
           {questions.map((item, index) => (
             <Question
               key={item.id}

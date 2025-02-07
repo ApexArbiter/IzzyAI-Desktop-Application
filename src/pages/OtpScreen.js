@@ -19,6 +19,7 @@ const OtpScreen = () => {
   };
 
   const handleVerifyOTP = async () => {
+    const token = await getToken()
     const enteredOTP = otp.join('');
     if (enteredOTP.length === 6) {
       const formData = new FormData();
@@ -29,24 +30,27 @@ const OtpScreen = () => {
           const response = await verifySignupOtp({ email: email?.trim()?.toLowerCase(), otp: enteredOTP });
           console.log(response.data.message);
             if (response?.data?.message === 'OTP verified successfully.') {
-            history('/signInPage'); // Redirect to Sign In page
+            history('/SignIn'); // Redirect to Sign In page
           }
-        } else {
-          const response = await fetch(`${BaseURL}/verify_otp`, {
+        } else{
+          const response = await fetch(`${BaseURL}/${'verify_otp'}`, {
             method: 'POST',
             body: formData,
-            headers: {
-              Authorization: `Bearer ${await getToken()}`,
-            },
+           headers: { 'Authorization': 'Bearer ' + token }
           });
+          // console.log(response.data.message);
+          console.log(response);
           if (response.ok) {
             const data = await response.json();
-            history('/newPassword', { email: email });
-          } else {
-            alert('Invalid OTP!');
-          }
+            history('/newPassword', {state:{ email: email }});
+          } 
+          
+        //  else {
+        //     alert('Invalid OTP!');
+        //   }
         }
       } catch (error) {
+        console.error('Error:', error);
         alert('An error occurred while verifying OTP. Please try again.');
       }
     } else {

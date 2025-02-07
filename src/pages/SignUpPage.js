@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BaseURL from '../components/ApiCreds';
 import CustomHeader from '../components/CustomHeader';
 import { UserIcon, Mail, Lock } from 'lucide-react';
-import { setToken } from '../utils/functions';
+import { setToken, calculateAge, signup } from '../utils/functions';
+import moment from 'moment';
 
 const CustomButton = ({ onPress, title, loading, className }) => {
   return (
     <button
       onClick={onPress}
-      className={`w-full max-w-md px-6 py-3 text-white bg-black rounded-full font-semibold 
+      className={`w-full px-6 py-3 text-white bg-black rounded-full font-semibold 
       transition-all duration-300 hover:bg-gray-800 disabled:opacity-50 
       disabled:cursor-not-allowed ${className}`}
       disabled={loading}
@@ -29,7 +30,7 @@ const CustomButton = ({ onPress, title, loading, className }) => {
 
 const InputField = ({ label, placeholder, value, onChangeText, icon, type = "text", required = true }) => {
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <label className="block text-sm font-medium text-gray-700">
         {label}{required && <span className="text-red-500">*</span>}
       </label>
@@ -42,7 +43,7 @@ const InputField = ({ label, placeholder, value, onChangeText, icon, type = "tex
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChangeText(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
+          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 
           focus:ring-blue-500 focus:border-transparent transition-all duration-300
           placeholder:text-gray-400"
         />
@@ -51,22 +52,31 @@ const InputField = ({ label, placeholder, value, onChangeText, icon, type = "tex
   );
 };
 
+const genders = ['Male', 'Female', 'Transgender', 'Prefer not to say'];
+
 const SignUpPage = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [gender, setGender] = useState('Male');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [date, setDate] = useState(new Date());
   const navigate = useNavigate();
+  const location = useLocation();
+  const { type } = location.state;
 
-  const navigateBack = () => {
-    navigate(-1);
-  };
-
-  const handleNavigate = () => {
-    if (!email || !password || !username || !confirmPassword) {
+  const handleNavigate = async () => {
+    if (!email || !password || !firstName || !username || !confirmPassword || !gender) {
       setError('Please fill all fields');
+      return;
+    }
+
+    if (!moment(date).isSameOrBefore(moment(new Date()).subtract(1, 'day'))) {
+      setError("Please add valid date of birth");
       return;
     }
 
@@ -74,11 +84,9 @@ const SignUpPage = () => {
       setError('Invalid email address');
       return;
     }
-
+    
     if (!isValidPassword(password)) {
-      setError(
-        'Invalid password. It should contain at least 8 characters, 1 uppercase letter, and 1 special character.'
-      );
+      setError('Invalid password. It should contain at least 8 characters, 1 uppercase letter, and 1 special character.');
       return;
     }
 
@@ -87,47 +95,52 @@ const SignUpPage = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    // Request Data
     const userData = {
-      username: username,
+      username,
+      fullName: firstName + " " + (lastName ?? ""),
       email: email?.trim()?.toLowerCase(),
-      password: password,
-      confirmPassword: confirmPassword,
-      source: 'web', // Web platform
+      password,
+      confirmPassword,
+      source: 'web',
+      gender,
+      dob: moment(date).format("YYYY-MM-DD"),
+      userType: "Patient"
     };
 
-    axios
-      .post(`${BaseURL}/signup`, userData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then(async (response) => {
-        const data = response.data;
-        if (data?.access_token) {
-          await setToken(data?.access_token);
-        }
-        if (data.error) {
-          setError(data.error);
+    if (type === 'adult') {
+      setIsLoading(true);
+      try {
+        const response = await signup(userData)
+        if (response?.data?.access_token) {
+          console.log(response?.data?.access_token)
+          await setToken(response?.data?.access_token);
+          navigate('/otpScreen', { state: { email: userData?.email, isSignup: true } });
         } else {
-          alert('OTP Sent! An OTP has been sent to your email. Enter it here to continue!');
-          navigate('/otpScreen', { state: { isSignup: true, email } });
+          setError(response?.response?.data?.error || response?.data?.error || 'Something went wrong');
         }
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setError('An error occurred while signing up');
-      });
+      } catch (error) {
+        console.log(error);
+        console.log(error?.response?.data?.error);
+        setError(error?.response?.data?.error || 'An error occurred while signing up');
+      }
+      setIsLoading(false);
+    } else if (type === 'child') {
+      const age = calculateAge(date);
+      console.log(age)
+      if (age >= 18) {
+        alert("Oops! Looks like you're under 18. No worries—just pop in your Parent/Guardian's email address to keep going");
+        return;
+      }
+      navigate("/ConsentGuardian", { state: { data: userData, isChild: true } });
+    } else {
+      navigate("/SomeoneCareScreen", { state: { data: userData } });
+    }
   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setError('');
     }, 10000);
-
     return () => clearTimeout(timer);
   }, [error]);
 
@@ -142,97 +155,131 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <CustomHeader title="Sign Up" goBack={() => navigate(-1)} />
 
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4">
-        <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
-          {/* Logo */}
-          <div className="flex justify-center">
+      <div className="h-[calc(100vh-64px)] p-4">
+        <div className="w-full max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl">
+          <div className="flex justify-center mb-6">
             <img
               src={require('../assets/images/logo.png')}
               alt="Logo"
-              className="h-16 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </div>
 
-          {/* Heading */}
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-center text-gray-900">
+          <div className="text-center mb-6">
+            <h1 className="text-xl font-bold text-gray-900">
               Sign up to get started with IzzyAI
             </h1>
-            <p className="text-center text-gray-500">
+            <p className="text-sm text-gray-500">
               Please fill in your details to create an account
             </p>
           </div>
 
-          {/* Form */}
-          <div className="space-y-6">
-            <InputField
-              label="Username"
-              placeholder="Enter your username"
-              value={username}
-              onChangeText={setUsername}
-              icon={<UserIcon className="w-5 h-5" />}
-            />
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <InputField
+                label="First Name"
+                placeholder="First Name"
+                value={firstName}
+                onChangeText={setFirstName}
+                icon={<UserIcon className="w-5 h-5" />}
+              />
 
-            <InputField
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              icon={<Mail className="w-5 h-5" />}
-              type="email"
-            />
+              <InputField
+                label="Last Name"
+                placeholder="Last Name"
+                value={lastName}
+                onChangeText={setLastName}
+                icon={<UserIcon className="w-5 h-5" />}
+                required={false}
+              />
 
-            <InputField
-              label="Password"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              icon={<Lock className="w-5 h-5" />}
-              type="password"
-            />
+              <InputField
+                label="Username"
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+                icon={<UserIcon className="w-5 h-5" />}
+              />
 
-            <InputField
-              label="Confirm Password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              icon={<Lock className="w-5 h-5" />}
-              type="password"
-            />
+              <InputField
+                label="Email"
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                icon={<Mail className="w-5 h-5" />}
+                type="email"
+              />
+            </div>
 
-            {/* Password Requirements */}
-            {/* <div className="text-xs text-gray-500 space-y-1">
-              <p>Password must contain:</p>
-              <ul className="list-disc pl-4 space-y-1">
-                <li>At least 8 characters</li>
-                <li>1 uppercase letter</li>
-                <li>1 special character</li>
-                <li>1 number</li>
-              </ul>
-            </div> */}
-
-            {/* Error Message */}
-            {error && (
-              <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-100">
-                {error}
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-700">
+                  Your Gender<span className="text-red-500">*</span>
+                </label>
+                <select 
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white"
+                >
+                  {genders.map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
               </div>
-            )}
 
-            {/* Sign Up Button */}
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-700">
+                  Date of Birth<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={moment(date).format("YYYY-MM-DD")}
+                  onChange={(e) => setDate(new Date(e.target.value))}
+                  max={moment().format("YYYY-MM-DD")}
+                  className="w-full pl-3 pr-4 py-2.5 border border-gray-300 rounded-lg"
+                />
+              </div>
+
+              <InputField
+                label="Password"
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                icon={<Lock className="w-5 h-5" />}
+                type="password"
+              />
+
+              <InputField
+                label="Confirm Password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                icon={<Lock className="w-5 h-5" />}
+                type="password"
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="mt-4 text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg border border-red-100">
+              {error}
+            </div>
+          )}
+
+          <div className="mt-6 max-w-md mx-auto">
             <CustomButton
               onPress={handleNavigate}
-              title="Create Account"
+              title="Sign Up"
               loading={isLoading}
             />
 
-            {/* Sign In Link */}
-            <p className="text-center text-gray-600">
+            <p className="text-center text-sm text-gray-600 mt-4">
               Already have an account?{' '}
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/SignIn')}
                 className="text-blue-600 hover:text-blue-800 font-semibold transition-colors duration-300"
               >
                 Sign In

@@ -8,6 +8,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import GoogleIcon from '../assets/GoogleIcon';
 import AppleIcon from '../assets/AppleIcon';
 import { getGoogleToken, googleLogin, isIOS, resendOtp, setToken } from '../utils/functions';
+import EmailPopup from '../components/EmailPopup';
 
 const CustomButton = ({ onPress, title, loading, className }) => {
   return (
@@ -45,7 +46,12 @@ function SignInPage() {
 
   const navigateAfterLogin = (isFace = false, route = 'main', params = {}) => {
     if (isFace) {
-      navigate('/scanfaceInstruction', { state: { routeName: 'baselineQuestions', nextPage: 'faceauthenticationscreen' } });
+      navigate('/scanfaceInstruction', { 
+        state: { 
+          routeName: 'baselineQuestions', 
+          nextPage: 'faceauthenticationscreen'
+        } 
+      });
     } else {
       navigate(route, { state: params });
     }
@@ -53,93 +59,83 @@ function SignInPage() {
 
   const checkUserInfo = async (data) => {
     if (data?.access_token) {
-      // Replace setToken with your web token storage method
-      localStorage.setItem('access_token', data?.access_token);
+      localStorage.setItem('token', data?.access_token);
     }
+    
     updateUserId(data?.USERID);
+    
     if (data?.error) {
       setIsLoading(false);
       setError(data.error);
-    } else {
-      if (data?.IsOTPVerified) {
-        try {
-          const response = await fetch(`${BaseURL}/userdata_info/${data?.USERID}`, {
-            headers: { 'Authorization': 'Bearer ' + data?.access_token }
-          });
-          const responseData = await response.json();
+      return;
+    }
 
-          // Replace AsyncStorage with localStorage
-          localStorage.setItem("isTerms", JSON.stringify(true));
+    if (!data?.IsOTPVerified) {
+      setIsLoading(false);
+      await resendOtp({ email: data?.email ?? email?.trim()?.toLowerCase() });
+      navigate("/otpScreen", { 
+        state: { 
+          isSignup: true, 
+          email: data?.email ?? email?.trim()?.toLowerCase() 
+        } 
+      });
+      return;
+    }
 
-          const quesReport = localStorage.getItem("questionReport");
-          // console.log("quesReport", quesReport);
-          setQuestionReport(JSON.parse(quesReport));
+    try {
+      const response = await fetch(`${BaseURL}/userdata_info/${data?.USERID}`, {
+        headers: { 'Authorization': 'Bearer ' + data?.access_token }
+      });
+      const responseData = await response.json();
 
-          updateUserDetail({
-            UserID: data?.USERID,
-            FullName: responseData?.UserProfile?.FullName,
-            Age: responseData?.UserProfile?.Age,
-            AvatarID: responseData?.UserProfile?.AvatarID,
-            email: email,
-            UserType: responseData?.UserType?.UserType,
-            Gender: responseData?.UserProfile?.Gender,
-            SubscriptionDetails: responseData?.SubscriptionDetails,
-            DaysLeft: responseData?.DaysLeft,
-            Amount: responseData?.SubscriptionDetails?.Amount ?? 0,
-          });
-          console.log(
-            {
-              UserID: data?.USERID,
-              FullName: responseData?.UserProfile?.FullName,
-              Age: responseData?.UserProfile?.Age,
-              AvatarID: responseData?.UserProfile?.AvatarID,
-              email: email,
-              UserType: responseData?.UserType?.UserType,
-              Gender: responseData?.UserProfile?.Gender,
-              SubscriptionDetails: responseData?.SubscriptionDetails,
-              DaysLeft: responseData?.DaysLeft,
-              Amount: responseData?.SubscriptionDetails?.Amount ?? 0,
-            }
-          )
-          setIsLoading(false);
+      localStorage.setItem("isTerms", JSON.stringify(true));
+      const quesReport = localStorage.getItem("questionReport");
+      setQuestionReport(JSON.parse(quesReport));
 
-          // Navigation logic remains the same
-          if (responseData?.UserProfile?.FullName?.length < 1 || !responseData?.UserProfile?.FullName?.length) {
-            navigateAfterLogin(false, "setupProfile");
-          } else if (responseData?.UserProfile?.FullName?.length > 1 && !responseData?.UserProfile?.AvatarID) {
-            navigateAfterLogin(false, "setupProfile1");
-          } else if (!responseData?.MicCameraTestReport?.CamQualityPrecent || !responseData?.MicCameraTestReport?.MicQualityPrecent) {
-            navigateAfterLogin(false, "setupProfile2");
-          } else if (!JSON.parse(localStorage.getItem("isTerms"))) {
-            navigateAfterLogin(false, "setupProfile4");
-          } else if (responseData?.FaceAuthentication?.FaceSnapshotURL?.length < 1 || !responseData?.FaceAuthentication?.FaceSnapshotURL) {
-            navigateAfterLogin(true);
-          } else if (!responseData?.InitialQuestions?.Answer) {
-            navigateAfterLogin(false, "baselineQuestions");
-          } else {
-            // Store question report in localStorage
-            localStorage.setItem("questionReport", JSON.stringify(responseData?.InitialquestionLogic?.InitialquestionLogic));
-            console.log("questionReportReal:", responseData?.InitialquestionLogic?.InitialquestionLogic)
-            setQuestionReport(JSON.parse(responseData?.InitialquestionLogic?.InitialquestionLogic));
+      updateUserDetail({
+        UserID: data?.USERID,
+        FullName: responseData?.UserProfile?.FullName,
+        Age: responseData?.UserProfile?.Age,
+        AvatarID: responseData?.UserProfile?.AvatarID,
+        email: email,
+        UserType: responseData?.UserType?.UserType,
+        Gender: responseData?.UserProfile?.Gender,
+        SubscriptionDetails: responseData?.SubscriptionDetails,
+        DaysLeft: responseData?.DaysLeft,
+        Amount: responseData?.SubscriptionDetails?.Amount ?? 0,
+      });
 
-            // Replace Alert with browser alert or a custom modal
-            if (responseData?.SubscriptionDetails?.Plan === 'annual' && responseData?.DaysLeft <= 14) {
-              alert(`Subscription End: Your subscription will expire in ${responseData?.DaysLeft} ${responseData?.DaysLeft > 0 ? "days" : "day"}. Renew now!`);
-            }
-            navigate('/home');
-          }
-        } catch (error) {
-          setIsLoading(false);
-          setError('An error occurred while fetching answers');
-        }
+      setIsLoading(false);
+
+      // Navigation logic
+      if (!responseData?.UserProfile?.CheckboxValues) {
+        navigateAfterLogin(false, "/setupProfile");
+      } else if (responseData?.UserProfile?.CheckboxValues && !responseData?.UserProfile?.AvatarID) {
+        navigateAfterLogin(false, "/setupProfile1");
+      } else if (!responseData?.MicCameraTestReport?.CamQualityPrecent || !responseData?.MicCameraTestReport?.MicQualityPrecent) {
+        navigateAfterLogin(false, "/setupProfile2");
+      } else if (!JSON.parse(localStorage.getItem("isTerms"))) {
+        navigateAfterLogin(false, "/setupProfile4");
+      } else if (responseData?.FaceAuthentication?.FaceSnapshotURL?.length < 1 || !responseData?.FaceAuthentication?.FaceSnapshotURL) {
+        navigateAfterLogin(true);
+      } else if (!responseData?.InitialQuestions?.Answer) {
+        navigateAfterLogin(false, "/baselineQuestions");
       } else {
-        setIsLoading(false);
-        resendOtp({ email: data?.email ?? email?.trim()?.toLowerCase() });
-        navigate("/otpScreen", { state: { isSignup: true, email: data?.email ?? email?.trim()?.toLowerCase() } });
+        localStorage.setItem("questionReport", JSON.stringify(responseData?.InitialquestionLogic?.InitialquestionLogic));
+        setQuestionReport(JSON.parse(responseData?.InitialquestionLogic?.InitialquestionLogic));
+
+        if (responseData?.SubscriptionDetails?.Plan === 'annual' && responseData?.DaysLeft <= 14) {
+          alert(`Your subscription will expire in ${responseData?.DaysLeft} ${responseData?.DaysLeft > 0 ? "days" : "day"}. Renew now!`);
+        }
+        navigate('/home');
       }
+    } catch (error) {
+      setIsLoading(false);
+      setError('An error occurred while fetching answers');
     }
   };
-  const handleLogin = () => {
+
+  const handleLogin = async () => {
     if (!email || !password) {
       setError('Email and password are required');
       return;
@@ -152,31 +148,27 @@ function SignInPage() {
 
     setIsLoading(true);
 
-    const userData = {
-      email: email?.trim()?.toLowerCase(),
-      password: password,
-    };
-
-    // Keyboard.dismiss();
-
-    fetch(`${BaseURL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    })
-      .then(response => response.json())
-      .then(async data => {
-        checkUserInfo(data);
-      })
-      .catch(error => {
-        setIsLoading(false);
-        setError('An error occurred while signing in');
+    try {
+      const response = await fetch(`${BaseURL}/new_login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email?.trim()?.toLowerCase(),
+          password: password,
+        }),
       });
+
+      const data = await response.json();
+      await checkUserInfo(data);
+    } catch (error) {
+      setIsLoading(false);
+      setError('An error occurred while signing in');
+    }
   };
 
-  const handleForgetPassword = async forgetEmail => {
+  const handleForgetPassword = async (forgetEmail) => {
     if (!forgetEmail) {
       setForgetError('Email is required');
       return;
@@ -194,24 +186,34 @@ function SignInPage() {
       });
       const data = await response.json();
 
-      if (data) {
-        if (data.error) {
-          setForgetLoading(false);
-          setForgetError(data.error);
-        } else {
-          setForgetLoading(false);
-          navigate('/otpScreen', { state: { email: forgetEmail } });
-          setShowEmailPopup(false);
-          setForgetError('');
-        }
+      if (data?.error) {
+        setForgetError(data.error);
       } else {
-        setForgetLoading(false);
-        const errorData = await response.json();
-        throw new Error(errorData.message || response.statusText);
+        navigate('/otpScreen', { state: { email: forgetEmail } });
+        setShowEmailPopup(false);
+        setForgetError('');
       }
     } catch (error) {
+      alert('An unexpected error occurred!');
+    } finally {
       setForgetLoading(false);
-      // Alert.alert('An unexpected error occurred!');
+    }
+  };
+
+  const onPressGoogle = async () => {
+    try {
+      const googleData = await getGoogleToken();
+      if (googleData?.idToken) {
+        const response = await googleLogin(googleData?.idToken);
+        if (response?.data?.USERID) {
+          await checkUserInfo(response?.data);
+        }
+      } else {
+        alert("Something went wrong");
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      alert("Failed to login with Google");
     }
   };
 
@@ -222,11 +224,9 @@ function SignInPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 overflow-hidden">
-      {/* <CustomHeader title="Sign In" goBack={() => navigate(-1)} /> */}
-      {/* <button className='p-3 text-xl' onClick={() => { navigate("home") }} >Homepage</button> */}
-      {/* <button className='p-3 text-xl' onClick={() => { navigate("allAssessmentPage") }} >All Assessments</button> */}
+   
 
-      <div className="flex flex-col  items-center justify-center min-h-[calc(100vh-64px)] px-4">
+      <div className="flex bg-gray-500 flex-col  items-center justify-center min-h-screen px-4">
 
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
           <div className="space-y-2">
@@ -322,7 +322,7 @@ function SignInPage() {
             <p className="text-center text-gray-600">
               Don't have an account?{' '}
               <button
-                onClick={() => navigate('/signUpPage')}
+                onClick={() => navigate('/SignUpConsent')}
                 className="text-blue-600 hover:text-blue-800 font-semibold transition-colors duration-300"
                 type="button"
               >
@@ -360,6 +360,17 @@ function SignInPage() {
           </div>
         </div>
       </div>
+
+      <EmailPopup
+        visible={showEmailPopup}
+        error={forgetError}
+        onClose={() => {
+          setShowEmailPopup(false);
+          setForgetError('');
+        }}
+        onConfirm={handleForgetPassword}
+        loading={forgetLoading}
+      />
     </div>
   );
 }

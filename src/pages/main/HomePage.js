@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useDataContext } from '../contexts/DataContext';
-import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import { useNavigate } from 'react-router-dom';
-import { getToken } from '../utils/functions';
-import BottomNavigation from '../components/BottomNavigation';
+import { getToken } from '../../utils/functions';
+import BottomNavigation from '../../components/BottomNavigation';
 import { motion } from 'framer-motion';
+import { useDataContext } from '../../contexts/DataContext';
+import BaseURL, { IMAGE_BASE_URL } from '../../components/ApiCreds';
 
 const HomePage = () => {
   const { userId } = useDataContext();
@@ -90,26 +90,26 @@ const HomePage = () => {
     {
       title: "Assessment",
       description: "Test your speech-language skills with our AI-based assessments",
-      image: require('../assets/images/home1.png'),
+      image: require('../../assets/images/home1.png'),
       route: 'assessmentPage'
     },
     {
       title: "Exercises",
       description: "Improve your speaking skills with our AI Therapist",
-      image: require('../assets/images/home2.png'),
+      image: require('../../assets/images/home2.png'),
       route: 'exercisePage'
     },
     {
       title: "Reports",
       description: "View your progress and improvement",
-      image: require('../assets/images/home3.png'),
+      image: require('../../assets/images/home3.png'),
       route: 'reportsPage'
     }
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4  sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

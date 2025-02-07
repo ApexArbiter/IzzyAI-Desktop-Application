@@ -1,66 +1,85 @@
 import React, { useEffect } from 'react';
-import { useHistory, useNavigate } from 'react-router-dom'; // React Router for navigation
-import SuccessIcon from '../assets/SuccessIcon'; // Ensure the success icon component works for React
-function ProfileSetupSuccessPage() {
-  const history = useNavigate(); // Using React Router's history for navigation
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { CheckCircle } from 'lucide-react';
+
+const ProfileSetupSuccessPage = () => {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const timer1 = setTimeout(() => {
-      history('/home'); // Navigate to the Tabs page after 2 seconds
-    }, 2000);
+    const timer = setTimeout(() => {
+      navigate('/home');
+    }, 3000);
 
-    return () => {
-      clearTimeout(timer1);
-    };
-  }, [history]);
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   return (
-    <div style={styles.safeArea}>
-      <div style={styles.mainView}>
-        <SuccessIcon />
-        <div style={styles.logoContainer}>
-          <img
-            src={require('../assets/images/logo.png')}
-            alt="Logo"
-            style={styles.logoImg}
-          />
-        </div>
-        <p style={styles.heading}>
-          Your IzzyAI profile has setup successfully
-        </p>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <motion.div 
+        className="flex flex-col items-center justify-center space-y-6 rounded-2xl bg-white p-8 shadow-lg"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 260,
+            damping: 20,
+            delay: 0.2 
+          }}
+        >
+          <CheckCircle className="h-16 w-16 text-green-500" />
+        </motion.div>
+
+        <motion.div 
+          className="mt-4 flex flex-col items-center space-y-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="h-16 w-40">
+            <img
+               src={require("../assets/images/logo.png")}
+              alt="Logo"
+              className="h-full w-full object-contain"
+            />
+          </div>
+
+          <motion.h1 
+            className="text-center text-2xl font-medium text-gray-800"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            Your IzzyAI profile has been setup successfully
+          </motion.h1>
+        </motion.div>
+
+        <motion.div
+          className="mt-4"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          <div className="h-2 w-32 overflow-hidden rounded-full bg-gray-200">
+            <motion.div
+              className="h-full bg-green-500"
+              initial={{ x: "-100%" }}
+              animate={{ x: "0%" }}
+              transition={{ 
+                duration: 3,
+                ease: "easeInOut"
+              }}
+            />
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
-}
-
-const styles = {
-  safeArea: {
-    display: 'flex',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '20px',
-  },
-  mainView: {
-    textAlign: 'center',
-  },
-  logoContainer: {
-    height: '60px',
-    width: '160px',
-    marginTop: '15px',
-  },
-  logoImg: {
-    height: '100%',
-    width: '100%',
-    objectFit: 'contain', // This ensures the image fits well
-  },
-  heading: {
-    fontSize: '24px',
-    fontWeight: '500',
-    fontFamily: 'Arial, sans-serif', // You can change this to your desired font
-    color: '#111920',
-    marginTop: '20px',
-  },
 };
 
 export default ProfileSetupSuccessPage;

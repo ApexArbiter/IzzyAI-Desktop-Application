@@ -4,7 +4,7 @@ import Webcam from 'react-webcam';
 import { ReactMic } from 'react-mic';
 import { LinearProgress } from '@mui/material';
 import { useDataContext } from '../contexts/DataContext';
-import { getExpressiveQuestions, evaluateExpressiveQuestion, getToken, authenticateFace, getExpressiveAllExerciseQuestions, getExpressiveExerciseQuestions, detectExpression, matchExpressiveAnswer } from "../utils/functions";
+import { getExpressiveQuestions, evaluateExpressiveQuestion, getToken, authenticateFace, getExpressiveAllExerciseQuestions, getExpressiveExerciseQuestions } from "../utils/functions";
 import CustomHeader from '../components/CustomHeader';
 import VideoPlayer2 from '../components/VideoPlayer2';
 import Loader from '../components/Loader';
@@ -67,7 +67,7 @@ const PlayButton = ({ onPress, disabled }) => (
 function ExpressiveAssessment() {
   const location = useLocation();
   const { sessionId, isAll } = location.state || {};
-  // console.log(location.state)
+  console.log(location.state)
   const navigate = useNavigate();
   const { setExpressiveReport } = useDataContext();
   const webcamRef = useRef(null);
@@ -79,21 +79,19 @@ function ExpressiveAssessment() {
 
   // State management
   const [startTime, setStartTime] = useState('');
-    const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
-    const [questionResponse, setQuestionResponse] = useState('');
-    const [questionCount, setQuestionCount] = useState(1);
-    const [recordingStatus, setRecordingStatus] = useState('idle');
-    const [incorrectQuestions, setIncorrectQuestions] = useState([]);
-    const [correctQuestions, setCorrectQuestions] = useState([]);
-    const [incorrectExpressions, setIncorrectExpressions] = useState([]);
-    const [correctExpressions, setCorrectExpressions] = useState([]);
-    const [expressionsArray, setExpressionsArray] = useState([]);
-    const [questionExpressions, setQuestionExpressions] = useState([]);
-    const [questions, setQuestions] = useState([]);
-    const [disableRecordingButton, setDisableRecordingButton] = useState(false);
-    const [isWrongAnswer, setInWrongAnswer] = useState(false);
-    const [wrongWord, setWrongWord] = useState(null);
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [questionResponse, setQuestionResponse] = useState('');
+  const [questionCount, setQuestionCount] = useState(1);
+  const [recordingStatus, setRecordingStatus] = useState('idle');
+  const [incorrectQuestions, setIncorrectQuestions] = useState([]);
+  const [correctQuestions, setCorrectQuestions] = useState([]);
+  const [incorrectExpressions, setIncorrectExpressions] = useState([]);
+  const [disableRecordingButton, setDisableRecordingButton] = useState(false);
+  const [correctExpressions, setCorrectExpressions] = useState([]);
+  const [expressionsArray, setExpressionsArray] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [isComplete, setIsComplete] = useState(false);
   // Add these new states at the start of your component
   const [answerCount, setAnswerCount] = useState(0);  // Tracks which part of the answer we're on
   const [recordCount, setRecordCount] = useState(0);  // Tracks number of attempts
@@ -106,7 +104,12 @@ function ExpressiveAssessment() {
   const [expression, setExpression] = useState(null);
   const [snapshot, setSnapshot] = useState(null);
   const [isVideoEnd, setIsVideoEnd] = useState(false);
-
+  const [categorywiseReport, setCategoryWiseReport] = useState({
+    category1: 0,
+    category2: 0,
+    category3: 0,
+    category4: 0
+  });
 
   // Get user details from localStorage
   const userId = localStorage.getItem("userId");
@@ -154,10 +157,6 @@ function ExpressiveAssessment() {
       setIsLoading(false);
     }
   };
-  // Call fetchQuestionData
-  useEffect(() => {
-    fetchQuestionData();
-  }, []);
   // Add this at the component level
   useEffect(() => {
     const resetAndPlayVideo = () => {
@@ -177,11 +176,11 @@ function ExpressiveAssessment() {
       resetAndPlayVideo();
     }
   }, [recordingStatus, isDelay, recordCount]);
-  const endAssessment = () => {
-    setExpressiveReport(incorrectQuestions);
-    navigateTo();
-  };
 
+  // Call fetchQuestionData
+  useEffect(() => {
+    fetchQuestionData();
+  }, []);
   const navigateTo = () => {
     setExpressiveReport(incorrectQuestions);
     navigate('/result-expressive-language', {
@@ -201,11 +200,6 @@ function ExpressiveAssessment() {
     });
   };
 
-  const getCurrentAnswer = () => {
-    let answers = questions?.[questionCount - 1]?.answers?.split(";")
-    return answers?.[answerCount]?.trim()
-  }
-
   const onStartRecord = async () => {
     try {
       setRecordingStatus('recording');
@@ -217,281 +211,240 @@ function ExpressiveAssessment() {
       }
 
       const imageSrc = webcamRef.current.getScreenshot();
-      setSnapshot(imageSrc)
+
       if (!imageSrc) {
         console.error('No image captured');
-        
         return;
       }
 
+      // // Convert base64 to blob and create a File object
+      // const blob = await fetch(imageSrc).then(r => r.blob());
+      // console.log("blob",blob)
+      // setSnapshot(blob);
+      // console.log("",snapshot)
 
-      // setDisableRecordingButton(false);
+
+
+      setDisableRecordingButton(false);
 
     } catch (error) {
       console.error('Error capturing image:', error);
       setRecordingStatus('idle');
     }
   };
-  const onCorrectAnswer = (ques) => {
-    setQuestionResponse('Correct!');
-    setCorrectAnswersCount(prevCount => prevCount + 1);
-    if (!correctQuestions.includes(ques + questionCount)) {
-        setCorrectQuestions(prevQuestions => [
-            ...prevQuestions,
-            ques + questionCount,
-        ]);
-    }
-    if (incorrectQuestions.some(q => q?.questiontext === ques + questionCount)) {
-        setIncorrectQuestions(prevQuestions =>
-            prevQuestions.filter(q => q?.questiontext !== ques + questionCount),
-        );
-    }
-    setRecordingStatus("stop")
-    setWrongWord(null)
-    setInWrongAnswer(null)
-}
-const onWrongAnswer = (ques) => {
-    if (!incorrectQuestions.some(q => q?.questiontext === ques + questionCount)) {
-        setIncorrectQuestions(prevQuestions => [
-            ...prevQuestions,
-            { ...questions?.[questionCount - 1], questiontext: ques + questionCount },
-        ]);
-    }
-    if (correctQuestions.includes(ques + questionCount)) {
-        setCorrectAnswersCount(prevCount => prevCount - 1);
-        setCorrectQuestions(prevQuestions =>
-            prevQuestions.filter(q => q !== ques + questionCount),
-        );
-    }
-    setQuestionResponse('Incorrect!');
-    setWrongWord(null)
-    setInWrongAnswer(null)
-}
-const onCorrectExpression = (ques, exp) => {
-    if (!correctExpressions.includes(ques + exp + questionCount)) {
-        setCorrectExpressions(prevQuestions => [
-            ...prevQuestions,
-            ques + exp + questionCount,
-        ]);
-    }
-    if (incorrectExpressions.some(q => q === ques + exp + questionCount)) {
-        setIncorrectExpressions(prevQuestions =>
-            prevQuestions.filter(q => q !== ques + exp + questionCount),
-        );
-    }
-}
-const onWrongExpression = (ques, exp) => {
-    if (!incorrectExpressions.some(q => q === ques + exp + questionCount)) {
-        setIncorrectExpressions(prevQuestions => [
-            ...prevQuestions,
-            ques + exp + questionCount,
-          ]);
-        }
-    if (correctExpressions.includes(ques + exp + questionCount)) {
-      setCorrectExpressions(prevQuestions =>
-            prevQuestions.filter(q => q !== (ques + exp + questionCount)),
-          );
-    }
-}
 
-const sendSnapshot = async () => {
-  if (!webcamRef.current) return null;
+  const processImage = async () => {
+    if (!webcamRef.current) {
+      console.error('Webcam reference not available');
+      setRecordingStatus('idle');
+      return;
+    }
 
-  try {
     const imageSrc = webcamRef.current.getScreenshot();
-    if (!imageSrc) return null;
 
-    const base64Response = await fetch(imageSrc);
-    const blob = await base64Response.blob();
+    if (!imageSrc) {
+      console.error('No image captured');
+      return;
+    }
 
-    const formData = new FormData();
-    formData.append('image', blob, 'snapshot.jpg');
+    // Convert base64 to blob and create a File object
+    const blob = await fetch(imageSrc).then(r => r.blob());
 
-    const response = await detectExpression(formData)
-    if (response?.expression) {
-      setExpression(response?.expression)
-      return response?.expression
+    const file = new File([blob], 'webcam-snapshot.jpg', { type: 'image/jpeg' });
+
+    console.log(file)
+    console.log("snapshot", snapshot)
+    return file
   }
-  console.log(response.expression)
-  return null
-
-   
-  } catch (error) {
-    console.error('Error capturing/sending snapshot:', error);
-    return null;
-  }
-};
-
-
-
-const getSingleExpression = (arr) => {
-  const countMap = arr.reduce((acc, item) => {
-      acc[item] = (acc[item] || 0) + 1;
-      return acc;
-  }, {});
-
-  // Step 2: Find the element with the highest count
-  const maxElement = Object.keys(countMap).reduce((a, b) =>
-      countMap[a] > countMap[b] ? a : b
-  );
-
-  // Step 3: Filter out the most frequent element
-  const filteredArray = arr.find(item => item === maxElement);
-  return filteredArray
-}
-
-const updateValuesToInitial = (updatedQuestionExpression) => {
-  setExpressionsArray(prevArray => [...prevArray, getSingleExpression(updatedQuestionExpression) || ""])
-  // setConsecutiveCorrect(0)
-  // setAnswerCount(0)
-  // setRecordCount(0)
-}
-
-
-
 
   const onStopRecord = async () => {
     setRecordingStatus('loading');
     // Stop recording will trigger ReactMic's onStop callback
   };
 
-  // const evaluateQuestion = async (transcription) => {
-  //   const file = await processImage()
-  //   console.log(file)
+  const evaluateQuestion = async (transcription) => {
+    const file = await processImage()
+    console.log(file)
 
-  //   const formData = new FormData();
-  //   formData.append('image', file, 'webcam-snapshot.jpg');
-  //   formData.append('transcription', transcription);
-  //   formData.append('answers', question?.[questionCount - 1]?.answers);
-  //   formData.append('expected_expression', question?.[questionCount - 1]?.expression);
+    const formData = new FormData();
+    formData.append('image', file, 'webcam-snapshot.jpg');
+    formData.append('transcription', transcription);
+    formData.append('answers', question?.[questionCount - 1]?.answers);
+    formData.append('expected_expression', question?.[questionCount - 1]?.expression);
 
-  //   try {
-  //     const response = await evaluateExpressiveQuestion(formData);
-  //     console.log(response)
+    try {
+      const response = await evaluateExpressiveQuestion(formData);
+      console.log(response)
 
-  //     setRecordingStatus("stop");
+      setRecordingStatus("stop");
 
-  //     if (response?.expression) {
-  //       setExpression(response.expression);
-  //       return response.expression;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error evaluating question:', error);
-  //   }
+      if (response?.expression) {
+        setExpression(response.expression);
+        return response.expression;
+      }
+    } catch (error) {
+      console.error('Error evaluating question:', error);
+    }
 
-  //   return null;
-  // };
+    return null;
+  };
 
   const handleAudioStop = async (recordedBlob) => {
-    const token = await getToken();
-    const formData = new FormData();
-    formData.append('audio', recordedBlob.blob, 'sound.wav');
-    const answer = getCurrentAnswer()?.replace(/\.$/, "")?.toLowerCase();
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('audio', recordedBlob.blob, 'sound.wav');
 
-        formData.append("answer", answer)
-    
-        try {
-          const response = await matchExpressiveAnswer(formData)
-          
-          const expressionResponse = await sendSnapshot()
-          const transcript = response?.transcription?.trim()?.toLowerCase()
-          const incorrectWord = response?.first_incorrect_word?.trim()?.toLowerCase()
-          const updatedQuestionExpression = [...questionExpressions, expressionResponse]
-          console.log(response, updatedQuestionExpression)
-          // if (expressionResponse?.toLowerCase() === questions?.[questionCount - 1]?.expression?.toLowerCase()) {
-            
-          // } else {
-            
-          // }
-          console.log("Hello")
-          setRecordCount(prev => prev + 1)
+      const response = await fetch(`${BaseURL}/api/voice_to_text`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
 
-      if (recordCount + 1 === 3) {
-        if (questions?.[questionCount - 1]?.answers?.split(";")?.[answerCount + 1]) {
-            setAnswerCount(answerCount + 1)
-            setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
-            setIsDelay(true)
-            setIsNextAnswer(true)
-            setTimeout(() => {
-              setIsDelay(false);
-              setExpression(null);
+      const result = await response.text();
+      const data = JSON.parse(result);
+      const detectedExpression = await evaluateQuestion(data?.transcription);
+
+      // Get current answer parts
+      const answers = question[questionCount - 1]?.answers?.split(";");
+      console.log("Answers", answers)
+      console.log("Question", question)
+
+      const currentAnswer = answers?.[answerCount]?.trim()?.toLowerCase();
+      const isCorrect = data?.transcription?.toLowerCase() === currentAnswer?.replace(/\.$/, "");
+
+      setExpressionsArray(prev => [...prev, detectedExpression]);
+      setRecordCount(prevCount => prevCount + 1);
+
+      if (recordCount + 1 >= 3) {
+        // Check if there's another answer part available
+        if (answers?.[answerCount + 1]) {
+          // Move to next answer part
+          setIsDelay(true);
+          setIsNextAnswer(true);
+          setTimeout(() => {
+            setAnswerCount(prev => prev + 1);
+            setRecordCount(0);
+            setIsDelay(false);
+            setIsNextAnswer(false);
+            setExpression(null);
+            setRecordingStatus('idle');
+            if (videoRef.current) {
               videoRef.current.stop();
               videoRef.current.seek(0.1);
               videoRef.current.resume();
-              setRecordingStatus("idle");
-              setIsNextAnswer(false);
-              setRecordCount(0);
-              setIsVideoEnd(false);
-            }, 2000);
-        } else {
-            setRecordingStatus("stop")
-            updateValuesToInitial(updatedQuestionExpression)
-            if (consecutiveCorrect > (questions?.[questionCount - 1]?.answers?.split(";")?.length / 2)) {
-                onCorrectExpression(questions?.[questionCount - 1]?.question, expressionResponse)
-                onCorrectAnswer(questions?.[questionCount - 1]?.question)
-            } else {
-                onWrongAnswer(questions?.[questionCount - 1]?.question)
-                onWrongExpression(questions?.[questionCount - 1]?.question, expressionResponse)
             }
+          }, 2000);
+        } else {
+          // No more answer parts, evaluate overall performance
+          setRecordingStatus('stop');
+          if (consecutiveCorrect > (answers?.length / 2)) {
+            onCorrectExpression(questions[questionCount - 1]?.question, detectedExpression);
+            onCorrectAnswer(questions[questionCount - 1]?.question);
+          } else {
+            onWrongAnswer(questions[questionCount - 1]?.question);
+            onWrongExpression(questions[questionCount - 1]?.question, detectedExpression);
+          }
         }
-    }else {
-      setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
-      if (incorrectWord === transcript || transcript === null || incorrectWord?.toLowerCase() === 'none') {
-          setConsecutiveCorrect(consecutiveCorrect + 1)
-          setIsDelay(true)
-          setTimeout(() => {
-              setIsDelay(false)
-              setExpression(null)
-              setRecordingStatus("idle")
-              setIsVideoEnd(false)
-          }, 2000);
       } else {
-          setInWrongAnswer(true)
-          setWrongWord(response?.first_incorrect_word)
-          setIsDelay(true)
-          setTimeout(() => {
-              setIsDelay(false)
-              setExpression(null)
-              setRecordingStatus("idle")
-              setIsVideoEnd(false)
-          }, 2000);
-      }
-  }
-  // } else {
-  // setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
-  // if (incorrectWord !== transcript && transcript !== null && incorrectWord?.toLowerCase() !== 'none') {
-  //     setIsDelay(true)
-  //     setTimeout(() => {
-  //         setIsDelay(false)
-  //         setExpression(null)
-  //         setRecordingStatus("idle")
-  //         setInWrongAnswer(true)
-  //         setWrongWord(response?.first_incorrect_word)
-  //         setRecordCount(0)
-  //         setIsVideoEnd(false)
-  //     }, 2000);
-  // }
-  //     } else {
-  //         updateValuesToInitial(updatedQuestionExpression)
-  //         onCorrectExpression(questions?.[questionCount - 1]?.question, expressionResponse)
-  //         onCorrectAnswer(questions?.[questionCount - 1]?.question)
-  //     }
-  // }
-} catch (error) {
-  console.error('Network request failed When sending audio:', error);
-}
-};
+        // Still within attempts for current answer part
+        if (isCorrect) {
+          setConsecutiveCorrect(prev => prev + 1);
+        }
 
+        setIsDelay(true);
+        setTimeout(() => {
+          setIsDelay(false);
+          setExpression(null);
+          setRecordingStatus('idle');
+          if (videoRef.current) {
+            videoRef.current.stop();
+            videoRef.current.seek(0.1);
+            videoRef.current.resume();
+          }
+        }, 2000);
+      }
+
+    } catch (error) {
+      console.error('Error processing audio:', error);
+      setRecordingStatus('idle');
+    }
+  };
+
+  const getCurrentAnswer = () => {
+    let answers = questions?.[questionCount - 1]?.answers?.split(";")
+    return answers?.[answerCount]?.trim()
+  }
+
+
+
+  const onCorrectAnswer = (question) => {
+    setQuestionResponse('Correct!');
+    setCorrectAnswersCount(prev => prev + 1);
+    if (!correctQuestions.includes(question + questionCount)) {
+      setCorrectQuestions(prev => [...prev, question + questionCount]);
+    }
+    if (incorrectQuestions.some(q => q?.questiontext === question + questionCount)) {
+      setIncorrectQuestions(prev =>
+        prev.filter(q => q?.questiontext !== question + questionCount)
+      );
+    }
+    setRecordingStatus("stop");
+  };
+
+  const onWrongAnswer = (ques) => {
+    if (!incorrectQuestions.some(q => q?.questiontext === ques + questionCount)) {
+      setIncorrectQuestions(prevQuestions => [
+        ...prevQuestions,
+        { ...questions?.[questionCount - 1], questiontext: ques + ques + questionCount },
+      ]);
+    }
+    if (correctQuestions.includes(ques + ques + questionCount)) {
+      setCorrectAnswersCount(prevCount => prevCount - 1);
+      setCorrectQuestions(prevQuestions =>
+        prevQuestions.filter(q => q !== ques + questionCount),
+      );
+    }
+
+    setQuestionResponse('Incorrect!');
+
+    let obj = { ...categorywiseReport }
+    if (questionCount > 0 && questionCount <= 10) obj.category1 = obj.category1 + 1
+    else if (questionCount > 10 && questionCount <= 18) obj.category2 = obj.category2 + 1
+    setCategoryWiseReport(obj)
+  }
+
+  const onCorrectExpression = (question, exp) => {
+    if (!correctExpressions.includes(question + exp + questionCount)) {
+      setCorrectExpressions(prev => [...prev, question + exp + questionCount]);
+    }
+    if (incorrectExpressions.some(q => q === question + exp + questionCount)) {
+      setIncorrectExpressions(prev =>
+        prev.filter(q => q !== question + exp + questionCount)
+      );
+    }
+  };
+
+  const onWrongExpression = (question, exp) => {
+    if (!incorrectExpressions.includes(question + exp + questionCount)) {
+      setIncorrectExpressions(prev => [...prev, question + exp + questionCount]);
+    }
+    if (correctExpressions.includes(question + exp)) {
+      setCorrectExpressions(prev =>
+        prev.filter(q => q !== (question + exp + questionCount))
+      );
+    }
+  };
+
+  const endAssessment = () => {
+    setExpressiveReport(incorrectQuestions);
+    navigateTo();
+  };
 
   const percentageCompleted = ((questionCount) / questions?.length) * 100;
-
-useEffect(() => {
-  
-console.log("record Count:",recordCount)
-  
-}, [recordCount])
-
-  
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -567,7 +520,7 @@ console.log("record Count:",recordCount)
                 />
               )}
             </div>
-            {/* {console.log(`${IMAGE_BASE_URL}/${questions?.[questionCount - 1]?.avatar_exercise?.split(",")?.[answerCount]?.trim()}`)} */}
+            {console.log(`${IMAGE_BASE_URL}/${questions?.[questionCount - 1]?.avatar_exercise?.split(",")?.[answerCount]?.trim()}`)}
             <div className="">
               <VideoPlayer2
                 source={`${IMAGE_BASE_URL}/${questions?.[questionCount - 1]?.avatar_exercise?.split(",")?.[answerCount]?.trim()}`}

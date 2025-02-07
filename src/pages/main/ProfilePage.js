@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDataContext } from '../contexts/DataContext';
-import CustomHeader from '../components/CustomHeader';
+import { useDataContext } from '../../contexts/DataContext';
+import CustomHeader from '../../components/CustomHeader';
 import { motion } from 'framer-motion';
 import { Settings, CreditCard, User, HelpCircle, MessageSquare, LogOut } from 'lucide-react';
-import { IMAGE_BASE_URL } from '../components/ApiCreds';
-import BottomNavigation from '../components/BottomNavigation';
-import FeedbackModal from '../components/FeedbackModal';
+import { IMAGE_BASE_URL } from '../../components/ApiCreds';
+import BottomNavigation from '../../components/BottomNavigation';
+import FeedbackModal from '../../components/FeedbackModal';
 
 
 

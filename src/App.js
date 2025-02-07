@@ -3,7 +3,6 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Import your components
 import SignInPage from './pages/SigninPage';
-import HomePage from './pages/HomePage';
 import WaitVerifyingNew from './pages/WaitingVerifyNew';
 import ScanFaceInstruction from './pages/ScanFaceInstruction';
 import FaceAuthenticationScreen from './pages/FaceAuthenticationScreen';
@@ -16,7 +15,7 @@ import AllAssessmentPage from './pages/AllAssesmentPage';
 import InstructionsPage from './pages/InstructionsPage';
 import SpeechArticulationPage from './pages/SpeachArticukationPage';
 import SetupProfilePage from './pages/SetupProfilePage';
-import SetupProfilePage1 from './pages/SerupProfilePage1';
+import SetupProfilePage1 from './pages/SetupProfilePage1';
 import SetupProfilePage2 from './pages/SetupProfilePage2';
 import ExercisePage from './pages/ExercisePage';
 import AllExercisesPage from './pages/AllExercisesPage';
@@ -47,7 +46,7 @@ import Games from './pages/Games';
 import PassageResults from './pages/PassageResults';
 import StammeringReport from './pages/StammeringReport';
 import ExpressiveExercise from './pages/ExpressiveExercise';
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './pages/main/ProfilePage';
 import TherapistsPage from './pages/main/TherapistsPage';
 import QuickArticulation from './pages/QuickArticulation';
 import QuickExpressive from './pages/QuickExpressive';
@@ -65,6 +64,10 @@ import SplashScreen from './pages/SplashScreen';
 import GettingStartedPageOne from './pages/GettingStartedPageOne';
 import GettingStartedPageTwo from './pages/GettingStartedPageTwo';
 import GettingStartedPageThree from './pages/GettingStartedPageThree';
+import HomePage from './pages/main/HomePage';
+import SignupConsent from './pages/SignUpConsent';
+import ConsentGuardian from './pages/ConsentGuardian';
+import NewPassword from './pages/NewPassword';
 
 function App() {
   return (
@@ -116,7 +119,7 @@ function App() {
           <Route path="/therapistsPage" element={<TherapistsPage />} />
           <Route path="/therapistProfile" element={<TherapistProfilePage />} />
           <Route path="/AvatarTherapistName" element={<TherapistName />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePage/>} />
           <Route path="/result-expressive-language" element={<ResultExpressiveLanguage />} />
           <Route path="/resultReport" element={<ResultReportArticulation />} />
           <Route path="/reportsPage" element={<ReportsPage />} />
@@ -139,6 +142,9 @@ function App() {
           <Route path="/BioData" element={<BioDataPage />} />
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/ManageSubcription" element={<ManageSubscriptions />} />
+          <Route path="/SignUpConsent" element={<SignupConsent />} />
+          <Route path="/ConsentGuardian" element={<ConsentGuardian />} />
+          <Route path="/newPassword" element={<NewPassword />} />
 
 
         </Routes>

@@ -6,7 +6,8 @@ import BaseURL from '../components/ApiCreds';
 import CustomHeader from '../components/CustomHeader';
 import { getToken, updateUserId } from '../utils/functions';
 
-const InputField = ({ label, placeholder, value, onChange, icon, type = "text", required = false }) => {
+const InputField = ({ label, placeholder, value, onChange, icon, type = "text", required = false, readOnly = false, disabled = false 
+}) => {
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700">
@@ -20,10 +21,12 @@ const InputField = ({ label, placeholder, value, onChange, icon, type = "text", 
           type={type}
           placeholder={placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
+          onChange={(e) => onChange && onChange(e.target.value)}
+          className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
           focus:ring-blue-500 focus:border-transparent transition-all duration-300
-          placeholder:text-gray-400"
+          placeholder:text-gray-400 ${disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+          readOnly={readOnly}
+          disabled={disabled}
         />
       </div>
     </div>
@@ -188,16 +191,17 @@ const BioDataPage = () => {
               onChange={setAge}
               type="number"
               icon={<Calendar className="w-5 h-5" />}
+              readOnly
             />
 
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">User Type</label>
               <RadioGroup
                 options={['Clinic', 'SLP', 'Parent', 'Self']}
                 selectedValue={type}
                 onChange={setType}
               />
-            </div>
+            </div> */}
 
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">

@@ -39,6 +39,14 @@ const Settings = () => {
       {/* Header */}
       <CustomHeader goBack={() => navigate(-1)} />
 
+        {/* Logo */}
+        <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+          <img
+            src={require("../assets/images/logo.png")}
+            alt="Logo"
+            className=" h-20"
+          />
+        </div>
       {/* Main Content */}
       <motion.main
         className="flex-1 container mx-auto px-4 py-6 max-w-2xl mt-20"
@@ -46,14 +54,6 @@ const Settings = () => {
         initial="hidden"
         animate="visible"
       >
-        {/* Logo */}
-        <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
-          <img
-            src={require("../assets/images/logo.png")}
-            alt="Logo"
-            className=" "
-          />
-        </div>
 
         {/* Profile Section */}
         <motion.div

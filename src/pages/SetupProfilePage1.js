@@ -202,7 +202,7 @@ const SetupProfilePage1 = () => {
             {/* Logo */}
             <div className="h-20 w-40 mx-auto mb-8">
               <img
-                src="/assets/images/logo.png"
+                src={require("../assets/images/logo.png")}
                 alt="Logo"
                 className="h-full w-full object-contain"
               />
@@ -219,13 +219,13 @@ const SetupProfilePage1 = () => {
 
             {/* Content */}
             <div className="flex-1">
-              <h1 className="text-2xl font-medium text-gray-900 text-center mb-8">
+              <h1 className="text-3xl font-medium text-gray-900 text-center mb-10 mt-2">
                 Choose your Avatar
               </h1>
 
               {renderAvatarSection()}
 
-              <div className="mt-8">
+              <div className="mt-10">
                 <CustomButton
                   onClick={handleNavigateNext}
                   title="Next"

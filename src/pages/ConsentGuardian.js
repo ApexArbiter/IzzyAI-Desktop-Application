@@ -121,9 +121,10 @@ const ConsentGuardian = () => {
   return (
     <div className="h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <CustomHeader title="Consent Process" goBack={() => navigate(-1)} />
-
-      <div className="h-[calc(100vh-64px)] p-4">
-        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl">
+<div className=''>
+  
+<div className="h-[calc(100vh-64px)] flex  justify-center items-center p-4">
+        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl mb-2">
           <div className="flex justify-center mb-6">
             <img
               src={require('../assets/images/logo.png')}
@@ -186,6 +187,7 @@ const ConsentGuardian = () => {
           </div>
         </div>
       </div>
+</div>
     </div>
   );
 };

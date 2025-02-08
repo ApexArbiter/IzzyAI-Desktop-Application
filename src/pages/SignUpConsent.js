@@ -20,11 +20,18 @@ const SignupConsent = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-     <CustomHeader title={"Profile Type"} />
+     <CustomHeader title={"Profile Type"} goBack={()=>{navigate(-1)}} />
 
       {/* Main Content */}
       <main className="px-4 md:px-10 lg:px-20 flex-1">
-        <h2 className="text-2xl font-bold text-center text-gray-900 mt-20 mb-8">
+      <div className="h-20 w-40 mx-auto mt-5 mb-8">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+        <h2 className="text-2xl font-bold text-center text-gray-900 mt-7 mb-8">
           Choose a Profile Type:
         </h2>
 
@@ -35,7 +42,7 @@ const SignupConsent = () => {
             onClick={() => onNavigateSignup('adult')}
             className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
           >
-            <div className="h-32 w-full flex items-center justify-center">
+            <div className="h-40 w-full flex items-center justify-center">
               <img 
                 src={require("../assets/images/adult_image.png")}
                 alt="Adult profile" 
@@ -52,7 +59,7 @@ const SignupConsent = () => {
             onClick={() => onNavigateSignup('child')}
             className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
           >
-            <div className="h-32 w-full flex items-center justify-center">
+            <div className="h-40 w-full flex items-center justify-center">
               <img 
                 src={require("../assets/images/child_image.png")}
                 alt="Child profile" 
@@ -69,7 +76,7 @@ const SignupConsent = () => {
             onClick={() => onNavigateSignup('someone')}
             className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
           >
-            <div className="h-32 w-full flex items-center justify-center">
+            <div className="h-40 w-full flex items-center justify-center">
               <img 
                 src={require("../assets/images/someone_image.png")}
                 alt="Caregiver profile" 
@@ -86,7 +93,7 @@ const SignupConsent = () => {
             onClick={() => onPressAdultClinic(true)}
             className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
           >
-            <div className="h-32 w-full flex items-center justify-center">
+            <div className="h-40 w-full flex items-center justify-center">
               <img 
                 src={require("../assets/images/clinic_image.png")}
                 alt="Clinic profile" 

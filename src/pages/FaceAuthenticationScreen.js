@@ -194,8 +194,8 @@ const styles = {
     overflow: 'hidden',
   },
   camera: {
-    width: '100%',
-    height: 'auto',
+    width: 'atuo',
+    height: '100%',
   },
   captureButtonContainer: {
     marginTop: '20px',

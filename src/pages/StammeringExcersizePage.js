@@ -20,6 +20,8 @@ import VideoPlayer from '../components/VideoPlayer';
 import { useDataContext } from '../contexts/DataContext';
 import CustomHeader from '../components/CustomHeader';
 import Loader from '../components/Loader';
+import WaveIcon from '../assets/Wave';
+import LogoQuestionView from '../components/LogoQuestionView';
 
 const StammeringExercisePage = () => {
   const { setExercisesReport, userId, userDetail } = useDataContext();
@@ -528,12 +530,11 @@ const StammeringExercisePage = () => {
         sx={{ marginBottom: 2 }}
       />
 
-      <Typography variant="h6" sx={{ marginBottom: 2 }}>
-        {isWrong
-          ? capitalize(questionWordsArray?.[wordCount])
-          : capitalize(exerciseData?.Sentence || 'Loading...')
-        }
-      </Typography>
+<LogoQuestionView
+            style={{ marginTop: 20 }}
+            first_text={"Say this..."}
+            second_text={(isWrong ? capitalize(questionWordsArray?.[wordCount]) : capitalize(exerciseData?.Sentence)) || 'Loading...'}
+          />
 
       {/* Video Player */}
       {avatarPath && (
@@ -617,24 +618,26 @@ const StammeringExercisePage = () => {
       {/* Recording Controls */}
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
         {recordingStatus === 'idle' && isVideoEnd && (
-          <Button
-            variant="contained"
-            color="primary"
+            <button
             onClick={onStartRecord}
+            className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
           >
-            Start Recording
-          </Button>
+            <span className="text-white font-semibold flex items-center gap-2 text-sm">
+              <span className="text-red-500">●</span> Record
+            </span>
+          </button>
         )}
 
         {recordingStatus === 'recording' && (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={onStopRecord}
+          <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-2 w-full">
+          <button
             disabled={isStopButtonDisabled}
+            onClick={onStopRecord}
+            className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
           >
-            Stop Recording
-          </Button>
+            <WaveIcon />
+          </button>
+        </div>
         )}
 
         {recordingStatus === 'stop' && (

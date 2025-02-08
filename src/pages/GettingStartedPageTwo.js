@@ -30,14 +30,14 @@ const GettingStartedPageTwo = () => {
 
     return (
         <motion.div
-            className="min-h-screen p-6 md:p-8 lg:p-12 flex flex-col justify-between relative overflow-hidden bg-gradient-to-b from-blue-50 to-white"
+            className="max-h-screen p-6 md:p-8 lg:p-12 flex flex-col justify-between relative overflow-hidden bg-gradient-to-b from-blue-50 to-white"
             initial="hidden"
             animate="visible"
             variants={containerVariants}
         >
             <div className="max-w-7xl mx-auto w-full flex flex-col flex-grow relative z-10">
                 {/* Logo */}
-                <motion.div className="flex justify-center mt-8 lg:mt-12" variants={itemVariants}>
+                <motion.div className="flex justify-center mt-4 lg:mt-8" variants={itemVariants}>
                     <div className="h-16 md:h-20 lg:h-24 w-32 md:w-40 lg:w-48 relative">
                         <img
                             src={require("../assets/images/logo.png")}
@@ -50,26 +50,26 @@ const GettingStartedPageTwo = () => {
                 {/* Content Section */}
                 <div className="flex-grow flex flex-col justify-center items-center mb-12 lg:mb-16">
                     <motion.h1
-                        className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center font-bold text-gray-900 mt-8 leading-tight"
+                        className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-center font-bold text-gray-900 mt-8 leading-tight"
                         variants={itemVariants}
                     >
                         Your partner at every step in achieving effective speech and language skills.
                     </motion.h1>
 
                     <motion.div variants={itemVariants} className="mt-8 md:mt-12 lg:mt-16">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-medium text-gray-800 text-center">
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-medium text-gray-800 text-center">
                             Vision
                         </h2>
-                        <p className="text-lg md:text-xl lg:text-2xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed">
+                        <p className="text-xl md:text-2xl lg:text-3xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed">
                             Accessibility to timely assessment and variety of therapeutic exercises for everyone.
                         </p>
                     </motion.div>
 
                     <motion.div variants={itemVariants} className="mt-8 md:mt-12">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-medium text-gray-800 text-center">
+                        <h2 className="text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-medium text-gray-800 text-center">
                             Mission
                         </h2>
-                        <p className="text-lg md:text-xl lg:text-2xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed">
+                        <p className="text-xl md:text-2xl lg:text-3xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed">
                             IzzyAI Avatar based assessments and interventions are tailored to
                             the specific needs of the users.
                         </p>
@@ -90,7 +90,7 @@ const GettingStartedPageTwo = () => {
             </div>
 
             {/* Decorative Blobs */}
-            <motion.div
+            {/* <motion.div
                 className="absolute top-0 left-0 w-64 h-64 rounded-full bg-blue-200 opacity-70 blur-xl mix-blend-multiply"
                 animate={{
                     scale: [1, 1.1, 1],
@@ -127,7 +127,7 @@ const GettingStartedPageTwo = () => {
                     ease: "easeInOut",
                     delay: 4
                 }}
-            />
+            /> */}
         </motion.div>
     );
 };

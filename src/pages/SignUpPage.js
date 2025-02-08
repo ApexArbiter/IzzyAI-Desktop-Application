@@ -155,11 +155,11 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="max-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <CustomHeader title="Sign Up" goBack={() => navigate(-1)} />
 
-      <div className="h-[calc(100vh-64px)] p-4">
-        <div className="w-full max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl">
+      <div className="h-[calc(100vh-64px)] mt-10 p-4">
+        <div className="w-full max-w-6xl mx-auto bg-white p-6  rounded-2xl shadow-xl">
           <div className="flex justify-center mb-6">
             <img
               src={require('../assets/images/logo.png')}
@@ -169,10 +169,10 @@ const SignUpPage = () => {
           </div>
 
           <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-gray-900">
+            <h1 className="text-xl  mb-4 font-bold text-gray-900">
               Sign up to get started with IzzyAI
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm md:text-lg text-gray-500">
               Please fill in your details to create an account
             </p>
           </div>
@@ -193,7 +193,7 @@ const SignUpPage = () => {
                 value={lastName}
                 onChangeText={setLastName}
                 icon={<UserIcon className="w-5 h-5" />}
-                required={false}
+                required={true}
               />
 
               <InputField

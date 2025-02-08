@@ -143,7 +143,7 @@ const styles = {
     textAlign: 'center',
   },
   button: {
-    width: '85%',
+    width: '40%',
     borderRadius: '50px',
     alignItems: 'center',
     backgroundColor: '#111920',

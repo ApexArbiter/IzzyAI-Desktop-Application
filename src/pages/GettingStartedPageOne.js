@@ -47,23 +47,23 @@ const GettingStartedPageOne = () => {
                 </motion.div>
 
                 {/* Content Section */}
-                <div className="flex-grow flex flex-col justify-center items-center mb-12 lg:mb-16">
+                <div className="flex-grow flex flex-col justify-center items-center mb-12 lg:mb-14">
                     <motion.h1
-                        className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center font-bold text-gray-900 mt-8 leading-tight"
+                        className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl text-center font-bold text-gray-900 mb-8 leading-tight"
                         variants={itemVariants}
                     >
                         Welcome to IzzyAI
                     </motion.h1>
 
                     <motion.h2
-                        className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-center font-medium text-gray-800 mt-4 md:mt-6"
+                        className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-center font-medium text-gray-800 mb-4 md:mt-6"
                         variants={itemVariants}
                     >
                         Your Speech Companion!
                     </motion.h2>
 
                     <motion.p
-                        className="text-lg md:text-xl lg:text-2xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed"
+                        className="text-lg md:text-xl lg:text-3xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed"
                         variants={itemVariants}
                     >
                         Embark on a journey to clear and confident speech with IzzyAI. Our
@@ -86,7 +86,7 @@ const GettingStartedPageOne = () => {
                 </div>
             </div>
 
-            {/* Decorative Blobs */}
+            {/* Decorative Blobs
             <motion.div
                 className="absolute top-0 left-0 w-64 h-64 rounded-full bg-blue-200 opacity-70 blur-xl mix-blend-multiply"
                 animate={{
@@ -124,7 +124,7 @@ const GettingStartedPageOne = () => {
                     ease: "easeInOut",
                     delay: 4
                 }}
-            />
+            /> */}
         </motion.div>
     );
 };

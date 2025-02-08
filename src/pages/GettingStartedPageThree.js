@@ -56,14 +56,14 @@ const GettingStartedPageThree = () => {
                 {/* Content Section */}
                 <div className="flex-grow flex flex-col justify-center items-center mb-12 lg:mb-16">
                     <motion.h1
-                        className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center font-bold text-gray-900 mt-8 leading-tight"
+                        className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-center font-bold text-gray-900 mb-8 leading-tight"
                         variants={itemVariants}
                     >
                         Rationale
                     </motion.h1>
 
                     <motion.p
-                        className="text-lg md:text-xl lg:text-2xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed"
+                        className="text-xl md:text-2xl lg:text-3xl text-center text-gray-600 mt-6 md:mt-8 max-w-4xl mx-auto leading-relaxed"
                         variants={itemVariants}
                     >
                         IzzyAI is the only human avatar-based model that captures audio-visual and emotional features of the user and provides comprehensive assessments and exercises. The wide variety of therapy options, especially the gamification, provides an easy and captivating intervention method. IzzyAI model training is based on data of articulation, stammering, voice, receptive language and expressive language disorders.
@@ -84,7 +84,7 @@ const GettingStartedPageThree = () => {
             </div>
 
             {/* Decorative Blobs */}
-            <motion.div
+            {/* <motion.div
                 className="absolute top-0 left-0 w-64 h-64 rounded-full bg-blue-200 opacity-70 blur-xl mix-blend-multiply"
                 animate={{
                     scale: [1, 1.1, 1],
@@ -121,7 +121,7 @@ const GettingStartedPageThree = () => {
                     ease: "easeInOut",
                     delay: 4
                 }}
-            />
+            /> */}
         </motion.div>
     );
 };

@@ -52,7 +52,7 @@ const CustomButton = ({ onClick, title, backgroundColor }) => {
   return (
     <button
       onClick={onClick}
-      className={`px-8 py-3 rounded-full text-white font-semibold 
+      className={`px-10 py-4 rounded-full text-white text-lg font-semibold 
         transition-all duration-300 ${bgColor}`}
     >
       {title}
@@ -121,21 +121,21 @@ console.log(location.state)
 
             {/* Content */}
             <div className="flex-1">
-              <h1 className="text-2xl font-medium text-gray-900 text-center mb-8">
+              <h1 className="text-4xl font-medium text-gray-900 text-center mb-8">
                 {passed 
                   ? "Congratulations! Your camera passed the test!"
                   : "Oops! Your Camera/Microphone didn't qualify the test"}
               </h1>
 
-              <p className="text-center text-gray-700 max-w-md mx-auto mb-12">
+              <p className="text-center text-lg lg:text-xl text-gray-700 max-w-md mx-auto mb-12">
                 {passed 
                   ? "Your camera is good to go! You can now proceed to the next step"
                   : "Try cleaning up your Camera/Microphone or use different device in order to use IzzyAI"}
               </p>
 
               {/* Circular Progress Indicators */}
-              <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
-                <div className="text-center">
+              <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-12 pt-8">
+                <div className="text-center ">
                   <CircularProgress
                     percentage={videoQualityPercentage}
                     color="#FC4343"
@@ -145,7 +145,12 @@ console.log(location.state)
                       {Math.round(videoQualityPercentage)}%
                     </span>
                   </CircularProgress>
-                  <p className="mt-4 text-gray-900">Camera Score</p>
+                  <p className="mt-6 mb-8 text-lg text-gray-900">Camera Score</p>
+                  <CustomButton
+                  onClick={handleBack}
+                  title="Retry"
+                  backgroundColor="red"
+                />
                 </div>
 
                 <div className="text-center">
@@ -158,22 +163,19 @@ console.log(location.state)
                       {Math.round(audioQualityPercentage)}%
                     </span>
                   </CircularProgress>
-                  <p className="mt-4 text-gray-900">Microphone Score</p>
+                  <p className="mt-6 mb-8 text-lg text-gray-900">Microphone Score</p>
+                  <CustomButton
+                  onClick={handleNavigate}
+                  title="Done"
+                  backgroundColor="green"
+                />
                 </div>
               </div>
 
               {/* Buttons */}
               <div className="flex justify-center gap-4">
-                <CustomButton
-                  onClick={handleBack}
-                  title="Retry"
-                  backgroundColor="red"
-                />
-                <CustomButton
-                  onClick={handleNavigate}
-                  title="Done"
-                  backgroundColor="green"
-                />
+                
+               
               </div>
             </div>
           </div>

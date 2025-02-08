@@ -30,12 +30,12 @@ const ScanFaceInstruction = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex-1 flex flex-col items-center justify-between max-w-2xl mx-auto w-full py-8 md:py-12"
+        className="flex-1 flex flex-col items-center justify-evenly max-w-2xl mx-auto w-full py-8 md:py-12"
       >
-        <div className="space-y-8 text-center">
+        <div className="space-y-10 text-center ">
           <motion.img
             initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            animate={{ scale: 1.5 }}
             transition={{ 
               type: "spring",
               stiffness: 260,
@@ -44,7 +44,7 @@ const ScanFaceInstruction = () => {
             }}
             src={require('../assets/images/faceIcon.png')}
             alt="Face Icon"
-            className="w-24 h-24 md:w-32 md:h-32 mx-auto object-contain"
+            className="w-34 h-34 md:w-32 md:h-32 mx-auto object-contain"
           />
           
           <motion.div
@@ -65,7 +65,7 @@ const ScanFaceInstruction = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="text-base md:text-lg text-gray-600 max-w-md mx-auto"
+            className="text-base md:text-lg lg:text-xl text-gray-600 max-w-md mx-auto "
           >
             Please take a clear picture of yourself. It will be used for authentication purposes.
           </motion.p>

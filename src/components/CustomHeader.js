@@ -7,7 +7,7 @@ const CustomHeader = (props) => {
       <button onClick={() => props.goBack()} style={styles.iconButton}>
         <ArrowLeft />
       </button>
-      <span className='font-semibold' style={styles.text}>{props.title}</span>
+      <span className=' text-2xl font-bold text-center text-gray-900' style={styles.text}>{props.title}</span>
     </div>
   );
 };
@@ -29,10 +29,7 @@ const styles = {
     marginRight: '15px', // Space between icon and text
   },
   text: {
-    fontFamily: 'SF-Pro-Display-Regular',
-    color: '#111920',
-    fontSize: '20px',
-    fontWeight: '600',
+  
     position: 'absolute', // Center text
     left: '50%',
     transform: 'translateX(-50%)', // Offset the element by 50% of its width to center it

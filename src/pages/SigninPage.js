@@ -242,7 +242,7 @@ function SignInPage() {
                 className="w-full h-full object-contain"
               />
             </div>
-            <p className="text-center pb-0 text-gray-500">Please enter your details to sign in</p>
+            <p className="text-center text-lg pb-0 text-gray-500">Please enter your details to sign in</p>
           </div>
 
           {/* Form Container */}
@@ -338,7 +338,7 @@ function SignInPage() {
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">or continue with</span>
+              <span className="px-4 text-lg bg-white text-gray-500">or continue with</span>
             </div>
           </div>
 

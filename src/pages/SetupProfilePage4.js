@@ -11,7 +11,7 @@ const CustomButton = ({ onClick, title }) => {
   return (
     <button
       onClick={onClick}
-      className="w-full bg-gray-900 text-white rounded-full py-3 px-6 font-semibold
+      className=" bg-gray-900 text-white rounded-full py-3 px-6 font-semibold
         hover:bg-gray-800 transition-all duration-300 mt-4"
     >
       {title}
@@ -61,17 +61,17 @@ const SetupProfilePage4 = () => {
           </div>
 
           {/* Content */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <h1 className="text-2xl font-medium text-gray-900 text-center mb-4">
+          <div className="flex-1 flex flex-col  min-h-0">
+            <h1 className="text-2xl lg:text-3xl font-medium text-gray-900 text-center mb-4">
               Our Terms & Conditions
             </h1>
 
-            <p className="text-center text-gray-700 mb-4">
+            <p className="text-center p-2 md:text-lg lg:text-xl font-semibold text-gray-700 mb-4">
               Finish setting up your profile by thoroughly reading our Terms & Conditions
             </p>
 
             {/* Scrollable Terms Content */}
-            <div className="flex-1 overflow-auto pr-2 space-y-3 text-gray-700 text-sm md:text-base">
+            <div className="flex-1  overflow-auto pr-2 space-y-3 text-gray-700 text-sm md:text-base lg:text-xl">
               <p>
                 Consent to Recording: You agree that this product may record audio
                 and video for the purpose of speech-language disorder assessment and
@@ -127,7 +127,7 @@ const SetupProfilePage4 = () => {
             </div>
 
             {/* Button Section */}
-            <div className="mt-4">
+            <div className="mt-4 mx-auto">
               <CustomButton
                 onClick={handleNavigate}
                 title="I agree to Terms & Conditions"

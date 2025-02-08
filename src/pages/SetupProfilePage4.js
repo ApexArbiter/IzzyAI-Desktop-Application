@@ -26,7 +26,7 @@ const SetupProfilePage4 = () => {
   const handleNavigate = async () => {
     try {
       localStorage.setItem("isTerms", JSON.stringify(true));
-      navigate('/scan-face-instruction', {
+      navigate('/scanfaceInstruction', {
         state: {
           ...location.state,
           routeName: 'baselineQuestions',

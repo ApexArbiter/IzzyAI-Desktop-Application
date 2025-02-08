@@ -62,27 +62,35 @@ const SufferingDisease = () => {
   const handleGetStarted = () => {
     navigate('/profileSetupSuccess');
   };
-
+    useEffect(() => {
+      if (questionReport) {
+        console.log('Articulation:', questionReport.articulationYes > (questionReport.articulationNo || 0));
+        console.log('Stammering:', questionReport.stammeringYes > (questionReport.stammeringNo || 0));
+        console.log('Voice:', questionReport.voiceYes > (questionReport.voiceNo || 0));
+        console.log('Receptive:', questionReport.receptiveNo > (questionReport.receptiveYes || 0));
+        console.log('Expressive:', questionReport.expressiveNo > (questionReport.expressiveYes || 0));
+      }
+    }, [questionReport]);
   const conditions = [
     {
       condition: 'Articulation Disorder',
-      show: questionReport?.articulationYes > questionReport?.articulationNo
+      show:  questionReport.articulationYes > (questionReport.articulationNo || 0)
     },
     {
       condition: 'Stammering',
-      show: questionReport?.stammeringYes > questionReport?.stammeringNo
+      show: questionReport.stammeringYes > (questionReport.stammeringNo || 0)
     },
     {
       condition: 'Voice Disorder',
-      show: questionReport?.voiceYes > questionReport?.voiceNo
+      show: questionReport.voiceYes > (questionReport.voiceNo || 0)
     },
     {
       condition: 'Receptive Language Disorder',
-      show: questionReport?.receptiveYes > questionReport?.receptiveNo
+      show: questionReport.receptiveNo > (questionReport.receptiveYes || 0)
     },
     {
       condition: 'Expressive Language Disorder',
-      show: questionReport?.expressiveYes > questionReport?.expressiveNo
+      show: questionReport.expressiveNo > (questionReport.expressiveYes || 0)
     }
   ];
 

@@ -26,11 +26,12 @@ const capitalize = (str) => str?.charAt(0)?.toUpperCase() + str?.slice(1);
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const userDetail = JSON.parse(localStorage.getItem("userDetails"));
 
   const routes = [
     { name: 'home', label: 'Home' },
     { name: 'Assessments', label: 'Assessments' },
-    { name: 'therapistsPage', label: 'Therapists' },
+    ...(userDetail?.SubscriptionDetails ? [{ name: 'therapistsPage', label: 'Therapists' }] : []),
     { name: 'profile', label: 'Profile' },
   ];
 
@@ -67,10 +68,6 @@ const BottomNavigation = () => {
           return (
             <button
               key={index}
-              // style={{
-              //   ...styles.bottomTabWrapper,
-              //   backgroundColor: isFocused ? 'rgba(0,0,0,0.05)' : 'transparent',
-              // }}
               onClick={() => handleClick(route.name)}
             >
               <div style={styles.iconTextContainer}>

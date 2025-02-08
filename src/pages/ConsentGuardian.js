@@ -103,6 +103,7 @@ const ConsentGuardian = () => {
         };
         
         const response = await registerGuardian(userData);
+        console.log("Guardian Reponse",response);
         if (response?.data) {
           navigate("/otpScreen", { state: { email: data?.email, isSignup: true }});
         } else {

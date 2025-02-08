@@ -7,53 +7,47 @@ import { getToken } from '../utils/functions';
 
 const CustomButton = (props) => {
   return (
-    <button onClick={() => props.onClick()} style={styles.button}>
-      {props.loading ? (
-        <div className="spinner" style={styles.spinner}></div> // You can replace with actual spinner component
-      ) : (
-        <span style={styles.buttonText}>{props.title}</span>
-      )}
-    </button>
+    <div className="flex justify-center">
+      <button 
+        onClick={() => props.onClick()} 
+        className="rounded-full bg-[#111920] py-3 px-6 w-64 h-12 flex items-center justify-center mt-5 mb-8"
+        disabled={props.loading}
+      >
+        {props.loading ? (
+          <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <span className="text-white font-semibold">{props.title}</span>
+        )}
+      </button>
+    </div>
   );
 };
 
 
 const Question = ({ num, questionText, onSelect, selectedValue }) => {
   return (
-    <div style={{ marginVertical: 15 }}>
-      <p style={{ marginBottom: 10, textAlign: 'left' }}>
+    <div className="my-4">
+      <p className="mb-3 text-left">
         {`Q${num}). ${questionText}`}
       </p>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div className="flex justify-between">
         <button
           onClick={() => onSelect('Yes')}
-          style={{
-            borderColor: selectedValue === 'Yes' ? '#71D860' : '#ccc',
-            borderWidth: 2,
-            width: '48%',
-            borderRadius: 50,
-            paddingVertical: 8,
-          }}
+          className={`border-2 w-[48%] rounded-full py-2 ${
+            selectedValue === 'Yes' ? 'border-[#71D860]' : 'border-gray-300'
+          }`}
         >
-          <span style={{ textAlign: 'center', fontWeight: '700' }}>
-            Yes
-          </span>
+          <span className="text-center font-bold">Yes</span>
         </button>
 
         <button
           onClick={() => onSelect('No')}
-          style={{
-            borderColor: selectedValue === 'No' ? '#FC4343' : '#ccc',
-            borderWidth: 2,
-            width: '48%',
-            borderRadius: 50,
-            paddingVertical: 8,
-          }}
+          className={`border-2 w-[48%] rounded-full py-2 ${
+            selectedValue === 'No' ? 'border-[#FC4343]' : 'border-gray-300'
+          }`}
         >
-          <span style={{ textAlign: 'center', fontWeight: '700' }}>
-            No
-          </span>
+          <span className="text-center font-bold">No</span>
         </button>
       </div>
     </div>

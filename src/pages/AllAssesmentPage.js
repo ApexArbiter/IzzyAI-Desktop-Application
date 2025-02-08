@@ -122,7 +122,7 @@ function AllAssessmentPage() {
             className="border border-[#0CC8E8] rounded-2xl p-4 flex flex-row items-center mt-8"
           >
             <div>
-              <h2 className="text-lg font-semibold">{item.title}</h2>
+              <h3 className="text-lg text-[22px] font-semibold">{item.title}</h3>
               <div className="flex items-center mt-2">
                 <DocumentIcon />
                 <p className="text-sm font-medium ml-2">{item.description}</p>

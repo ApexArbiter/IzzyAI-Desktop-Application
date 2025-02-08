@@ -68,6 +68,8 @@ import HomePage from './pages/main/HomePage';
 import SignupConsent from './pages/SignUpConsent';
 import ConsentGuardian from './pages/ConsentGuardian';
 import NewPassword from './pages/NewPassword';
+import ClinicSignUp from './pages/ClinicSignUp';
+import SomeoneCareScreen from './pages/SomeoneCareScreen';
 
 function App() {
   return (
@@ -145,6 +147,8 @@ function App() {
           <Route path="/SignUpConsent" element={<SignupConsent />} />
           <Route path="/ConsentGuardian" element={<ConsentGuardian />} />
           <Route path="/newPassword" element={<NewPassword />} />
+          <Route path="/ClinicSignUp" element={<ClinicSignUp />} />
+          <Route path="/SomeoneCareScreen" element={<SomeoneCareScreen />} />
 
 
         </Routes>

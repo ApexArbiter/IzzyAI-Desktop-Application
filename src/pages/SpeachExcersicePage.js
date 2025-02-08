@@ -12,6 +12,7 @@ import dynamicfunctions from '../utils/dynamicfunctions';
 import html2canvas from 'html2canvas';
 import { ArrowLeft } from 'lucide-react';
 import LogoQuestionView from '../components/LogoQuestionView';
+import WaveIcon from '../assets/Wave';
 const RecordButton = (props) => {
   return (
     <button
@@ -672,15 +673,14 @@ const SpeechArticulationPage = () => {
                 {/* Recording Controls */}
                 <div className="flex justify-center items-center">
                   {recordingStatus === 'idle' && tries <= 4 && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={onStartRecord}
-                      className="flex items-center justify-center bg-black text-white rounded-full py-2 px-4 font-semibold transition-colors mb-6"
-                    >
-                      <i className="fas fa-record-vinyl text-xl mr-2"></i>
-                      Start Recording
-                    </motion.button>
+                    <button
+                    onClick={onStartRecord}
+                    className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+                  >
+                    <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                      <span className="text-red-500">●</span> Record
+                    </span>
+                  </button>
                     // <motion.button
                     //   whileHover={{ scale: 1.02 }}
                     //   whileTap={{ scale: 0.98 }}
@@ -693,16 +693,15 @@ const SpeechArticulationPage = () => {
                   )}
 
                   {recordingStatus === 'recording' && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={onStopRecord}
+                    <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-2 w-full">
+                    <button
                       disabled={isStopButtonDisabled}
-                      className="flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 px-4 font-semibold transition-colors mb-6"
+                      onClick={onStopRecord}
+                      className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
                     >
-                      <i className="fas fa-stop text-xl mr-2"></i>
-                      Stop Recording
-                    </motion.button>
+                      <WaveIcon />
+                    </button>
+                  </div>
                   )}
                 </div>
 

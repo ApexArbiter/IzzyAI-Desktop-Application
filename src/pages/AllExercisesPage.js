@@ -4,23 +4,48 @@ import CustomHeader from '../components/CustomHeader';
 import DocumentIcon from '../assets/DocumentIcon';
 import { useDataContext } from '../contexts/DataContext';
 import BaseURL from '../components/ApiCreds';
-import { resetArticSession, getToken, getReceptiveAllExerciseQuestions, getExpressiveAllExerciseQuestions, checkReceptiveAssessment, checkExpressiveAssessment, checkArticulationAssessment, checkAllAssessment } from "../utils/functions";
+import { 
+    resetArticSession, 
+    getToken, 
+    getReceptiveAllExerciseQuestions, 
+    getExpressiveAllExerciseQuestions, 
+    checkReceptiveAssessment, 
+    checkExpressiveAssessment, 
+    checkArticulationAssessment, 
+    checkAllAssessment 
+} from "../utils/functions";
 import Loader from '../components/Loader';
-import { COLORS, fonts } from '../theme';
 
-const DarkButton = (props) => {
-    const isDisabled = props.disabled;
+const DarkButton = ({ onClick, title, isLock, disabled }) => (
+    <button
+        onClick={onClick}
+        disabled={disabled}
+        className={`ml-auto rounded-full bg-gray-900 text-white px-6 py-3 font-semibold hover:bg-gray-700 disabled:opacity-30`}
+    >
+        {isLock ? (
+            <span className="text-white">🔒</span>
+        ) : (
+            <span>{title}</span>
+        )}
+    </button>
+);
+
+const ExerciseCard = ({ title, subtitle, onStart }) => {
     return (
-        <button
-            onClick={props.onPress}
-            style={{ ...styles.darkButton, opacity: isDisabled ? 0.3 : 1 }}
-            disabled={isDisabled}>
-            {props?.isLock ? (
-                <span style={{ color: 'white' }}>🔒</span>
-            ) : (
-                <span style={styles.buttonText}>{props.title}</span>
-            )}
-        </button>
+        <div className="border border-[#0CC8E8] rounded-2xl p-4 flex flex-row items-center mt-8">
+            <div className="flex-1 mr-3">
+                <h2 className="text-gray-900 text-xl font-medium">
+                    {title}
+                </h2>
+                <div className="flex items-center mt-3">
+                    <DocumentIcon className="w-5 h-5 text-gray-600" />
+                    <p className="text-gray-900 text-sm font-medium ml-2">
+                        {subtitle}
+                    </p>
+                </div>
+            </div>
+            <DarkButton onClick={onStart} title="Start" />
+        </div>
     );
 };
 
@@ -36,23 +61,19 @@ function AllExercisesPage() {
 
     const User = () => localStorage.getItem("userId");
     const userId = User();
-    console.log(userId)
+
     useEffect(() => {
         const fetchData = () => {
             try {
                 const storedUserDetail = localStorage.getItem("userDetails");
-
                 if (storedUserDetail) {
                     setUserDetail(JSON.parse(storedUserDetail));
-                    console.log(userDetail)
                 }
             } catch (error) {
                 console.error("Error retrieving or parsing userDetails from localStorage", error);
             }
         };
-
         fetchData();
-        console.log(User());
     }, []);
 
     const fetchReport = async () => {
@@ -238,7 +259,6 @@ function AllExercisesPage() {
 
             if (sessionResponse.ok) {
                 const data = await sessionResponse.json();
-                console.log("SessionId", data.SessionID)
                 navigate(isReceptive ? '/ReceptiveExercise' : '/ExpressiveExercise', {
                     state: {
                         sessionId: data.SessionID,
@@ -261,149 +281,55 @@ function AllExercisesPage() {
     };
 
     return (
-        <div style={styles.safe_area}>
+        <div className="flex flex-col h-screen">
             <CustomHeader title="Exercises" goBack={() => navigate(-1)} />
-            <div style={styles.main_view}>
-                <div>
-                    <div style={styles.cardContainer}>
-                        <div style={styles.text_view}>
-                            <span style={styles.heading}>
-                                Articulation Disorder
-                            </span>
-                            <div style={styles.text_row}>
-                                <DocumentIcon />
-                                <span style={styles.para}>271 Words</span>
-                            </div>
-                        </div>
-                        <DarkButton onPress={handleButtonClick} title="Start" />
-                    </div>
-                    <div style={styles.cardContainer}>
-                        <div style={styles.text_view}>
-                            <span style={styles.heading}>Stammering</span>
-                            <div style={styles.text_row}>
-                                <DocumentIcon />
-                                <span style={styles.para}>5 Statements</span>
-                            </div>
-                        </div>
-                        <DarkButton onPress={handleButtonClickStammering} title="Start" />
-                    </div>
+            <div className="p-5 py-2">
+                <div className="space-y-6">
+                    <ExerciseCard
+                        title="Articulation Disorder"
+                        subtitle="271 Words"
+                        onStart={handleButtonClick}
+                    />
 
-                    <div style={styles.cardContainer}>
-                        <div style={styles.text_view}>
-                            <span style={styles.heading}>Voice Disorder</span>
-                            <div style={styles.text_row}>
-                                <DocumentIcon />
-                                <span style={styles.para}>3 Sounds</span>
-                            </div>
-                        </div>
-                        <DarkButton onPress={handleButtonClickVoice} title="Start" />
-                    </div>
+                    <ExerciseCard
+                        title="Stammering"
+                        subtitle="5 Statements"
+                        onStart={handleButtonClickStammering}
+                    />
 
-                    <div style={styles.cardContainer}>
-                        <div style={styles.text_view}>
-                            <span style={styles.heading}>
-                                Receptive Language Disorder
-                            </span>
-                            <div style={styles.text_row}>
-                                <DocumentIcon />
-                                <span style={styles.para}>
-                                    {`${receptiveQuestions?.length || 0} Questions`}
-                                </span>
-                            </div>
-                        </div>
-                        <DarkButton onPress={() => handleButtonLanguage(true)} title="Start" />
-                    </div>
+                    <ExerciseCard
+                        title="Voice Disorder"
+                        subtitle="3 Sounds"
+                        onStart={handleButtonClickVoice}
+                    />
 
-                    <div style={styles.cardContainer}>
-                        <div style={styles.text_view}>
-                            <span style={styles.heading}>
-                                Expressive Language Disorder
-                            </span>
-                            <div style={styles.text_row}>
-                                <DocumentIcon />
-                                <span style={styles.para}>
-                                    {`${expressiveQuestions?.length || 0} Questions`}
-                                </span>
-                            </div>
-                        </div>
-                        <DarkButton onPress={() => handleButtonLanguage()} title="Start" />
-                    </div>
-                    {/* 
-                    {userDetail?.SubscriptionDetails &&
-                        userDetail?.SubscriptionDetails?.Status !== 'Free Trial' && ( */}
-                    <div style={styles.cardContainer}>
-                        <div style={styles.text_view}>
-                            <span style={styles.heading}>Games</span>
-                            <div style={styles.text_row}>
-                                <DocumentIcon />
-                                <span style={styles.para}>{"5 Games"}</span>
-                            </div>
-                        </div>
-                        <DarkButton onPress={() => navigate('/voiceExerciseGame')} title="Start" />
-                    </div>
-                    {/* )} */}
+                    <ExerciseCard
+                        title="Receptive Language Disorder"
+                        subtitle={`${receptiveQuestions?.length || 0} Questions`}
+                        onStart={() => handleButtonLanguage(true)}
+                    />
+
+                    <ExerciseCard
+                        title="Expressive Language Disorder"
+                        subtitle={`${expressiveQuestions?.length || 0} Questions`}
+                        onStart={() => handleButtonLanguage()}
+                    />
+
+                    {
+                      userDetail?.SubscriptionDetails && (
+                            <ExerciseCard
+                        title="Games"
+                        subtitle="5 Games"
+                        onStart={() => navigate('/voiceExerciseGame')}
+                    />
+                        )
+                    }
+
                     {loading && <Loader loading={loading} />}
-                    <div style={{ height: 20 }} />
                 </div>
             </div>
         </div>
     );
 }
-
-const styles = {
-    safe_area: {
-        flex: 1,
-    },
-    main_view: {
-        flex: 1,
-        padding: 20,
-    },
-    base: {
-        fontFamily: fonts.regular,
-        color: '#111920',
-    },
-    heading: {
-        flex: 1,
-        fontSize: 22,
-        fontWeight: '500',
-    },
-    para: {
-        fontSize: 14,
-        fontWeight: '500',
-        marginLeft: 5,
-    },
-    cardContainer: {
-        borderWidth: 1,
-        borderColor: COLORS.blue_border_color,
-        borderRadius: 16,
-        padding: 14,
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 30,
-    },
-    darkButton: {
-        borderRadius: 50,
-        alignItems: 'center',
-        backgroundColor: '#111920',
-        justifyContent: 'center',
-        height: 45,
-        width: 100,
-    },
-    text_view: {
-        flex: 1,
-        marginRight: 12,
-    },
-    text_row: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 12,
-    },
-    buttonText: {
-        color: '#fff',
-        fontWeight: '600',
-    },
-};
 
 export default AllExercisesPage;

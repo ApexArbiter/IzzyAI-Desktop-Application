@@ -11,7 +11,7 @@ export const getToken = () => localStorage.getItem("token")
 export const setToken = (token) => localStorage.setItem("token",token)
 
 export const getExpressiveQuestions = async (id, avatar) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_questions_expressive_assessment_latest/${id}/${avatar}`,
@@ -28,7 +28,7 @@ export const getExpressiveQuestions = async (id, avatar) => {
   }
 };
 export const getExpressiveExerciseQuestions = async (id, avatar) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_expressive_exercise_questions_latest/${id}/1`,
@@ -45,7 +45,7 @@ export const getExpressiveExerciseQuestions = async (id, avatar) => {
   }
 };
 export const getExpressiveAllExerciseQuestions = async (id, avatar) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/expressive_show_full_exercise/${id}/1`,
@@ -62,7 +62,7 @@ export const getExpressiveAllExerciseQuestions = async (id, avatar) => {
   }
 };
 export const getQuickExpressiveQuestions = async id => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `http://154.38.160.197:5000/expressive_quick_assessment/${id}`,
@@ -79,7 +79,7 @@ export const getQuickExpressiveQuestions = async id => {
   }
 };
 export const getReceptiveQuestions = async (id, avatar) => {
-  const token = await getToken()
+  const token = getToken()
   console.log(id, avatar);
   try {
     const response = await axios.get(
@@ -97,7 +97,7 @@ export const getReceptiveQuestions = async (id, avatar) => {
   }
 };
 export const getReceptiveExerciseQuestions = async (id, avatar) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/exercise_questions_based_on_performance/${id}/${avatar}`,
@@ -114,7 +114,7 @@ export const getReceptiveExerciseQuestions = async (id, avatar) => {
   }
 };
 export const getReceptiveAllExerciseQuestions = async (id, avatar) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/receptive_show_full_exercise/${id}/1`,
@@ -131,7 +131,7 @@ export const getReceptiveAllExerciseQuestions = async (id, avatar) => {
   }
 };
 export const getQuickReceptiveQuestions = async id => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/receptive_quick_assessment/${id}`,
@@ -148,7 +148,7 @@ export const getQuickReceptiveQuestions = async id => {
   }
 };
 export const getArticulationAllExerciseQuestions = async (id) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/articulation_show_full_exercise/${id}/1`,
@@ -166,7 +166,7 @@ export const getArticulationAllExerciseQuestions = async (id) => {
 };
 export const getSessionDetail = async id => {
 
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_session_details/${id}/1/1`,
@@ -183,7 +183,7 @@ export const getSessionDetail = async id => {
   }
 };
 export const matchExpressiveAnswer = async data => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.post(
       `${BaseURL}/api/match_answer`,
@@ -204,7 +204,7 @@ export const matchExpressiveAnswer = async data => {
   }
 };
 export const evaluateExpressiveQuestion = async data => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.post(
       `${BaseURL}/api/evaluate`,
@@ -227,7 +227,7 @@ export const evaluateExpressiveQuestion = async data => {
 export const detectExpression = async (formData) => {
   try {
 
-    const token = await getToken(); // Get the authorization token
+    const token = getToken(); // Get the authorization token
     const response = await fetch(`${BaseURL}/detect_expression`, {
       method: 'POST',
       headers: {
@@ -249,7 +249,7 @@ export const detectExpression = async (formData) => {
   }
 };
 export const analyzeUserAudio = async data => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.post(
       `${BaseURL}/analyze_audio`,
@@ -270,7 +270,7 @@ export const analyzeUserAudio = async data => {
   }
 };
 export const insertSessionData = async (userId, id) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const formData = new FormData();
     formData.append('UserID', userId);
@@ -296,7 +296,7 @@ export const insertSessionData = async (userId, id) => {
   }
 };
 export const endSession = async (id, startTime, status, disorderid) => {
-  const token = await getToken()
+  const token = getToken()
 
   const currentEndTime = new Date()
     .toISOString()
@@ -327,7 +327,7 @@ export const endSession = async (id, startTime, status, disorderid) => {
   }
 };
 export const getReports = async id => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_report/${id}`,
@@ -344,7 +344,7 @@ export const getReports = async id => {
   }
 };
 export const getGameReports = async id => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_game_reports/${id}/1`,
@@ -361,7 +361,7 @@ export const getGameReports = async id => {
   }
 };
 export const getQuickReports = async id => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_quick_report/${id}`,
@@ -378,7 +378,7 @@ export const getQuickReports = async id => {
   }
 };
 export const getAvatarChats = async id => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_conservation_chat/${id}`,
@@ -395,7 +395,7 @@ export const getAvatarChats = async id => {
   }
 };
 export const getStammeringAvatar = async id => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_stammering_avatar/${id}`,
@@ -413,7 +413,7 @@ export const getStammeringAvatar = async id => {
 };
 export const checkArticVoice = async (audioBlob, word) => {
   try {
-    const token = await getToken();
+    const token = getToken();
     const formData = new FormData();
 
     // Log the audio blob details for debugging
@@ -474,7 +474,7 @@ export const checkVoiceDisorder = async (audioPath) => {
     const formData = new FormData();
     formData.append('audio', new File([audioPath], 'sound.wav', { type: 'audio/wav' }));
 
-    const token = await getToken();
+    const token = getToken();
     const response = await fetch(
       `${BaseURL}/predict_voice_disorder`,
       {
@@ -493,7 +493,7 @@ export const checkVoiceDisorder = async (audioPath) => {
   }
 };
 export const voiceToText = async (audioPath) => {
-  const token = await getToken();
+  const token = getToken();
   const formData = new FormData();
   formData.append('audio', audioPath, 'sound.wav');
 
@@ -522,7 +522,7 @@ export const voiceToText = async (audioPath) => {
 };
 export const checkStammering = async (audioPath) => {
   try {
-    const token = await getToken();
+    const token = getToken();
     const formData = new FormData();
     formData.append('audio', audioPath, 'stammering_audio.wav');
 
@@ -541,7 +541,7 @@ export const checkStammering = async (audioPath) => {
   }
 };
 export const sendIOSVideo = async (videoPath, fileName, path) => {
-  const token = await getToken()
+  const token = getToken()
   const formData = new FormData()
   formData.append('file', {
     uri: videoPath,
@@ -565,7 +565,7 @@ export const sendIOSVideo = async (videoPath, fileName, path) => {
   }
 };
 export const resetArticSession = async (id, disorderId) => {
-  const token = await getToken()
+  const token = getToken()
   const formData = new FormData()
   formData.append('UserID', id);
   formData.append('DisorderID', disorderId);
@@ -586,7 +586,7 @@ export const resetArticSession = async (id, disorderId) => {
   }
 };
 export const getStammeringWords = async (id) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(`${BaseURL}/get_exercise_stammering/${id}`,
       {
@@ -600,7 +600,7 @@ export const getStammeringWords = async (id) => {
   }
 };
 export const updateUserId = async (body) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.put(
       `${BaseURL}/update_user_type`,
@@ -618,7 +618,7 @@ export const updateUserId = async (body) => {
   }
 };
 export const changeUserPassword = async (body) => {
-  const token = await getToken()
+  const token = getToken()
 
   try {
     const response = await axios.post(
@@ -637,7 +637,7 @@ export const changeUserPassword = async (body) => {
   }
 };
 export const checkArticulationAssessment = async (id) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_word_texts/${id}/1`,
@@ -654,7 +654,7 @@ export const checkArticulationAssessment = async (id) => {
   }
 };
 export const checkReceptiveAssessment = async (id) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_assessment_status_receptive/${id}`,
@@ -671,7 +671,7 @@ export const checkReceptiveAssessment = async (id) => {
   }
 };
 export const checkExpressiveAssessment = async (id) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/get_assessment_status_expressive/${id}`,
@@ -688,7 +688,7 @@ export const checkExpressiveAssessment = async (id) => {
   }
 };
 export const checkAllAssessment = async (userId, disorderid) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/check_assessment_status/${userId}/${disorderid}`,
@@ -704,7 +704,7 @@ export const checkAllAssessment = async (userId, disorderid) => {
     return error
   }
 }; export const cancelSubscription = async (id, invoiceid) => {
-  const token = await getToken()
+  const token = getToken()
   const url = invoiceid ? `/cancel_subscription/${id}/${invoiceid}` : `/cancel_subscription/${id}`
   try {
     const response = await axios.post(
@@ -722,7 +722,7 @@ export const checkAllAssessment = async (userId, disorderid) => {
   }
 };
 export const resendOtp = async (data) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.post(
       `${BaseURL}/resend_otp`,
@@ -742,7 +742,7 @@ export const resendOtp = async (data) => {
   }
 };
 export const verifySignupOtp = async (data) => {
-  const token = await getToken()
+  const token = getToken()
   console.log(token);
   try {
     const response = await axios.post(
@@ -780,7 +780,7 @@ export const verifySignupOtp = async (data) => {
 //   }
 // };
 export const getCheckoutUrl = async (id, plan, invoiceid) => {
-  const token = await getToken()
+  const token = getToken()
   const url = invoiceid ? `/get_checkout_url/${id}?invoice_id=${invoiceid}?plan=${plan}` : `/get_checkout_url/${id}?plan=${plan}`
   try {
     const response = await axios.get(
@@ -798,7 +798,7 @@ export const getCheckoutUrl = async (id, plan, invoiceid) => {
   }
 };
 export const getUserInfo = async (id) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.get(
       `${BaseURL}/userdata_info/${id}`,
@@ -815,7 +815,7 @@ export const getUserInfo = async (id) => {
   }
 };
 export const googleLogin = async (access_token) => {
-  const token = await getToken()
+  const token = getToken()
   const data = {
     access_token,
     platform: 'windows'
@@ -838,7 +838,7 @@ export const googleLogin = async (access_token) => {
 };
 
 export const sendFeedback = async (data) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.post(
       `${BaseURL}/send_feedback`,
@@ -894,7 +894,7 @@ export const getGoogleToken = async () => {
   }
 }
 export const registerGuardian = async (data) => {
-  const token = await getToken()
+  const token = getToken()
   try {
     const response = await axios.post(
       `${BaseURL}/register_guardian_user`,
@@ -910,6 +910,41 @@ export const registerGuardian = async (data) => {
     return response
   } catch (error) {
     return error
+  }
+};
+export const clinicSignup = async (data) => {
+  try {
+    console.log('Request Data:', JSON.stringify(data, null, 2));
+    
+    const response = await axios.post(
+      `${BaseURL}/demo_request`,
+      data,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+    
+    console.log('API Response:', {
+      status: response.status,
+      data: response.data
+    });
+    
+    return response;
+  } catch (error) {
+    console.error('API Error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      config: {
+        url: error.config?.url,
+        method: error.config?.method,
+        headers: error.config?.headers,
+        data: error.config?.data
+      }
+    });
+    return error;
   }
 };
 

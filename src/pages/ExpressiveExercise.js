@@ -11,6 +11,7 @@ import Loader from '../components/Loader';
 import LogoQuestionView from '../components/LogoQuestionView';
 import WaveIcon from '../assets/Wave'; // Make sure to convert your WaveSVG to React component
 import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
+import { useExpressiveExercise } from '../hooks/useExpressiveExercise';
 
 // Button Components
 const RecordButton = ({ onPress, title, disabled }) => (
@@ -65,48 +66,8 @@ const PlayButton = ({ onPress, disabled }) => (
 );
 
 function ExpressiveAssessment() {
-  const location = useLocation();
-  const { sessionId, isAll } = location.state || {};
-  // console.log(location.state)
-  const navigate = useNavigate();
-  const { setExpressiveReport } = useDataContext();
-  const webcamRef = useRef(null);
-  const videoRef = useRef(null);
-
-  // // Get params from router state or localStorage
-  // const sessionId = localStorage.getItem("sessionId");
-  // const isAll = localStorage.getItem("isAll") === "true";
-
-  // State management
-  const [startTime, setStartTime] = useState('');
-    const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
-    const [questionResponse, setQuestionResponse] = useState('');
-    const [questionCount, setQuestionCount] = useState(1);
-    const [recordingStatus, setRecordingStatus] = useState('idle');
-    const [incorrectQuestions, setIncorrectQuestions] = useState([]);
-    const [correctQuestions, setCorrectQuestions] = useState([]);
-    const [incorrectExpressions, setIncorrectExpressions] = useState([]);
-    const [correctExpressions, setCorrectExpressions] = useState([]);
-    const [expressionsArray, setExpressionsArray] = useState([]);
-    const [questionExpressions, setQuestionExpressions] = useState([]);
-    const [questions, setQuestions] = useState([]);
-    const [disableRecordingButton, setDisableRecordingButton] = useState(false);
-    const [isWrongAnswer, setInWrongAnswer] = useState(false);
-    const [wrongWord, setWrongWord] = useState(null);
-  // Add these new states at the start of your component
-  const [answerCount, setAnswerCount] = useState(0);  // Tracks which part of the answer we're on
-  const [recordCount, setRecordCount] = useState(0);  // Tracks number of attempts
-  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0); // Tracks correct attempts
-  const [isNextAnswer, setIsNextAnswer] = useState(false); // Indicates moving to next answer part
-  const [isDelay, setIsDelay] = useState(false); // Controls delay between attempts
-
-
+  const { sessionId, isAll, navigate, setExpressiveReport, webcamRef, videoRef, startTime, setStartTime, correctAnswersCount, setCorrectAnswersCount, isLoading, setIsLoading, questionResponse, setQuestionResponse, questionCount, setQuestionCount, recordingStatus, setRecordingStatus, incorrectQuestions, setIncorrectQuestions, correctQuestions, setCorrectQuestions, incorrectExpressions, setIncorrectExpressions, correctExpressions, setCorrectExpressions, expressionsArray, setExpressionsArray, questionExpressions, setQuestionExpressions, questions, setQuestions, disableRecordingButton, setDisableRecordingButton, isWrongAnswer, setInWrongAnswer, wrongWord, setWrongWord, answerCount, setAnswerCount, recordCount, setRecordCount, consecutiveCorrect,setConsecutiveCorrect, isNextAnswer, setIsNextAnswer, isDelay, setIsDelay, expression, setExpression, snapshot, setSnapshot, isVideoEnd, setIsVideoEnd, response, setResponse, expressionResponse, setExpressionResponse, transcript, setTranscript, incorrectWord, setIncorrectWord, updatedQuestionExpression, setUpdatedQuestionExpression } = useExpressiveExercise();
   let question = [];
-  const [expression, setExpression] = useState(null);
-  const [snapshot, setSnapshot] = useState(null);
-  const [isVideoEnd, setIsVideoEnd] = useState(false);
-
 
   // Get user details from localStorage
   const userId = localStorage.getItem("userId");
@@ -115,7 +76,6 @@ function ExpressiveAssessment() {
   useEffect(() => {
     const currentStartTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
     setStartTime(currentStartTime);
-
 
     // Add beforeunload event listener
     const handleBeforeUnload = (e) => {
@@ -128,11 +88,6 @@ function ExpressiveAssessment() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
-  useEffect(() => {
-    if (questions.length > 0) {
-      console.log("Questions state updated:", questions);
-    }
-  }, [questions]);
 
   const fetchQuestionData = async () => {
     try {
@@ -156,7 +111,10 @@ function ExpressiveAssessment() {
   };
   // Call fetchQuestionData
   useEffect(() => {
-    fetchQuestionData();
+    const func = async () => {
+      await fetchQuestionData();
+    }
+    func();
   }, []);
   // Add this at the component level
   useEffect(() => {
@@ -383,7 +341,7 @@ const updateValuesToInitial = (updatedQuestionExpression) => {
   // };
 
   const handleAudioStop = async (recordedBlob) => {
-    const token = await getToken();
+    const token = getToken();
     const formData = new FormData();
     formData.append('audio', recordedBlob.blob, 'sound.wav');
     const answer = getCurrentAnswer()?.replace(/\.$/, "")?.toLowerCase();
@@ -391,72 +349,26 @@ const updateValuesToInitial = (updatedQuestionExpression) => {
         formData.append("answer", answer)
     
         try {
-          const response = await matchExpressiveAnswer(formData)
+          const res = await matchExpressiveAnswer(formData)
+          setResponse(res)
           
-          const expressionResponse = await sendSnapshot()
-          const transcript = response?.transcription?.trim()?.toLowerCase()
-          const incorrectWord = response?.first_incorrect_word?.trim()?.toLowerCase()
-          const updatedQuestionExpression = [...questionExpressions, expressionResponse]
+          const expResponse = await sendSnapshot();
+          setExpressionResponse(expResponse)
+
+          setTranscript(response?.transcription?.trim()?.toLowerCase())
+          setIncorrectWord(response?.first_incorrect_word?.trim()?.toLowerCase())
+          setUpdatedQuestionExpression([...questionExpressions, expressionResponse])
+          setRecordCount(prev => prev + 1)
           console.log(response, updatedQuestionExpression)
           // if (expressionResponse?.toLowerCase() === questions?.[questionCount - 1]?.expression?.toLowerCase()) {
             
           // } else {
             
           // }
-          console.log("Hello")
-          setRecordCount(prev => prev + 1)
+          console.log("Hello recording stop")
 
-      if (recordCount + 1 === 3) {
-        if (questions?.[questionCount - 1]?.answers?.split(";")?.[answerCount + 1]) {
-            setAnswerCount(answerCount + 1)
-            setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
-            setIsDelay(true)
-            setIsNextAnswer(true)
-            setTimeout(() => {
-              setIsDelay(false);
-              setExpression(null);
-              videoRef.current.stop();
-              videoRef.current.seek(0.1);
-              videoRef.current.resume();
-              setRecordingStatus("idle");
-              setIsNextAnswer(false);
-              setRecordCount(0);
-              setIsVideoEnd(false);
-            }, 2000);
-        } else {
-            setRecordingStatus("stop")
-            updateValuesToInitial(updatedQuestionExpression)
-            if (consecutiveCorrect > (questions?.[questionCount - 1]?.answers?.split(";")?.length / 2)) {
-                onCorrectExpression(questions?.[questionCount - 1]?.question, expressionResponse)
-                onCorrectAnswer(questions?.[questionCount - 1]?.question)
-            } else {
-                onWrongAnswer(questions?.[questionCount - 1]?.question)
-                onWrongExpression(questions?.[questionCount - 1]?.question, expressionResponse)
-            }
-        }
-    }else {
-      setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
-      if (incorrectWord === transcript || transcript === null || incorrectWord?.toLowerCase() === 'none') {
-          setConsecutiveCorrect(consecutiveCorrect + 1)
-          setIsDelay(true)
-          setTimeout(() => {
-              setIsDelay(false)
-              setExpression(null)
-              setRecordingStatus("idle")
-              setIsVideoEnd(false)
-          }, 2000);
-      } else {
-          setInWrongAnswer(true)
-          setWrongWord(response?.first_incorrect_word)
-          setIsDelay(true)
-          setTimeout(() => {
-              setIsDelay(false)
-              setExpression(null)
-              setRecordingStatus("idle")
-              setIsVideoEnd(false)
-          }, 2000);
-      }
-  }
+          
+      
   // } else {
   // setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
   // if (incorrectWord !== transcript && transcript !== null && incorrectWord?.toLowerCase() !== 'none') {
@@ -485,9 +397,61 @@ const updateValuesToInitial = (updatedQuestionExpression) => {
 
   const percentageCompleted = ((questionCount) / questions?.length) * 100;
 
-useEffect(() => {
-  
-console.log("record Count:",recordCount)
+  useEffect(() => {
+  console.log("record Count:", recordCount)
+  if (recordCount === 2) {
+    console.log("mango")
+    if (questions?.[questionCount - 1]?.answers?.split(";")?.[answerCount + 1]) {
+        setAnswerCount(answerCount + 1)
+        setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
+        setIsDelay(true)
+        setIsNextAnswer(true)
+        setTimeout(() => {
+          setIsDelay(false);
+          setExpression(null);
+          videoRef.current.stop();
+          videoRef.current.seek(0.1);
+          videoRef.current.resume();
+          setRecordingStatus("idle");
+          setIsNextAnswer(false);
+          setRecordCount(0);
+          setIsVideoEnd(false);
+        }, 2000);
+    } else {
+        setRecordingStatus("stop")
+        updateValuesToInitial(updatedQuestionExpression)
+        if (consecutiveCorrect > (questions?.[questionCount - 1]?.answers?.split(";")?.length / 2)) {
+            onCorrectExpression(questions?.[questionCount - 1]?.question, expressionResponse)
+            onCorrectAnswer(questions?.[questionCount - 1]?.question)
+        } else {
+            onWrongAnswer(questions?.[questionCount - 1]?.question)
+            onWrongExpression(questions?.[questionCount - 1]?.question, expressionResponse)
+        }
+    }
+}else {
+  setQuestionExpressions(prevArray => [...prevArray, expressionResponse || ""])
+  if (incorrectWord === transcript || transcript === null || incorrectWord?.toLowerCase() === 'none') {
+      setConsecutiveCorrect(consecutiveCorrect + 1)
+      setIsDelay(true)
+      setTimeout(() => {
+          setIsDelay(false)
+          setExpression(null)
+          setRecordingStatus("idle")
+          setIsVideoEnd(false)
+      }, 2000);
+  } else {
+      setInWrongAnswer(true)
+      setWrongWord(response?.first_incorrect_word)
+      setIsDelay(true)
+      setTimeout(() => {
+          setIsDelay(false)
+          setExpression(null)
+          setRecordingStatus("idle")
+          setIsVideoEnd(false)
+      }, 2000);
+  }
+}
+
   
 }, [recordCount])
 

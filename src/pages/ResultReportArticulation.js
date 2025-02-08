@@ -28,55 +28,58 @@ const CardContent = ({ children, className = "" }) => (
 );
 
 // Progress Components
-const CircularProgress = ({ percentage, size = "lg" }) => {
-  const radius = 45;
+const CircularProgress = ({ percentage, size = "lg", tintColor = "#FC4343", backgroundColor = "#71D860" }) => {
+  const radius = 75;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
-
-  const sizes = {
-    sm: "w-32 h-32",
-    lg: "w-48 h-48",
-    xl: "w-64 h-64"
-  };
-
+  const strokeWidth = size === "lg" ? 15 : 30;
+  
   return (
-    <div className={`relative ${sizes[size]} flex items-center justify-center`}>
+    <div className={`relative ${size === "lg" ? "w-48 h-48" : "w-64 h-64"} flex items-center justify-center`}>
       <svg className="transform -rotate-90 w-full h-full">
         <circle
           cx="50%"
           cy="50%"
           r={radius}
-          className="stroke-gray-200 fill-none"
-          strokeWidth="8"
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{ stroke: backgroundColor }}
         />
         <circle
           cx="50%"
           cy="50%"
           r={radius}
-          className={`${percentage >= 70 ? 'stroke-green-500' : 'stroke-red-500'} fill-none`}
-          strokeWidth="8"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{
+            stroke: tintColor,
+            strokeDasharray: circumference,
+            strokeDashoffset: circumference - (percentage / 100) * circumference,
+            strokeLinecap: "round",
+            transition: "stroke-dashoffset 0.5s ease-out"
+          }}
         />
       </svg>
-      <span className="absolute text-2xl font-bold">
+      <span className={`absolute ${size === "lg" ? "text-4xl" : "text-5xl"} font-medium text-red-500`}>
         {percentage.toFixed(1)}%
       </span>
     </div>
   );
 };
 
-const LinearProgressBar = ({ value }) => {
-  return (
-    <div className="w-full bg-gray-200 rounded-full h-2.5">
+const LinearProgressBar = ({ value, color }) => (
+  <div className="flex items-center w-full gap-4">
+    <div className="flex-1 bg-gray-200 rounded-full h-2">
       <div
-        className={`h-2.5 rounded-full ${value >= 70 ? 'bg-green-500' : 'bg-red-500'}`}
-        style={{ width: `${value}%` }}
+        className="h-2 rounded-full transition-all duration-500"
+        style={{
+          width: `${value}%`,
+          backgroundColor: color
+        }}
       />
     </div>
-  );
-};
+    <span className="text-sm font-medium min-w-[4rem]">{value.toFixed(1)}%</span>
+  </div>
+);
 
 const ArticulationResult = () => {
   const navigate = useNavigate();
@@ -317,119 +320,100 @@ const ArticulationResult = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50 p-4 md:p-8"
-    >
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <CustomHeader title={isQuick ? "Quick Articulation Disorder Assessment Result Report" :
-          SessiontypId === 2 ? "Articulation Disorder Exercise Result Report" :
-            "Articulation Disorder Assessment Result Report"} goBack={() => { navigate(-1) }} />
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="min-h-screen bg-gray-50 p-4 md:p-8"
+  >
+    <div className="max-w-6xl mx-auto">
+      <h1 className="text-2xl font-semibold mb-8">
+        {isQuick 
+          ? "Quick Articulation Disorder Assessment Result Report"
+          : SessiontypId === 2 
+            ? "Articulation Disorder Exercise Result Report"
+            : "Articulation Disorder Assessment Result Report"
+        }
+      </h1>
 
-        <div className={`${expressionsArray ? 'grid md:grid-cols-2 gap-6' : ''} flex justify-center w-50`}>
-          {/* Overall Score */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Overall Score</CardTitle>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <CircularProgress percentage={percentage} />
-            </CardContent>
-          </Card>
-
-          {/* Expression Score */}
-          {expressionsArray?.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Expression Analysis</CardTitle>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                <CircularProgress percentage={expressionScore} />
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Detailed Results */}
-        <Card className="mt-6">
-          {/* <CardHeader>
-            <CardTitle>Assessment Details</CardTitle>
-          </CardHeader> */}
-          <CardContent className="space-y-6">
-            {/* Correct Answers */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-medium">Correct Answers</span>
-                <span className="font-semibold">{correctAnswers}/{totalQuestions}</span>
-              </div>
-              <LinearProgressBar value={correctPercentage} />
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-medium">Incorrect Answers</span>
-                <span className="font-semibold">{incorrectQuestions.length}/{totalQuestions}</span>
-              </div>
-              <LinearProgressBar value={percentage} />
-            </div>
-
-            {/* Expressions */}
-            {expressionsArray?.length > 0 && (
-              <>
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium">Correct Expressions</span>
-                    <span className="font-semibold">{correctExpressions?.length}/{totalQuestions}</span>
-                  </div>
-                  <LinearProgressBar value={correctexpressionPercentage} />
-                </div>
-
-                <div className='w-full'>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium">Incorrect Expressions</span>
-                    <span className="font-semibold">{incorrectExpressions?.length}/{totalQuestions}</span>
-                  </div >
-                  <LinearProgressBar value={expressionpercentage} />
-                </div>
-              </>
-            )}
-
-            {/* Incorrect Words List */}
-            {incorrectQuestions?.length > 0 && (
-              <div>
-                <h3 className="font-semibold mb-3">List of incorrect Pronounciations:</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {incorrectQuestions.map((question, index) => (
-                    <div
-                      key={index}
-                      className="p-2 bg-red-50 text-red-700 rounded-lg flex items-center gap-2"
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      {!isQuick && <span>{question.WordText}</span>}
-                      {isQuick && <span>{question.wordtext}</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Action Button */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="mt-8 flex justify-center"
-        >
-          <button
-            onClick={() => { onPressBack() }}
-            className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            Back to Home
-          </button>
-        </motion.div>
+      <div className="flex justify-center gap-8 mb-12">
+        <CircularProgress 
+          percentage={percentage} 
+          size={!isQuick ? "lg" : "xl"}
+        />
+        {!isQuick && (
+          <CircularProgress 
+            percentage={expressionpercentage}
+            size="lg"
+          />
+        )}
       </div>
-    </motion.div>
+
+      {!isQuick && expressionsArray && (
+        <div className="mb-8">
+          <p className="text-lg font-medium mb-4">
+            Facial Expressions: {expressionsArray.join(" , ")}
+          </p>
+          
+          <div className="space-y-6">
+            <div>
+              <p className="text-lg mb-2">Correct Facial Expressions</p>
+              <LinearProgressBar 
+                value={(correctExpressions?.length / totalQuestions) * 100} 
+                color="#71D860"
+              />
+            </div>
+            
+            <div>
+              <p className="text-lg mb-2">Incorrect Facial Expressions</p>
+              <LinearProgressBar 
+                value={(incorrectExpressions?.length / totalQuestions) * 100} 
+                color="#FC4343"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-6 mb-8">
+        <div>
+          <p className="text-lg mb-2">Correct Answers</p>
+          <LinearProgressBar value={correctPercentage} color="#71D860" />
+        </div>
+        
+        <div>
+          <p className="text-lg mb-2">Incorrect Answers</p>
+          <LinearProgressBar value={percentage} color="#FC4343" />
+        </div>
+      </div>
+
+      {incorrectQuestions?.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-lg font-medium mb-4">List of Incorrect Pronunciations:</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {incorrectQuestions.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 p-3 bg-red-50 rounded-lg"
+              >
+                <AlertCircle className="w-5 h-5 text-red-500" />
+                <span className="text-red-700">
+                  {item.WordText || item.wordtext}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-center">
+        <button
+          onClick={onPressBack}
+          className="px-12 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
+        >
+          Back to Home
+        </button>
+      </div>
+    </div>
+  </motion.div>
   );
 };
 

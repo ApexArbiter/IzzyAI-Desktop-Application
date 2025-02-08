@@ -428,6 +428,11 @@ const VoiceDisorderPage = () => {
                     Facial Expression: {expression.expression}
                   </div>
                 )}
+                {error && (
+              <div className="bg-red-50 text-red-800 p-2 rounded-xl text-sm">
+                <p>{error}</p>
+              </div>
+            )}
                 {/* {recordingStatus === "stop" && voiceResponse?.predictions && (
                   <div className="bg-gray-50 p-2 rounded-xl mt-2">
                     <p className="text-sm font-medium">Label: Normal</p>
@@ -465,27 +470,23 @@ const VoiceDisorderPage = () => {
               />
             </div>
 
-            {error && (
-              <div className="bg-red-50 text-red-800 p-2 rounded-xl text-sm">
-                <p>{error}</p>
-              </div>
-            )}
+            
 
             <div className="flex justify-center items-center h-16">
               {recordingStatus === "idle" && isVideoEnd && (
-                <Button
-                  onClick={onStartRecord}
-                  variant="contained"
-                  color="primary"
-                  className="w-full max-w-xs py-2 text-base font-semibold rounded-full"
-                >
-                  Record
-                </Button>
+                <button
+                onClick={onStartRecord}
+                className="w-1/2 rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+              >
+                <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                  <span className="text-red-500">●</span> Record
+                </span>
+              </button>
               )}
 
               {recordingStatus === "recording" && (
                 <div className="text-center">
-                  <p className="text-lg font-semibold text-red-500 mb-2">
+                  <p className="text-lg font-semibold transition-transform text-red-500 mb-2">
                     0:0{timer > 0 ? timer : 0} Seconds Left
                   </p>
                   <CircularProgress variant="determinate" value={counter} color="error" size={40} thickness={4} />

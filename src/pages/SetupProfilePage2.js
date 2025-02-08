@@ -4,6 +4,7 @@ import { useDataContext } from '../contexts/DataContext';
 import BaseURL from '../components/ApiCreds';
 import { getToken } from '../utils/functions';
 import CustomHeader from '../components/CustomHeader';
+import Loader from '../components/Loader';
 
 // Existing components remain the same
 const BarFilled = () => (
@@ -81,6 +82,7 @@ const SetupProfilePage2 = () => {
   const [recordingStatus, setRecordingStatus] = useState('idle');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [loader, setLoader] = useState(false)
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -110,6 +112,7 @@ const SetupProfilePage2 = () => {
   useEffect(() => {
     const initializeCamera = async () => {
       try {
+        setLoader(true)
         const stream = await navigator.mediaDevices.getUserMedia({ 
           audio: true,
           video: true 
@@ -121,6 +124,8 @@ const SetupProfilePage2 = () => {
       } catch (error) {
         console.error('Error accessing camera:', error);
         setError('Failed to access camera');
+      }finally{
+        setLoader(false)
       }
     };
   
@@ -178,7 +183,7 @@ const SetupProfilePage2 = () => {
 
   const onStopRecord = async () => {
     try {
-      setIsLoading(true);
+      setLoader(true);
       if (!mediaRecorderRef.current) return;
 
       return new Promise((resolve) => {
@@ -208,7 +213,7 @@ const SetupProfilePage2 = () => {
       setRecordingStatus('stop');
       setPlayStart(false);
     } finally {
-      setIsLoading(false);
+      setLoader(false);
     }
   };
 
@@ -395,6 +400,7 @@ const SetupProfilePage2 = () => {
             </div>
           </div>
         </div>
+        <Loader loading={loader} />
       </div>
     </div>
   );

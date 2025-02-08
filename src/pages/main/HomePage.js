@@ -73,12 +73,11 @@ const HomePage = () => {
 
   const onPressTab = (route) => {
 
-    history(`/${route}`);
-    // if (!userDetail?.SubscriptionDetails) {
-    //   history(`/${route}`);
-    // } else {
-    //   alert('Please subscribe first');
-    // }
+    if (route === 'assessmentPage' || userDetail?.SubscriptionDetails) {
+      history(`/${route}`);
+    } else {
+      alert('Please subscribe first');
+    }
   };
 
   const cardVariants = {

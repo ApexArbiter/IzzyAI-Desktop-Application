@@ -8,63 +8,81 @@ import moment from 'moment';
 import { endSession, getToken } from '../utils/functions';
 import BaseURL from '../components/ApiCreds';
 
-// Reusable Card Components
 const Card = ({ children, className = "" }) => (
   <div className={`bg-white rounded-lg shadow-lg overflow-hidden ${className}`}>
-    {children}
-  </div>
+  {children}
+</div>
 );
 
 const CardHeader = ({ children }) => (
-  <div className="p-6 border-b border-gray-200">{children}</div>
+<div className="p-6 border-b border-gray-200">{children}</div>
 );
 
 const CardTitle = ({ children }) => (
-  <h2 className="text-xl font-semibold text-gray-800">{children}</h2>
+<h2 className="text-xl font-semibold text-gray-800">{children}</h2>
 );
 
 const CardContent = ({ children }) => (
-  <div className="p-6 ">{children}</div>
+<div className="p-6">{children}</div>
 );
 
-// Progress Circle Component
 const CircularProgress = ({ percentage, size = "lg" }) => {
-  const radius = 45;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
+const radius = 75;
+const circumference = 2 * Math.PI * radius;
+const offset = circumference - (percentage / 100) * circumference;
 
-  const sizes = {
-    sm: "w-32 h-32",
-    lg: "w-48 h-48"
-  };
-
-  return (
-    <div className={`relative ${sizes[size]} flex items-center justify-center`}>
-      <svg className="transform -rotate-90 w-full h-full">
-        <circle
-          cx="50%"
-          cy="50%"
-          r={radius}
-          className="stroke-green-400 fill-none"
-          strokeWidth="8"
-        />
-        <circle
-          cx="50%"
-          cy="50%"
-          r={radius}
-          className={`stroke-red-500 fill-none`}
-          strokeWidth="8"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className="absolute text-2xl font-bold">
-        {percentage.toFixed(1)}%
-      </span>
-    </div>
-  );
+const sizes = {
+  sm: "w-32 h-32",
+  lg: "w-48 h-48"
 };
+
+return (
+  <div className={`relative ${sizes[size]} flex items-center justify-center`}>
+    <svg className="transform -rotate-90 w-full h-full">
+      <circle
+        cx="50%"
+        cy="50%"
+        r={radius}
+        className="stroke-[#71D860] fill-none"
+        strokeWidth="15"
+      />
+      <circle
+        cx="50%"
+        cy="50%"
+        r={radius}
+        className="stroke-[#FC4343] fill-none"
+        strokeWidth="15"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap="round"
+      />
+    </svg>
+    <span className="absolute text-4xl font-medium text-[#FC4343]">
+      {percentage?.toFixed(1)}%
+    </span>
+  </div>
+);
+};
+
+const LinearProgressBar = ({ label, value, color }) => (
+<div className="space-y-2">
+  <p className="text-base md:text-lg text-[#111920]">{label}</p>
+  <div className="flex items-center gap-4">
+    <div className="flex-1 bg-gray-200 rounded-full h-2">
+      <div
+        className="h-2 rounded-full transition-all duration-500"
+        style={{
+          width: `${value}%`,
+          backgroundColor: color
+        }}
+      />
+    </div>
+    <span className="text-sm font-medium text-[#111920] min-w-[4rem]">
+      {value?.toFixed(1)}%
+    </span>
+  </div>
+</div>
+);
 
 const PassageResults = () => {
   const navigate = useNavigate();
@@ -206,12 +224,12 @@ const PassageResults = () => {
   };
 
   return (
-    <motion.div
+<motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50 p-4 md:p-8"
+      className="min-h-screen bg-gray-50 flex flex-col"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="p-4 md:p-6 flex-grow max-w-6xl mx-auto w-full">
         {/* Header */}
         <motion.div
           initial={{ y: -20 }}
@@ -224,160 +242,73 @@ const PassageResults = () => {
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-bold">{isQuick ? "Quick Stamering Assessment Result Report" :
-            isExercise ? "Stammering Exercise Result Report" :
-              "Stammering Assessment Result Report"}</h1>
+          <h1 className="text-2xl font-semibold text-[#111920]">
+            {isQuick ? "Quick Stammering Assessment Result Report" :
+              isExercise ? "Stammering Exercise Result Report" :
+                "Stammering Assessment Result Report"}
+          </h1>
         </motion.div>
 
-        <div className={`${expressionsArray ? 'grid md:grid-cols-2 gap-6' : 'flex justify-center w-100'} `}>
-          {/* Stuttering Score */}
-          <Card className={`${expressionsArray ? '' : "w-full text-center"} `}>
-            <CardHeader>
-              <div className='flex justify-around' >
-                {/* <CardTitle>Fluency Score</CardTitle> */}
-                {!isQuick && (<CardTitle>Expressions</CardTitle>)}
-
-              </div>
-            </CardHeader>
-            <div className="flex justify-around p-6">
-              <CircularProgress percentage={stutteringPercentage} />
-              {!isQuick && (<CircularProgress percentage={expressionpercentage} />)}
-            </div>
-          </Card>
-
-          {/* Expression Analysis */}
-          {expressionsArray?.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Expression Analysis</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Initial Expression:</span>
-                    <span className={`font-semibold ${getExpressionColor(initialExpression)}`}>
-                      {initialExpression || 'Not detected'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Middle Expression:</span>
-                    <span className={`font-semibold ${getExpressionColor(middleExpression)}`}>
-                      {middleExpression || 'Not detected'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Final Expression:</span>
-                    <span className={`font-semibold ${getExpressionColor(lastExpression)}`}>
-                      {lastExpression || 'Not detected'}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Progress Circles */}
+        <div className="flex justify-center gap-8 mb-12">
+          <CircularProgress percentage={stutteringPercentage} />
+          {!isQuick && (
+            <CircularProgress percentage={expressionpercentage} />
           )}
         </div>
 
-        {/* Detailed Analysis */}
-        <Card className="mt-6">
-          {/* <CardHeader>
-            <CardTitle>Detailed Analysis</CardTitle>
-          </CardHeader> */}
-          <CardContent>
-            {/* <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Stuttering Analysis</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <div className="text-sm text-green-600">Fluent Speech</div>
-                    <div className="text-2xl font-bold text-green-700">
-                      {noStutteringPercentage.toFixed(1)}%
-                    </div>
-                  </div>
-                  <div className="p-4 bg-red-50 rounded-lg">
-                    <div className="text-sm text-red-600">Stuttering Detected</div>
-                    <div className="text-2xl font-bold text-red-700">
-                      {stutteringPercentage.toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
+        {/* Expressions Section */}
+        {!isQuick && expressionsArray && (
+          <Card className="mb-6">
+            <CardContent className="space-y-6">
+              <p className="text-lg font-medium text-[#111920]">
+                Facial Expressions: {expressionsArray?.join(", ")}
+              </p>
+              
+              <LinearProgressBar 
+                label="Correct Facial Expressions"
+                value={correctexpressionPercentage}
+                color="#71D860"
+              />
+              
+              <LinearProgressBar 
+                label="Incorrect Facial Expressions"
+                value={expressionpercentage}
+                color="#FC4343"
+              />
+            </CardContent>
+          </Card>
+        )}
 
-            {!isQuick && (
-              <>
-                <div className="mb-8">
-                  <p className="text-lg font-medium mb-4">
-                    Facial Expressions: {expressionsArray?.join(", ")}
-                  </p>
-
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-medium mb-2">Correct Facial Expressions</h3>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-green-500 h-2 rounded-full"
-                          style={{ width: `${correctexpressionPercentage}%` }}
-                        />
-                      </div>
-                      <span className="text-sm mt-1">{correctexpressionPercentage.toFixed(1)}%</span>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-medium mb-2">Incorrect Facial Expressions</h3>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-red-500 h-2 rounded-full"
-                          style={{ width: `${expressionpercentage}%` }}
-                        />
-                      </div>
-                      <span className="text-sm mt-1">{expressionpercentage.toFixed(1)}%</span>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-
-            <div className="space-y-6 mb-8">
-              <div>
-                <h3 className="text-lg font-medium mb-2">No Stuttering</h3>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${noStutteringPercentage.toFixed(1)}%` }}
-                  />
-                </div>
-                <span className="text-sm mt-1">{noStutteringPercentage.toFixed(1)}%</span>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-2">Stuttering</h3>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-red-500 h-2 rounded-full"
-                    style={{ width: `${stutteringPercentage.toFixed(1)}%` }}
-                  />
-                </div>
-                <span className="text-sm mt-1">{stutteringPercentage.toFixed(1)}%</span>
-              </div>
-            </div>
-
+        {/* Stuttering Analysis */}
+        <Card>
+          <CardContent className="space-y-6">
+            <LinearProgressBar 
+              label={isExercise ? "Correct Answers" : "No Stuttering"}
+              value={isExercise ? (100 - percentage) : noStutteringPercentage}
+              color="#71D860"
+            />
+            
+            <LinearProgressBar 
+              label={isExercise ? "Wrong Answers" : "Stuttering"}
+              value={isExercise ? percentage : stutteringPercentage}
+              color="#FC4343"
+            />
           </CardContent>
         </Card>
 
-        {/* Action Buttons */}
+        {/* Action Button */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="mt-8 flex justify-center gap-4"
+          className="mt-8 flex justify-center"
         >
           <button
             onClick={() => navigate("/home")}
-            className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+            className="px-12 py-4 bg-[#111920] text-white rounded-full hover:bg-gray-800 transition-colors"
           >
             Back to Home
           </button>
-
         </motion.div>
       </div>
     </motion.div>

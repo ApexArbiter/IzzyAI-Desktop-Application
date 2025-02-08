@@ -11,27 +11,9 @@ import BaseURL from '../components/ApiCreds';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { IMAGE_BASE_URL } from '../components/ApiCreds';
+import WaveIcon from '../assets/Wave';
 
-const PlayButton = (props) => {
-  return (
-    <div style={styles.playButtonContainer}>
-      <button
-        disabled={props.disabled}
-        onClick={props.onPress}
-        style={styles.playButton}>
-        <WaveSVG />
-      </button>
-    </div>
-  );
-};
 
-const DarkButton = (props) => {
-  return (
-    <button onClick={props.onPress} style={styles.recordButton}>
-      <span style={styles.recordButtonText}>{props.children}</span>
-    </button>
-  );
-};
 
 
 const PassagePage = () => {
@@ -647,30 +629,25 @@ const PassagePage = () => {
           >
             <div className="p-8 flex flex-col items-center gap-4">
               {isVideoEnd && status === 'idle' && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onStartRecord}
-                  className="bg-red-500 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-red-600 transition-colors flex items-center gap-2"
-                >
-                  <span className="block w-2 h-2 rounded-full bg-white animate-pulse" />
-                  Record
-                </motion.button>
+               <button
+               onClick={onStartRecord}
+               className=" rounded-full bg-slate-900 py-2 px-32 w-full h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+             >
+               <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                 <span className="text-red-500">●</span> Record
+               </span>
+             </button>
               )}
               {status === 'recording' && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onStopRecord}
-                  disabled={isStopButtonDisabled}
-                  className={`
-                    px-6 py-2 rounded-full font-semibold shadow-lg transition-colors
-                    ${isStopButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} 
-                    text-white
-                  `}
-                >
-                  {isStopButtonDisabled ? 'Recording...' : 'Stop Recording'}
-                </motion.button>
+               <div className="border-2 border-red-500 mb-4 p-1 rounded-full w-full mt-2">
+                  <button
+                    disabled={isStopButtonDisabled}
+                    onClick={onStopRecord}
+                    className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                  >
+                    <WaveIcon />
+                  </button>
+                </div>
               )}
             </div>
           </motion.div>

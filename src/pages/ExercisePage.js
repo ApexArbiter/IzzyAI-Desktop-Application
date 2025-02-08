@@ -278,17 +278,26 @@ function ExercisePage() {
       alert(isReceptive ? 'Complete your receptive language disorder assessment' : 'Complete your expressive language disorder assessment');
     }
   };
+    useEffect(() => {
+      if (questionReport) {
+        console.log('Articulation:', questionReport.articulationYes > (questionReport.articulationNo || 0));
+        console.log('Stammering:', questionReport.stammeringYes > (questionReport.stammeringNo || 0));
+        console.log('Voice:', questionReport.voiceYes > (questionReport.voiceNo || 0));
+        console.log('Receptive:', questionReport.receptiveNo > (questionReport.receptiveYes || 0));
+        console.log('Expressive:', questionReport.expressiveNo > (questionReport.expressiveYes || 0));
+      }
+    }, [questionReport]);
 
 
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen  ">
       <CustomHeader title="Exercises" goBack={() => history("/home")} />
 
-      <div className="w-full px-6 py-6">
+      <div className="w-full  px-6 py-2 flex flex-col ">
         <div className="space-y-6">
           {/* Articulation Disorder Card */}
-          {questionReport && questionReport.articulationYes > questionReport.articulationNo && (
+          {questionReport && questionReport.articulationYes > (questionReport.articulationNo || 0) && (
             <ExerciseCard
               title="Articulation Disorder"
               subtitle={`${userDetail.totalQuestion} Words`}
@@ -297,7 +306,7 @@ function ExercisePage() {
           )}
 
           {/* Stammering Card */}
-          {questionReport && questionReport.stammeringYes > questionReport.stammeringNo && (
+          {questionReport && questionReport.stammeringYes > (questionReport.stammeringNo || 0) && (
             <ExerciseCard
               title="Stammering"
               subtitle="5 Statements"
@@ -306,7 +315,7 @@ function ExercisePage() {
           )}
 
           {/* Voice Disorder Card */}
-          {questionReport && questionReport.voiceYes > questionReport.voiceNo && (
+          {questionReport && questionReport.voiceYes > (questionReport.voiceNo || 0) && (
             <ExerciseCard
               title="Voice Disorder"
               subtitle="3 Sounds"
@@ -315,7 +324,7 @@ function ExercisePage() {
           )}
 
           {/* Receptive Language Disorder Card */}
-          {questionReport && questionReport.receptiveYes > questionReport.receptiveNo && (
+          {questionReport && questionReport.receptiveNo > (questionReport.receptiveYes || 0) && (
             <ExerciseCard
               title="Receptive Language Disorder"
               subtitle={`${receptiveQuestions?.length || 0} Questions`}
@@ -324,7 +333,7 @@ function ExercisePage() {
           )}
 
           {/* Expressive Language Disorder Card */}
-          {questionReport && questionReport.expressiveYes > questionReport.expressiveNo && (
+          {questionReport && questionReport.expressiveNo > (questionReport.expressiveYes || 0) && (
             <ExerciseCard
               title="Expressive Language Disorder"
               subtitle={`${expressiveQuestions?.length || 0} Questions`}
@@ -353,7 +362,7 @@ function ExercisePage() {
         {/* Bottom Button - unchanged */}
         <button
           onClick={() => history("/AllExercisesPage")}
-          className="w-full mt-8 bg-gray-900 text-white py-3 px-6 rounded-full hover:bg-gray-800 
+          className="w-[250px] mx-auto mt-8 bg-gray-900 text-white py-3 px-6 rounded-full hover:bg-gray-800 
                      transition-colors font-semibold text-sm text-center"
         >
           Show All Exercises

@@ -22,7 +22,9 @@ const ScanFaceInstruction = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col p-4 md:p-6 lg:p-8">
-      <CustomHeader title="Verification" goBack={handleNavigateBack} />
+     <div className='w-full absolute top-0 left-0' >
+     <CustomHeader title="Verification" goBack={handleNavigateBack} />
+     </div>
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

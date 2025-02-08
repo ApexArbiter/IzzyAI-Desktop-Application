@@ -129,7 +129,7 @@ const SignUpPage = () => {
       console.log(age)
       if (age >= 18) {
         alert("Oops! Looks like you're under 18. No worries—just pop in your Parent/Guardian's email address to keep going");
-        return;
+       
       }
       navigate("/ConsentGuardian", { state: { data: userData, isChild: true } });
     } else {

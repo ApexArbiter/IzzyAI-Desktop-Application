@@ -201,7 +201,7 @@ const AssessmentPage = () => {
     <div style={styles.mainView}>
       <div style={styles.scrollContainer} className='overflow-hidden'>
         {/* Articulation Disorder */}
-        {questionReport && questionReport.articulationYes > questionReport.articulationNo && (
+        {questionReport && questionReport.articulationYes > (questionReport.articulationNo || 0) && (
           <div style={styles.cardContainer}>
             <div style={styles.textView}>
               <h3 style={styles.heading}>Articulation Disorder</h3>
@@ -215,7 +215,7 @@ const AssessmentPage = () => {
         )}
 
         {/* Stammering */}
-        {questionReport && questionReport.stammeringYes > questionReport.stammeringNo && (
+        {questionReport && questionReport.stammeringYes > (questionReport.stammeringNo || 0) && (
           <div style={styles.cardContainer}>
             <div style={styles.textView}>
               <h3 style={styles.heading}>Stammering</h3>
@@ -229,7 +229,7 @@ const AssessmentPage = () => {
         )}
 
         {/* Voice Disorder */}
-        {questionReport && questionReport.voiceYes > questionReport.voiceNo && (
+        {questionReport && questionReport.voiceYes > (questionReport.voiceNo || 0) && (
           <div style={styles.cardContainer}>
             <div style={styles.textView}>
               <h3 style={styles.heading}>Voice Disorder</h3>
@@ -243,7 +243,7 @@ const AssessmentPage = () => {
         )}
 
         {/* Receptive Language Disorder */}
-        {questionReport && questionReport.receptiveYes > questionReport.receptiveNo && (
+        {questionReport && questionReport.receptiveNo > (questionReport.receptiveYes || 0) && (
           <div style={styles.cardContainer}>
             <div style={styles.textView}>
               <h3 style={styles.heading}>Receptive Language Disorder</h3>
@@ -257,7 +257,7 @@ const AssessmentPage = () => {
         )}
 
         {/* Expressive Language Disorder */}
-        {questionReport && questionReport.expressiveYes > questionReport.expressiveNo && (
+        {questionReport && questionReport.expressiveNo > (questionReport.expressiveYes || 0) && (
           <div style={styles.cardContainer}>
             <div style={styles.textView}>
               <h3 style={styles.heading}>Expressive Language Disorder</h3>
@@ -275,6 +275,7 @@ const AssessmentPage = () => {
       </div>
       <button
         style={styles.bottomButton}
+        className='mx-auto'
         onClick={() => history('/allAssessmentPage')}>
         Show All Assessments
       </button>
@@ -338,7 +339,8 @@ const styles = {
   },
   bottomButton: {
     backgroundColor: '#111920',
-    width: '100%',
+    width: "250px",
+    
     padding: '14px',
     borderRadius: '30px',
     color: '#fff',

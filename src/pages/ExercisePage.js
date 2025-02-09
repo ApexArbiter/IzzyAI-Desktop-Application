@@ -19,31 +19,36 @@ import CustomHeader from '../components/CustomHeader';
 const DarkButton = ({ isLock, onClick, title }) => {
   return (
     <button
-      disabled={isLock}
       onClick={onClick}
-      style={styles.darkButton}>
-      <span style={styles.buttonText}>{title}</span>
+      className="bg-[#111920] text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
+    >
+      {isLock ? (
+        <span className="text-white">🔒</span>
+      ) : (
+        <span className="font-semibold">{title}</span>
+      )}
     </button>
   );
 };
+
+// Update the ExerciseCard component to match the new styling
 const ExerciseCard = ({ title, subtitle, onStart }) => {
   return (
-    <div className=" border border-[#0CC8E8] rounded-2xl p-4 flex flex-row items-center mt-8">
-      <div className="flex-1 mr-3">
-        <h2 className="text-gray-900 text-xl font-medium">
-          {title}
-        </h2>
-        <div className="flex items-center mt-3">
-          <DocumentIcon className="w-5 h-5 text-gray-600" />
-          <p className="text-gray-900 text-sm font-medium ml-2">
-            {subtitle}
-          </p>
+    <div className="bg-white rounded-2xl border border-[#0CC8E8] p-4 mb-4 hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-center">
+        <div className="flex-1">
+          <h3 className="text-xl font-medium mb-3">{title}</h3>
+          <div className="flex items-center text-gray-600">
+            <DocumentIcon />
+            <span className="ml-2 text-sm">{subtitle}</span>
+          </div>
         </div>
+        <DarkButton onClick={onStart} title="Start" />
       </div>
-      <DarkButton onClick={onStart} title="Start" />
     </div>
   );
 };
+
 function ExercisePage() {
   const { updateUserDetail } = useDataContext();
   const history = useNavigate();
@@ -278,96 +283,104 @@ function ExercisePage() {
       alert(isReceptive ? 'Complete your receptive language disorder assessment' : 'Complete your expressive language disorder assessment');
     }
   };
-    useEffect(() => {
-      if (questionReport) {
-        console.log('Articulation:', questionReport.articulationYes > (questionReport.articulationNo || 0));
-        console.log('Stammering:', questionReport.stammeringYes > (questionReport.stammeringNo || 0));
-        console.log('Voice:', questionReport.voiceYes > (questionReport.voiceNo || 0));
-        console.log('Receptive:', questionReport.receptiveNo > (questionReport.receptiveYes || 0));
-        console.log('Expressive:', questionReport.expressiveNo > (questionReport.expressiveYes || 0));
-      }
-    }, [questionReport]);
+  useEffect(() => {
+    if (questionReport) {
+      console.log('Articulation:', questionReport.articulationYes > (questionReport.articulationNo || 0));
+      console.log('Stammering:', questionReport.stammeringYes > (questionReport.stammeringNo || 0));
+      console.log('Voice:', questionReport.voiceYes > (questionReport.voiceNo || 0));
+      console.log('Receptive:', questionReport.receptiveNo > (questionReport.receptiveYes || 0));
+      console.log('Expressive:', questionReport.expressiveNo > (questionReport.expressiveYes || 0));
+    }
+  }, [questionReport]);
 
 
 
   return (
-    <div className="min-h-screen  ">
+    <div className="h-screen overflow-hidden bg-[#f2f1f1]">
       <CustomHeader title="Exercises" goBack={() => history("/home")} />
-
-      <div className="w-full  px-6 py-2 flex flex-col ">
-        <div className="space-y-6">
-          {/* Articulation Disorder Card */}
-          {questionReport && questionReport.articulationYes > (questionReport.articulationNo || 0) && (
-            <ExerciseCard
-              title="Articulation Disorder"
-              subtitle={`${userDetail.totalQuestion} Words`}
-              onStart={handleButtonClick}
-            />
-          )}
-
-          {/* Stammering Card */}
-          {questionReport && questionReport.stammeringYes > (questionReport.stammeringNo || 0) && (
-            <ExerciseCard
-              title="Stammering"
-              subtitle="5 Statements"
-              onStart={handleButtonClickStammering}
-            />
-          )}
-
-          {/* Voice Disorder Card */}
-          {questionReport && questionReport.voiceYes > (questionReport.voiceNo || 0) && (
-            <ExerciseCard
-              title="Voice Disorder"
-              subtitle="3 Sounds"
-              onStart={handleButtonClickVoice}
-            />
-          )}
-
-          {/* Receptive Language Disorder Card */}
-          {questionReport && questionReport.receptiveNo > (questionReport.receptiveYes || 0) && (
-            <ExerciseCard
-              title="Receptive Language Disorder"
-              subtitle={`${receptiveQuestions?.length || 0} Questions`}
-              onStart={() => handleButtonLanguage(true)}
-            />
-          )}
-
-          {/* Expressive Language Disorder Card */}
-          {questionReport && questionReport.expressiveNo > (questionReport.expressiveYes || 0) && (
-            <ExerciseCard
-              title="Expressive Language Disorder"
-              subtitle={`${expressiveQuestions?.length || 0} Questions`}
-              onStart={() => handleButtonLanguage()}
-            />
-          )}
-
-          {/* Games Card - unchanged */}
-          {userDetail?.SubscriptionDetails &&
-            userDetail?.SubscriptionDetails?.Status !== 'Free Trial' && (
-              <ExerciseCard
-                title="Games"
-                subtitle="5 Games"
-                onStart={() => history('/voiceExerciseGame')}
-              />
-          )}
-        </div>
-
-        {/* Loading Indicator - unchanged */}
-        {loading && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
-          </div>
-        )}
-
-        {/* Bottom Button - unchanged */}
-        <button
-          onClick={() => history("/AllExercisesPage")}
-          className="w-[250px] mx-auto mt-8 bg-gray-900 text-white py-3 px-6 rounded-full hover:bg-gray-800 
-                     transition-colors font-semibold text-sm text-center"
-        >
-          Show All Exercises
-        </button>
+      <div className="h-20 w-40 mx-auto mt-2 ">
+        <img
+          src={require("../assets/images/logo.png")}
+          alt="Logo"
+          className="h-full w-full object-contain"
+        />
       </div>
+      <div className="h-[calc(100vh-64px)]  p-4">
+        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl h-4/5 flex flex-col">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto pr-2">
+            <div className="space-y-4">
+              {/* Articulation Disorder Card */}
+              {questionReport && questionReport.articulationYes > (questionReport.articulationNo || 0) && (
+                <ExerciseCard
+                  title="Articulation Disorder"
+                  subtitle={`${userDetail.totalQuestion} Words`}
+                  onStart={handleButtonClick}
+                />
+              )}
+
+              {/* Stammering Card */}
+              {questionReport && questionReport.stammeringYes > (questionReport.stammeringNo || 0) && (
+                <ExerciseCard
+                  title="Stammering"
+                  subtitle="5 Statements"
+                  onStart={handleButtonClickStammering}
+                />
+              )}
+
+              {/* Voice Disorder Card */}
+              {questionReport && questionReport.voiceYes > (questionReport.voiceNo || 0) && (
+                <ExerciseCard
+                  title="Voice Disorder"
+                  subtitle="3 Sounds"
+                  onStart={handleButtonClickVoice}
+                />
+              )}
+
+              {/* Receptive Language Disorder Card */}
+              {questionReport && questionReport.receptiveNo > (questionReport.receptiveYes || 0) && (
+                <ExerciseCard
+                  title="Receptive Language Disorder"
+                  subtitle={`${receptiveQuestions?.length || 0} Questions`}
+                  onStart={() => handleButtonLanguage(true)}
+                />
+              )}
+
+              {/* Expressive Language Disorder Card */}
+              {questionReport && questionReport.expressiveNo > (questionReport.expressiveYes || 0) && (
+                <ExerciseCard
+                  title="Expressive Language Disorder"
+                  subtitle={`${expressiveQuestions?.length || 0} Questions`}
+                  onStart={() => handleButtonLanguage()}
+                />
+              )}
+
+              {/* Games Card */}
+              {userDetail?.SubscriptionDetails &&
+                userDetail?.SubscriptionDetails?.Status !== 'Free Trial' && (
+                  <ExerciseCard
+                    title="Games"
+                    subtitle="5 Games"
+                    onStart={() => history('/voiceExerciseGame')}
+                  />
+                )}
+            </div>
+          </div>
+
+          {/* Fixed Bottom Button */}
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => history("/AllExercisesPage")}
+              className="bg-[#111920] text-white px-8 py-3 rounded-full hover:opacity-90 transition-opacity w-64 text-center"
+            >
+              Show All Exercises
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Loading Indicator */}
+      {loading && <Loader loading={loading} />}
     </div>
 
   );

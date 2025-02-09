@@ -305,84 +305,76 @@ const AvatarTherapistName = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen" style={{ backgroundColor: "#fafcf9" }} >
-            {/* <header className="bg-white py-4 px-6 border-b flex items-center gap-4">
-                <button onClick={() => navigate('/therapistsPage')} className="p-2">
-                    <ArrowLeft className="w-6 h-6" />
-                </button>
-                <h1 className="text-xl font-semibold">IzzyAI Conversational Avatar</h1>
-            </header> */}
-            <CustomHeader title="IzzyAI Conversational Avatar" goBack={() => { navigate(-1) }} />
+        <div className="flex flex-col min-h-screen bg-[#fafcf9]">
+        <CustomHeader title="IzzyAI Conversational Avatar" goBack={() => navigate(-1)} />
+      
+        <main className="flex-1 p-5">
+          <div className="max-w-3xl mx-auto space-y-10 mt-16">
+         {/* Video Container */}
+<div className="aspect-video w-full max-h-[calc(100vh-500px)] md:max-h-[calc(100vh-500px)] lg:max-h-[calc(100vh-600px)] rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+  {getVideoUrl() && (
+    <video
+      ref={videoRef}
+      src={getVideoUrl()}
+      className="w-full h-full object-contain"
+      onLoadStart={() => setIsVideoLoading(true)}
+      onLoadedData={() => setIsVideoLoading(false)}
+      onEnded={onEndVideo}
+      autoPlay
+      playsInline
+      controls={false}
+    />
+  )}
+</div>
 
-            <main className="flex-1 p-5">
-                <div className="max-w-3xl mx-auto">
-                    <div className="aspect-video rounded-lg overflow-hidden mb-8  max-h-fit flex justify-center">
-                        {getVideoUrl() && (
-                            <video
+{/* Image Container */}
+{questionCount === 6 && questions?.[questionCount - 1]?.imageurl && (
+  <div className="aspect-video w-full max-h-[calc(100vh-500px)] md:max-h-[calc(100vh-500px)] lg:max-h-[calc(100vh-600px)] flex items-center justify-center rounded-lg overflow-hidden mb-4">
+    <img
+      src={`${IMAGE_BASE_URL}${questions[questionCount - 1].imageurl}`}
+      alt="Question"
+      className="w-full h-full object-contain"
+    />
+  </div>
+)}
 
-                                ref={videoRef}
-                                src={getVideoUrl()}
-                                className=" h-full object-cover"
-                                onLoadStart={() => setIsVideoLoading(true)}
-                                onLoadedData={() => setIsVideoLoading(false)}
-                                onEnded={onEndVideo}
-                                autoPlay
-                                playsInline
-                                controls={false}
-                            />
-                        )}
+      
+            {/* Bottom Controls */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full flex justify-center">
+              {questionCount > 1 && questionCount < 7 && isVideoEnd && !disorderVideo && !disorder2 && (
+                <div className="flex items-center justify-center gap-4 border-t pt-4">
+                  {!isRecording ? (
+                    <button
+                      disabled={isVideoLoading || disorderVideo !== null}
+                      onClick={onStartRecord}
+                      className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-300 transition-colors disabled:opacity-50"
+                    >
+                      <img height={44} width={44} src={require("../assets/images/microphone.png")} />
+                    </button>
+                  ) : (
+                    <div className="text-center flex items-center">
+                      <p className="text-2xl font-medium mb-4 pr-2">
+                        <span className="text-red-500">0:0{timer > 0 ? timer : 0}</span>
+                      </p>
+                      <motion.button
+                        onClick={sendVoiceMessage}
+                        className="w-12 mb-2 h-12 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ repeat: Infinity, duration: 1 }}
+                      >
+                        <span className="w-8 h-8 bg-white rounded-sm" />
+                      </motion.button>
                     </div>
-
-                    <div
-                        className="w-full min-w-sm  mt-8 mb-4 flex justify-center">
-                        {questionCount === 6 && questions?.[questionCount - 1]?.imageurl && (
-                            <img
-                                src={`${IMAGE_BASE_URL}${questions[questionCount - 1].imageurl}`}
-                                alt="Question"
-                                className="w-1/2 h-auto"
-
-                            />
-                        )}
-                    </div>
-
-
-                    {questionCount > 1 && questionCount < 7 && isVideoEnd && !disorderVideo && !disorder2 && (
-                        <div className="flex items-center justify-center gap-4 border-t pt-4">
-                            <LoaderWave isAnimation={isRecording} isDark={true} />
-
-                            {!isRecording ? (
-                                <button
-                                    disabled={isVideoLoading || disorderVideo !== null}
-                                    onClick={onStartRecord}
-                                    className="w-12 h-12 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition-colors disabled:opacity-50"
-                                >
-                                    <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-                                        <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3z" />
-                                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
-                                    </svg>
-                                </button>
-                            ) : (
-                                <div className="text-center">
-                                    <p className="text-2xl font-medium mb-4">
-                                        <span className="text-red-500">0:0{timer > 0 ? timer : 0}</span>
-                                    </p>
-                                    <motion.button
-                                        onClick={sendVoiceMessage}
-                                        className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                                        animate={{ scale: [1, 1.1, 1] }}
-                                        transition={{ repeat: Infinity, duration: 1 }}
-                                    >
-                                        <span className="w-8 h-8 bg-white rounded-sm" />
-                                    </motion.button>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                  )}
                 </div>
-            </main>
-
-            <Loader loading={loading} />
-        </div>
+              )}
+            </div>
+          </div>
+        </main>
+      
+        <Loader loading={loading} />
+      </div>
+      
     );
 };
 

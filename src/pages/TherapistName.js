@@ -21,15 +21,19 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #f2f1f1#;
+  background-color: #f2f1f1;
+  overflow: hidden; // Prevent outer scrolling
 `;
 
+// Update the ChatContainer styled component
 const ChatContainer = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 20px;
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 250px); // Adjust based on header and input heights
+  margin-bottom: 10px;
 `;
 
 const MessageGroup = styled.div`
@@ -76,7 +80,7 @@ const InputContainer = styled.div`
 `;
 
 const Input = styled.input`
-  width: 78%;
+  flex:1;
   border: 1px solid #ccc;
   border-radius: 40px;
   padding: 8px 15px;
@@ -91,13 +95,13 @@ const Input = styled.input`
 const IconButton = styled.button`
   background-color: ${props => props.primary ? '#2DEEAA' : 'transparent'};
   border-radius: 50%;
-  padding: 12px;
+  padding: ${props => props.primary ? '12px' : '5px 5px'};
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+ 
   
   &:hover {
     opacity: 0.8;
@@ -135,11 +139,11 @@ const TherapistName = () => {
   const [chats, setChats] = useState([
     { text: 'Welcome to IzzyAI Chatbot.', isUser: false, audio: null },
     { text: 'Click on any of the disorders for quick assessment.', isUser: false, audio: null },
-    { text: '1: Articulation', isUser: false, audio: null, path: "quick-articulation" },
-    { text: '2: Stammering', isUser: false, audio: null, path: "quick-stammering" },
-    { text: '3: Voice', isUser: false, audio: null, path: "quick-voice" },
-    { text: '4: Receptive Language', isUser: false, audio: null, path: "quick-receptive" },
-    { text: '5: Expressive Language', isUser: false, audio: null, path: "quick-expressive" }
+    { text: '1: Articulation', isUser: false, audio: null, path: "quick-articulation", icon: true },
+    { text: '2: Stammering', isUser: false, audio: null, path: "quick-stammering", icon: true },
+    { text: '3: Voice', isUser: false, audio: null, path: "quick-voice", icon: true },
+    { text: '4: Receptive Language', isUser: false, audio: null, path: "quick-receptive", icon: true },
+    { text: '5: Expressive Language', isUser: false, audio: null, path: "quick-expressive", icon: true }
   ]);
 
   const [inputText, setInputText] = useState('');
@@ -320,65 +324,68 @@ const TherapistName = () => {
   }, []);
 
   return (
-    <Container>
-      <CustomHeader title="IzzyAI chatbot" goBack={() => navigate(-1)} />
+    <div className='h-screen overflow-hidden'> 
+    <CustomHeader title="IzzyAI chatbot" goBack={() => navigate(-1)} />
+    <div className="h-[calc(100vh-104px)] mt-5 p-4 overflow-hidden">
+      <div className="w-full max-w-2xl  lg:max-w-3xl  mx-auto bg-white px-6 rounded-2xl  h-full flex flex-col">
+        <div className="flex flex-col flex-1 overflow-hidden">
+            <ChatContainer ref={chatContainerRef}>
+              {chats.map((chat, index) => (
+                <MessageGroup key={index} isUser={chat.isUser}>
+                  <div className="flex flex-col items-center gap-1">
+                    {(!chat.icon) && (<img height={34} width={34} src={require("../assets/images/microphone.png")} />)}
+                    {(!chat.icon) && (<span className="text-sm font-bold">{chat.isUser ? 'You' : 'IzzyAI'}</span>)}
 
-      <ChatContainer ref={chatContainerRef}>
-        {chats.map((chat, index) => (
-          <MessageGroup key={index} isUser={chat.isUser}>
-            <div className="flex flex-col items-center gap-1">
-              <Mic size={24} />
-              <span className="text-sm font-bold">{chat.isUser ? 'You' : 'IzzyAI'}</span>
-            </div>
+                  </div>
 
-            {chat?.path ? (
-              <DisorderButton onClick={() => navigateto(chat.path)}>
-                {chat.text}
-              </DisorderButton>
-            ) : chat.audio ? (
-              <AudioMessage isUser={chat.isUser}>
-                <Wave>
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <WaveLine
-                      key={i}
-                      isUser={chat.isUser}
-                      isAnimating={playingAudioIndex === index}
-                      delay={i * 0.1}
-                      height={15}
-                    />
-                  ))}
-                </Wave>
-                <IconButton onClick={() => playAudio(chat.audio, index)}>
-                  {playingAudioIndex === index ? <Pause size={20} /> : <Play size={20} />}
-                </IconButton>
-              </AudioMessage>
-            ) : (
-              <MessageText isUser={chat.isUser}>
-                {capitalize(chat.text)}
-              </MessageText>
-            )}
-          </MessageGroup>
-        ))}
+                  {chat?.path ? (
+                    <DisorderButton onClick={() => navigateto(chat.path)}>
+                      {chat.text}
+                    </DisorderButton>
+                  ) : chat.audio ? (
+                    <AudioMessage isUser={chat.isUser}>
+                      <Wave>
+                        {Array.from({ length: 8 }).map((_, i) => (
+                          <WaveLine
+                            key={i}
+                            isUser={chat.isUser}
+                            isAnimating={playingAudioIndex === index}
+                            delay={i * 0.1}
+                            height={15}
+                          />
+                        ))}
+                      </Wave>
+                      <IconButton onClick={() => playAudio(chat.audio, index)}>
+                        {playingAudioIndex === index ? <Pause size={20} /> : <Play size={20} />}
+                      </IconButton>
+                    </AudioMessage>
+                  ) : (
+                    <MessageText isUser={chat.isUser}>
+                      {capitalize(chat.text)}
+                    </MessageText>
+                  )}
+                </MessageGroup>
+              ))}
 
-        {isLoading && (
-          <MessageGroup>
-            <div className="flex flex-col items-center gap-1">
-              <Mic size={24} />
-              <span className="text-sm font-bold">IzzyAI</span>
-            </div>
-            <MessageText>
-              <div className="dots-loader">
-                <div className="dot"></div>
-                <div className="dot"></div>
-                <div className="dot"></div>
-              </div>
-            </MessageText>
-          </MessageGroup>
-        )}
-      </ChatContainer>
+              {isLoading && (
+                <MessageGroup>
+                  <div className="flex flex-col items-center gap-1">
+                    <img height={34} width={34} src={require("../assets/images/microphone.png")} />
+                    <span className="text-sm font-bold">IzzyAI</span>
+                  </div>
+                  <MessageText>
+                    <div className="dots-loader">
+                      <div className="dot"></div>
+                      <div className="dot"></div>
+                      <div className="dot"></div>
+                    </div>
+                  </MessageText>
+                </MessageGroup>
+              )}
+            </ChatContainer>
 
-      <InputContainer>
-        {recordingStatus === 'recording' ? (
+            <InputContainer>
+              {/* {recordingStatus === 'recording' ? (
           <Wave style={{ flex: 1 }}>
             {Array.from({ length: 8 }).map((_, i) => (
               <WaveLine
@@ -389,41 +396,37 @@ const TherapistName = () => {
               />
             ))}
           </Wave>
-        ) : (
-          <Input
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            maxLength={40}
-            placeholder="Type message..."
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-          />
-        )}
+        ) : ( */}
+              <Input
 
-        {inputText === '' ? (
-          <IconButton
-            onClick={recordingStatus === 'recording' ? onStopRecord : onStartRecord}
-            primary={recordingStatus === 'recording'}
-          >
-            {recordingStatus === 'recording' ? <StopCircle size={20} /> : <Mic size={20} />}
-          </IconButton>
-        ) : (
-          <IconButton primary onClick={sendMessage}>
-            <Send size={20} />
-          </IconButton>
-        )}
-      </InputContainer>
-      <Loader loading={loader} />
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                maxLength={40}
+                placeholder="Type message..."
+                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+              />
+              {/* )} */}
 
-      {/* {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg text-center">
-            <h3 className="text-lg mb-2">You have</h3>
-            <h2 className="text-xl font-bold mb-2">{modalContent}</h2>
-            <h2 className="text-xl font-bold">Score: {modalScore}</h2>
+              {inputText === '' ? (
+                <IconButton
+
+                  onClick={recordingStatus === 'recording' ? onStopRecord : onStartRecord}
+                  primary={recordingStatus === 'recording'}
+                >
+                  {recordingStatus === 'recording' ? <StopCircle size={20} /> : <img height={34} width={34} src={require("../assets/images/microphone.png")} />}
+                </IconButton>
+              ) : (
+                <IconButton primary onClick={sendMessage}>
+                  <Send size={20} />
+                </IconButton>
+              )}
+            </InputContainer>
+            <Loader loading={loader} />
+
           </div>
         </div>
-      )} */}
-    </Container>
+      </div>
+    </div>
   );
 };
 

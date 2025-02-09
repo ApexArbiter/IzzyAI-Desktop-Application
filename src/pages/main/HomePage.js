@@ -165,7 +165,7 @@ const HomePage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="bg-white rounded-xl shadow-lg p-6"
+          className="bg-white rounded-xl shadow-lg p-6 mb-24"
         >
           <h3 className="text-xl font-semibold text-gray-900 mb-4">Notes:</h3>
           <ul className="space-y-2 text-gray-600">

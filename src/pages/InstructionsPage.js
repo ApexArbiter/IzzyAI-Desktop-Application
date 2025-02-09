@@ -22,8 +22,14 @@ function InstructionsPage() {
         title="Articulation Disorder"
         goBack={() => navigate(-1)}
       />
-
-      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg md:m-20 m-0">
+      <div className="h-20 w-40 mx-auto mt-2 ">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg mx-20 mb-10 ">
         {/* Image container */}
         <div className="flex justify-center mb-12">
           <div className="relative w-56 h-56 bg-teal-50 rounded-full flex items-center justify-center">

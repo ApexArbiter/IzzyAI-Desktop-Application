@@ -229,12 +229,12 @@ function SignInPage() {
 
       <div className="flex flex-col  items-center justify-center min-h-screen px-4">
 
-        <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
+        <div className="w-full  max-w-sm  lg:max-w-md space-y-8  bg-white p-8 rounded-2xl shadow-xl">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-center pb-4 text-gray-900">Sign In</h1>
+            <h1 className=" text-xl  md:text-2xl  lg:text-3xl font-bold text-center pb-4 text-gray-900">Sign In</h1>
 
             <div
-              className="w-48 h-16 mx-auto mb-8"
+              className=" w-36  h-12  md:w-36 md:h-12    lg:w-48 lg:h-16 mx-auto mb-8"
             >
               <img
                 src={require("../assets/images/logo.png")}
@@ -242,11 +242,11 @@ function SignInPage() {
                 className="w-full h-full object-contain"
               />
             </div>
-            <p className="text-center text-lg pb-0 text-gray-500">Please enter your details to sign in</p>
+            <p className="text-center text-base lg:text-lg pb-0 text-gray-500">Please enter your details to sign in</p>
           </div>
 
           {/* Form Container */}
-          <div className="space-y-6">
+          <div className="   md:space-y-2  lg:space-y-6">
             {/* Email Input */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
@@ -338,7 +338,7 @@ function SignInPage() {
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 text-lg bg-white text-gray-500">or continue with</span>
+              <span className="px-4  text-base lg:text-lg bg-white text-gray-500">or continue with</span>
             </div>
           </div>
 

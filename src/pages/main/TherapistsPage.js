@@ -45,8 +45,11 @@ export default function TherapistsPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="max-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <CustomHeader title="Therapists" goBack={() => navigate("/home")} />
+      <div className="h-[calc(100vh-64px)] mt-10 p-4">
+        <div className="w-full max-w-2xl mx-auto bg-white p-6  rounded-2xl shadow-xl">
+          <div className="flex flex-col justify-center mb-6">
        {/* Logo */}
        <div className="h-20 w-40 mx-auto my-5 ">
               <img
@@ -62,6 +65,9 @@ export default function TherapistsPage() {
         <Card navigate={navigate} isAvatar />
         <Card navigate={navigate} />
       </main>
+      </div>
+        </div>
+      </div>
       <BottomNavigation />
     </div>
   );

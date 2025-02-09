@@ -196,90 +196,134 @@ const AssessmentPage = () => {
 
 
   return (
-    <div style={styles.safeArea}>
+    <div className="h-screen overflow-hidden bg-[#f2f1f1]">
     <CustomHeader title="Assessments" goBack={() => history(-1)} />
-    <div style={styles.mainView}>
-      <div style={styles.scrollContainer} className='overflow-hidden'>
-        {/* Articulation Disorder */}
-        {questionReport && questionReport.articulationYes > (questionReport.articulationNo || 0) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Articulation Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>44 Words</span>
+    <div className="h-20 w-40 mx-auto mt-2 ">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+    <div className="h-[calc(100vh-64px)] p-4">
+      <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl h-4/5 flex flex-col">
+        {/* Scrollable Content Area */}
+      
+        <div className="flex-1 overflow-y-auto pr-2">
+          {questionReport && questionReport.articulationYes > (questionReport.articulationNo || 0) && (
+            <div className="bg-white rounded-2xl border border-[#0CC8E8] p-4 mb-4 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center">
+                <div className="flex-1">
+                  <h3 className="text-xl font-medium mb-3">Articulation Disorder</h3>
+                  <div className="flex items-center text-gray-600">
+                    <DocumentIcon />
+                    <span className="ml-2 text-sm">44 Words</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={handleButtonClick}
+                  className="bg-[#111920] text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
+                >
+                  Start
+                </button>
               </div>
             </div>
-            <DarkButton onClick={handleButtonClick} title="Start" />
-          </div>
-        )}
+          )}
 
-        {/* Stammering */}
-        {questionReport && questionReport.stammeringYes > (questionReport.stammeringNo || 0) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Stammering</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>2 Passages</span>
+          {/* Repeat similar structure for other conditions */}
+          {questionReport && questionReport.stammeringYes > (questionReport.stammeringNo || 0) && (
+            <div className="bg-white rounded-2xl border border-[#0CC8E8] p-4 mb-4 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center">
+                <div className="flex-1">
+                  <h3 className="text-xl font-medium mb-3">Stammering</h3>
+                  <div className="flex items-center text-gray-600">
+                    <DocumentIcon />
+                    <span className="ml-2 text-sm">2 Passages</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={handleButtonClickStammering}
+                  className="bg-[#111920] text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
+                >
+                  Start
+                </button>
               </div>
             </div>
-            <DarkButton onClick={handleButtonClickStammering} title="Start" />
-          </div>
-        )}
+          )}
 
-        {/* Voice Disorder */}
-        {questionReport && questionReport.voiceYes > (questionReport.voiceNo || 0) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Voice Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>3 Sounds</span>
+          {questionReport && questionReport.voiceYes > (questionReport.voiceNo || 0) && (
+            <div className="bg-white rounded-2xl border border-[#0CC8E8] p-4 mb-4 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center">
+                <div className="flex-1">
+                  <h3 className="text-xl font-medium mb-3">Voice Disorder</h3>
+                  <div className="flex items-center text-gray-600">
+                    <DocumentIcon />
+                    <span className="ml-2 text-sm">3 Sounds</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={handleButtonClickVoice}
+                  className="bg-[#111920] text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
+                >
+                  Start
+                </button>
               </div>
             </div>
-            <DarkButton onClick={handleButtonClickVoice} title="Start" />
-          </div>
-        )}
+          )}
 
-        {/* Receptive Language Disorder */}
-        {questionReport && questionReport.receptiveNo > (questionReport.receptiveYes || 0) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Receptive Language Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>20 Questions</span>
+          {questionReport && questionReport.receptiveNo > (questionReport.receptiveYes || 0) && (
+            <div className="bg-white rounded-2xl border border-[#0CC8E8] p-4 mb-4 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center">
+                <div className="flex-1">
+                  <h3 className="text-xl font-medium mb-3">Receptive Language Disorder</h3>
+                  <div className="flex items-center text-gray-600">
+                    <DocumentIcon />
+                    <span className="ml-2 text-sm">20 Questions</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleButtonLanguage(true)}
+                  className="bg-[#111920] text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
+                >
+                  Start
+                </button>
               </div>
             </div>
-            <DarkButton onClick={() => handleButtonLanguage(true)} title="Start" />
-          </div>
-        )}
+          )}
 
-        {/* Expressive Language Disorder */}
-        {questionReport && questionReport.expressiveNo > (questionReport.expressiveYes || 0) && (
-          <div style={styles.cardContainer}>
-            <div style={styles.textView}>
-              <h3 style={styles.heading}>Expressive Language Disorder</h3>
-              <div style={styles.textRow}>
-                <DocumentIcon />
-                <span style={styles.para}>18 Questions</span>
+          {questionReport && questionReport.expressiveNo > (questionReport.expressiveYes || 0) && (
+            <div className="bg-white rounded-2xl border border-[#0CC8E8] p-4 mb-4 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center">
+                <div className="flex-1">
+                  <h3 className="text-xl font-medium mb-3">Expressive Language Disorder</h3>
+                  <div className="flex items-center text-gray-600">
+                    <DocumentIcon />
+                    <span className="ml-2 text-sm">18 Questions</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleButtonLanguage(false)}
+                  className="bg-[#111920] text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
+                >
+                  Start
+                </button>
               </div>
             </div>
-            <DarkButton onClick={() => handleButtonLanguage(false)} title="Start" />
-          </div>
-        )}
+          )}
+        </div>
 
-        {loading && <Loader loading={loading} />}
-        <div style={{ height: 20 }} />
+        {/* Fixed Bottom Section */}
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={() => history('/allAssessmentPage')}
+            className="bg-[#111920] text-white px-8 py-3 rounded-full hover:opacity-90 transition-opacity w-64 text-center"
+          >
+            Show All Assessments
+          </button>
+        </div>
       </div>
-      <button
-        style={styles.bottomButton}
-        className='mx-auto'
-        onClick={() => history('/allAssessmentPage')}>
-        Show All Assessments
-      </button>
     </div>
+    {loading && <Loader loading={loading} />}
     <BottomNavigation />
   </div>
   );

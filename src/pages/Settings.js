@@ -37,19 +37,27 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <CustomHeader goBack={() => navigate(-1)} />
+      <CustomHeader title="Settings" goBack={() => navigate(-1)} />
+         {/* Logo */}
+         <div className="h-20 w-40 mx-auto my-5 ">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
 
         {/* Logo */}
-        <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+        {/* <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
           <img
             src={require("../assets/images/logo.png")}
             alt="Logo"
-            className=" h-20"
+            className=" h-14"
           />
-        </div>
+        </div> */}
       {/* Main Content */}
       <motion.main
-        className="flex-1 container mx-auto px-4 py-6 max-w-2xl mt-20"
+        className="flex-1 container mx-auto px-4 py-6 max-w-2xl "
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -57,7 +65,7 @@ const Settings = () => {
 
         {/* Profile Section */}
         <motion.div
-          className="bg-gradient-to-r from-cyan-50 to-teal-50 rounded-2xl p-6 mb-6"
+          className="bg-gradient-to-r from-[#0cc8e81f] to-[#2deeaa1f] rounded-2xl p-6 mb-6"
           variants={itemVariants}
         >
           <div className="flex items-center">
@@ -80,11 +88,11 @@ const Settings = () => {
         </motion.div>
 
         {/* Settings Options */}
-        <motion.div className="space-y-4" variants={itemVariants}>
+        <motion.div className="space-y-6 mt-16" variants={itemVariants}>
           {/* Update Avatar Button */}
           <motion.button
             onClick={() => navigate('/UpdateAvatar')}
-            className="w-full bg-gradient-to-r from-cyan-50 to-teal-50 rounded-2xl p-6 flex items-center justify-between group hover:shadow-md transition-shadow"
+            className="w-full bg-gradient-to-r from-[#0cc8e81f] to-[#2deeaa1f] rounded-2xl p-6 flex items-center justify-between group hover:shadow-md transition-shadow"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
           >
@@ -95,7 +103,7 @@ const Settings = () => {
           {/* Change Password Button */}
           <motion.button
             onClick={() => navigate('/ChangePassword')}
-            className="w-full bg-gradient-to-r from-cyan-50 to-teal-50 rounded-2xl p-6 flex items-center justify-between group hover:shadow-md transition-shadow"
+            className="w-full bg-gradient-to-r from-[#0cc8e81f] to-[#2deeaa1f] rounded-2xl p-6 flex items-center justify-between group hover:shadow-md transition-shadow"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
           >

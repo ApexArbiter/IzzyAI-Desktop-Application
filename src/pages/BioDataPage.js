@@ -150,22 +150,29 @@ const BioDataPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <CustomHeader goBack={() => navigate(-1)} />
+      <CustomHeader title="Bio Data" goBack={() => navigate(-1)} />
 
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-2 py-4">
         <div className="w-full max-w-2xl space-y-4 bg-white p-8 rounded-2xl shadow-xl">
           {/* Logo */}
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+          {/* <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
             <img
               src={require("../assets/images/logo.png")}
               alt="Logo"
               className="h-16 w-auto object-contain"
             />
-          </div>
+          </div> */}
 
 
           {/* Heading */}
           <div className="space-y-2">
+          <div className="h-20 w-40 mx-auto  ">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
             <h1 className="text-2xl font-bold text-center text-gray-900">
               Update Your Profile
             </h1>
@@ -205,7 +212,7 @@ const BioDataPage = () => {
 
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700">
-                Improvement Preferences
+                Change Your Preferences
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 bg-gray-50 p-4 rounded-lg">
                 <CheckBox
@@ -236,12 +243,12 @@ const BioDataPage = () => {
               </div>
             </div>
 
+            <div className='w-full flex justify-center'>
             <button
               onClick={Update}
               disabled={isLoading}
-              className="w-full px-6 py-3 text-white bg-black rounded-full font-semibold 
-                transition-all duration-300 hover:bg-gray-800 disabled:opacity-50 
-                disabled:cursor-not-allowed"
+              className=" bg-black text-white rounded-full py-3 px-8 font-semibold
+        hover:bg-gray-800 transition-all duration-300 mt-4  "
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -249,9 +256,10 @@ const BioDataPage = () => {
                   Updating...
                 </div>
               ) : (
-                'Update Profile'
+                'Update'
               )}
             </button>
+            </div>
           </div>
         </div>
       </div>
@@ -269,7 +277,8 @@ const BioDataPage = () => {
               <h3 className="text-lg font-medium text-gray-900">Profile Updated Successfully!</h3>
               <button
                 onClick={() => setIsModalVisible(false)}
-                className="w-full px-4 py-2 text-sm font-medium text-white bg-black rounded-full hover:bg-gray-800"
+                className=" bg-black  text-white rounded-full py-3 px-12 font-semibold
+        hover:bg-gray-800 transition-all duration-300 mt-4 "
               >
                 OK
               </button>

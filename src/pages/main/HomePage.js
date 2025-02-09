@@ -107,7 +107,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center">
       <div className="max-w-7xl mx-auto px-4  sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -123,7 +123,15 @@ const HomePage = () => {
             <span className="text-gray-600">Logged in as </span>
             <span className="font-medium text-gray-900">{userData.FullName}</span>
           </div>
+          {/* Logo */}
         </motion.div>
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+              <img
+                src={require("../../assets/images/logo.png")}
+                alt="Logo"
+                className="w-48 h-16 object-contain"
+              />
+            </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {cards.map((card, index) => (

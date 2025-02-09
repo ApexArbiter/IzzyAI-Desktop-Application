@@ -70,9 +70,12 @@ const BottomNavigation = () => {
               key={index}
               onClick={() => handleClick(route.name)}
             >
-              <div style={styles.iconTextContainer}>
+              <div
+              className='  lg:text-xl '
+              style={styles.iconTextContainer}>
                 <Icon active={isFocused} style={styles.icon} />
                 <span
+                
                   style={{
                     ...styles.base,
                     color: isFocused ? '#111920' : '#888C90',
@@ -95,7 +98,6 @@ export default BottomNavigation;
 const styles = {
   base: {
     fontFamily: fonts.regular,
-    fontSize: '12px',
   },
   menuUpperWrapper: {
     position: 'fixed',

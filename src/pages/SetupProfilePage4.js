@@ -11,7 +11,7 @@ const CustomButton = ({ onClick, title }) => {
   return (
     <button
       onClick={onClick}
-      className=" bg-gray-900 text-white rounded-full py-3 px-6 font-semibold
+      className=" bg-gray-900 text-white rounded-full py-3 px-8 font-semibold
         hover:bg-gray-800 transition-all duration-300 mt-4"
     >
       {title}

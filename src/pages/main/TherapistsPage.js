@@ -46,15 +46,16 @@ export default function TherapistsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <CustomHeader goBack={() => navigate("/home")} />
-      <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
-        <img
-          src={require("../../assets/images/logo.png")}
-          alt="Logo"
-          className="w-48 h-16 object-contain"
-        />
-      </div>
-      <main className="p-5">
+      <CustomHeader title="Therapists" goBack={() => navigate("/home")} />
+       {/* Logo */}
+       <div className="h-20 w-40 mx-auto my-5 ">
+              <img
+                src={require("../../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+      <main className="px-5 space-y-4">
         <h2 className="text-2xl font-medium text-[#111920] my-5">
           List of therapists you can choose from!
         </h2>

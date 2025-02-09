@@ -53,12 +53,20 @@ function ProfilePage() {
     <div className="min-h-screen bg-gray-50">
       <CustomHeader title="My Profile" goBack={navigateBack} />
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-2xl mx-auto px-4 py-2 space-y-4  lg:space-y-6">
         {/* Profile Section */}
+          {/* Logo */}
+          <div className="h-20 w-40 mx-auto ">
+              <img
+                src={require("../../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
+          className="bg-gradient-to-r from-[#0cc8e81f] to-[#2deeaa1f] rounded-2xl  px-4 py-6"
         >
           <div className="flex items-center space-x-4">
             <motion.div
@@ -96,25 +104,20 @@ function ProfilePage() {
         </motion.div>
 
         {/* Menu Items */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="bg-white rounded-2xl shadow-lg overflow-hidden"
-        >
+        
           {menuItems.map((item, index) => (
             <motion.div
               key={item.label}
               variants={itemVariants}
-              whileHover={{ backgroundColor: '#f3f4f6' }}
-              className="flex items-center justify-between p-4 cursor-pointer border-b last:border-b-0 border-gray-100"
+              // whileHover={{ backgroundColor: '#f3f4f6' }}
+              className="flex items-center  rounded-2xl bg-gradient-to-r from-[#0cc8e81f] to-[#2deeaa1f] justify-between p-4 cursor-pointer border-b last:border-b-0 border-gray-100"
               onClick={item.onClick}
             >
               <div className="flex items-center space-x-4">
                 <div className="text-blue-500">
                   {item.icon}
                 </div>
-                <span className="text-gray-700">{item.label}</span>
+                <span className="text-gray-700 lg:text-lg font-medium">{item.label}</span>
               </div>
               <motion.div
                 whileHover={{ x: 5 }}
@@ -126,7 +129,7 @@ function ProfilePage() {
               </motion.div>
             </motion.div>
           ))}
-        </motion.div>
+        
 
         <FeedbackModal
           isOpen={showFeedbackModal}

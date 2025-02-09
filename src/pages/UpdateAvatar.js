@@ -110,13 +110,13 @@ const UpdateAvatar = () => {
       {/* Main Content */}
       <main className="pt-20 pb-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center space-y-8">
+          <div className="flex  flex-col items-center space-y-8">
             {/* Logo */}
             <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
               <img
                 src={logo}
                 alt="Logo"
-                className="w-48 h-16 object-contain"
+                className="h-20 w-40 object-contain"
               />
             </div>
 

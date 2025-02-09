@@ -27,7 +27,7 @@ const CustomButton = (props) => {
 const Question = ({ num, questionText, onSelect, selectedValue }) => {
   return (
     <div className="my-4">
-      <p className="mb-3 text-left">
+      <p className="mb-3 text-lg font-semibold text-left">
         {`Q${num}). ${questionText}`}
       </p>
 
@@ -469,7 +469,7 @@ function BaselineQuestions() {
   };
 
   return (
-    <div style={styles.safeArea}>
+    <div style={styles.safeArea} className='mx-5'>
       <CustomHeader title="Setup Profile" goBack={() => history.goBack()} />
       <div style={styles.mainView}>
         <div style={{ marginVertical: 15 }}>
@@ -492,7 +492,7 @@ function BaselineQuestions() {
 const styles = {
   safeArea: {
     flex: 1,
-    margin: 20,
+   
   },
   mainView: {
     flex: 1,

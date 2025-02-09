@@ -12,9 +12,9 @@ const getSubscriptionDetails = (user) => {
     return {
       title: "You'are currently on the Basic Tiel, which includes:",
       desc1: "Access to IzzyAI assessmenets Unlock the full benefits of IzzyAI Unlimited anytime, including:",
-      desc2: "Unlimited therapy sessions",
+      desc2: "Unlimited therapy sessions.",
       desc3: "Advances insights and prpgress tracking.",
-      desc4: "Priority access to new features",
+      desc4: "Priority access to new features.",
       plan_text: "Free Trial",
       header_title: "Basic",
     }
@@ -22,7 +22,7 @@ const getSubscriptionDetails = (user) => {
   if (user?.SubscriptionDetails && user?.SubscriptionDetails?.Status === 'Trial') {
     return {
       title: "Enjoy to all therapy features:",
-      desc1: "Access to all AI therapy features",
+      desc1: "Access to all AI therapy features.",
       desc2: "Personalized insights and progress tracking.",
       desc3: "Interactive therapy games designed to support your growth and development.",
       bottom_desc: "After your trial ends, you will automatically switch to IzzyAI Unlimited - Monthly",
@@ -32,7 +32,7 @@ const getSubscriptionDetails = (user) => {
   }
   return {
     title: "Thankyou for being an Unlimited user! Here's what you're enjoying:",
-    desc1: "Unlimited access to all therapy features",
+    desc1: "Unlimited access to all therapy features.",
     desc2: "Personalized insights and progress tracking.",
     desc3: "24/7 AI powered therapy.",
     desc4: "Interactive therapy games designed to support your growth and development.",
@@ -89,8 +89,16 @@ const ManageSubscriptions = () => {
         title={`IzzyAI ${details.header_title}`} 
         goBack={() => navigate(-1)} 
       />
+       {/* Logo */}
+       <div className="h-20 w-40 mx-auto my-5 ">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="max-w-3xl mx-auto px-4 pb-6">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -114,14 +122,14 @@ const ManageSubscriptions = () => {
           >
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-semibold text-gray-900">PLAN TYPE:</p>
+                <p className="text-sm font-medium text-gray-900">PLAN TYPE:</p>
                 <p className="text-lg font-semibold text-green-600">
                   IzzyAI {details.plan_text}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-900">STATUS:</p>
-                <p className="text-lg font-semiboldtext-green-600">
+                <p className="text-sm font-medium text-gray-900">STATUS:</p>
+                <p className="text-lg font-semibold text-green-600">
                   {userDetail?.SubscriptionDetails?.Status || 'Active'}
                 </p>
               </div>
@@ -131,7 +139,7 @@ const ManageSubscriptions = () => {
               <div className="mt-4">
                 <p className="text-sm font-semibold text-gray-900">FREQUENCY:</p>
                 <p className="text-lg font-semibold text-green-600">
-                  {userDetail?.SubscriptionDetails?.Plan || 'Monthly/Annual'}
+                  { 'Monthly/Annual'}
                 </p>
               </div>
             )}
@@ -151,7 +159,7 @@ const ManageSubscriptions = () => {
                     {moment(userDetail.SubscriptionDetails.SubscriptionEndDate).format("MMM D, YYYY")}
                   </p>
                  </div>
-                <div className="px-3 py-1 text-xs font-medium   text-orange-700 bg-orange-100 rounded-md border border-orange-200 ">
+                <div className="px-3 ml-2 py-1 text-xs font-medium   text-orange-700 bg-orange-100 rounded-md border border-orange-200 ">
                   {userDetail.DaysLeft} days
                 </div>
                 </div>
@@ -187,7 +195,7 @@ const ManageSubscriptions = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            <h3 className="text-lg font-semibold md:text-lg lg:text-xl text-gray-900 mb-6   lg:mt-20  ">
               {details.title}
             </h3>
 
@@ -204,7 +212,7 @@ const ManageSubscriptions = () => {
                     whileHover={{ x: 5 }}
                   >
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
-                    <p className="text-gray-700">{feature}</p>
+                    <p className="text-gray-700 md:lg lg:text-xl">{feature}</p>
                   </motion.div>
                 ))}
             </div>

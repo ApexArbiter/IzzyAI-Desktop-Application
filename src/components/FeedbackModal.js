@@ -33,7 +33,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50" onClick={onClose}>
+        <div className="fixed  inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50" onClick={onClose}>
             <div
                 className="bg-white rounded-2xl p-6 w-full max-w-lg relative"
                 onClick={e => e.stopPropagation()}
@@ -59,8 +59,10 @@ const FeedbackModal = ({ isOpen, onClose }) => {
                     placeholder="Add your feedback"
                 />
 
+                <div className='w-full flex justify-center '>
                 <button
-                    className={`w-full mt-6 py-3 rounded-xl text-white font-semibold transition-colors
+                    className={` bg-black   text-white rounded-full py-3 px-12 font-semibold
+        transition-all duration-300 mt-4
                         ${(!comment || comment.trim().length < 1)
                             ? 'bg-gray-200 cursor-not-allowed'
                             : 'bg-gray-900 hover:bg-gray-800'}`}
@@ -79,6 +81,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
                         'Submit'
                     )}
                 </button>
+                </div>
             </div>
         </div>
     );

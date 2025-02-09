@@ -9,9 +9,8 @@ const CustomButton = ({ onPress, title, loading, className }) => {
   return (
     <button
       onClick={onPress}
-      className={`w-full max-w-md px-6 py-3 text-white bg-black rounded-full font-semibold 
-      transition-all duration-300 hover:bg-gray-800 disabled:opacity-50 
-      disabled:cursor-not-allowed ${className}`}
+      className=" bg-gray-900 text-white rounded-full py-3 px-8 font-semibold
+        hover:bg-gray-800 transition-all duration-300 mt-4 "
       disabled={loading}
     >
       {loading ? (
@@ -105,16 +104,16 @@ function ChangePassword() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <CustomHeader title="Change Password" goBack={() => navigate(-1)} />
 
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4">
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-4 pb-8">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
           {/* Logo */}
-          <div className="flex justify-center">
-            <img
-              src={require('../assets/images/logo.png')}
-              alt="Logo"
-              className="h-16 w-auto object-contain"
-            />
-          </div>
+          <div className="h-20 w-40 mx-auto  ">
+              <img
+                src={require("../assets/images/logo.png")}
+                alt="Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
 
           {/* Heading */}
           <div className="space-y-2">
@@ -160,11 +159,13 @@ function ChangePassword() {
             )}
 
             {/* Change Password Button */}
-            <CustomButton
+           <div className='w-full mx-auto flex justify-center'>
+           <CustomButton
               onPress={handleChange}
               title="Change Password"
               loading={isLoading}
             />
+           </div>
           </div>
         </div>
       </div>

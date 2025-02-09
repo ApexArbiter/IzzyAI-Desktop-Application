@@ -24,7 +24,7 @@ const CustomButton = ({ onClick, title, loading }) => (
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
     onClick={onClick}
-    className="w-full md:w-auto px-8 py-3 bg-gray-900 text-white rounded-full 
+    className="w-full md:w-auto px-8 py-3 mt-20 bg-gray-900 text-white rounded-full 
                font-semibold hover:bg-gray-800 transition-colors duration-300
                min-w-[200px] h-[50px] flex items-center justify-center"
   >
@@ -37,15 +37,17 @@ const CustomButton = ({ onClick, title, loading }) => (
 );
 
 const SufferingDisease = () => {
+  const questionReport = JSON.parse(localStorage.getItem('questionReport'));
 
-  const [questionReport, setQuestionReport] = useState(null);
+  // const [questionReport, setQuestionReport] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const questions = JSON.parse(localStorage.getItem('questionReport'));
-    if (questions) {
-      setQuestionReport(questions);
-    }
+   
+    // console.log(questions)
+    // if (questions) {
+      // setQuestionReport(questions);
+    // }
   }, []); // Empty dependency array means this only runs once when component mounts
 
   useEffect(() => {
@@ -71,28 +73,34 @@ const SufferingDisease = () => {
         console.log('Expressive:', questionReport.expressiveNo > (questionReport.expressiveYes || 0));
       }
     }, [questionReport]);
-  const conditions = [
-    {
-      condition: 'Articulation Disorder',
-      show:  questionReport.articulationYes > (questionReport.articulationNo || 0)
-    },
-    {
-      condition: 'Stammering',
-      show: questionReport.stammeringYes > (questionReport.stammeringNo || 0)
-    },
-    {
-      condition: 'Voice Disorder',
-      show: questionReport.voiceYes > (questionReport.voiceNo || 0)
-    },
-    {
-      condition: 'Receptive Language Disorder',
-      show: questionReport.receptiveNo > (questionReport.receptiveYes || 0)
-    },
-    {
-      condition: 'Expressive Language Disorder',
-      show: questionReport.expressiveNo > (questionReport.expressiveYes || 0)
-    }
-  ];
+    const conditions = [
+      {
+        condition: 'Articulation Disorder',
+        show: (questionReport?.articulationYes || questionReport?.articulationNo) &&
+              ((questionReport?.articulationYes > questionReport?.articulationNo) || !questionReport?.articulationNo)
+      },
+      {
+        condition: 'Stammering',
+        show: (questionReport?.stammeringYes || questionReport?.stammeringNo) &&
+              ((questionReport?.stammeringYes > questionReport?.stammeringNo) || !questionReport?.stammeringNo)
+      },
+      {
+        condition: 'Voice Disorder',
+        show: (questionReport?.voiceYes || questionReport?.voiceNo) &&
+              ((questionReport?.voiceYes > questionReport?.voiceNo) || !questionReport?.voiceNo)
+      },
+      {
+        condition: 'Receptive Language Disorder',
+        show: (questionReport?.receptiveYes || questionReport?.receptiveNo) &&
+              ((questionReport?.receptiveYes < questionReport?.receptiveNo) || !questionReport?.receptiveYes)
+      },
+      {
+        condition: 'Expressive Language Disorder',
+        show: (questionReport?.expressiveYes || questionReport?.expressiveNo) &&
+              ((questionReport?.expressiveYes < questionReport?.expressiveNo) || !questionReport?.expressiveYes)
+      }
+    ];
+    
 
 
   return (
@@ -116,10 +124,10 @@ const SufferingDisease = () => {
         </motion.div>
 
         {/* Content Section */}
-        <div className="flex-1 flex flex-col">
+        <div className=" flex flex-1 flex-col ">
           <motion.h2 
             variants={fadeIn}
-            className="text-3xl md:text-4xl font-bold text-gray-900 mb-6"
+            className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 mt-4"
           >
             Suspected Conditions
           </motion.h2>
@@ -145,7 +153,7 @@ const SufferingDisease = () => {
           {/* Description */}
           <motion.p 
             variants={fadeIn}
-            className="text-base md:text-lg text-gray-700 mb-8 max-w-2xl"
+            className="text-base md:text-lg text-gray-700 mb-8 w-full mt-8"
           >
             Explore our app to find personalized exercise plans, assessments,
             and informative content designed to address common disorder
@@ -155,7 +163,7 @@ const SufferingDisease = () => {
           {/* Button */}
           <motion.div 
             variants={fadeIn}
-            className="flex justify-center mt-auto pb-8"
+            className="flex justify-center mt-auto pb-32"
           >
             <CustomButton
               onClick={handleGetStarted}

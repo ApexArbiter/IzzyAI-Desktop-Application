@@ -22,16 +22,16 @@ function InstructionsPage() {
         title="Articulation Disorder"
         goBack={() => navigate(-1)}
       />
-      <div className="h-20 w-40 mx-auto mt-2 ">
+      <div className="h-14 w-28 md:h-16 md:w-32  lg:h-20 lg:w-40 mx-auto mt-2 ">
               <img
                 src={require("../assets/images/logo.png")}
                 alt="Logo"
                 className="h-full w-full object-contain"
               />
             </div>
-      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg mx-20 mb-10 ">
+      <main className="flex-1 p-5 flex flex-col items-center  bg-white shadow-lg rounded-lg mx-20 relative mb-5 ">
         {/* Image container */}
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-center mb-8">
           <div className="relative w-56 h-56 bg-teal-50 rounded-full flex items-center justify-center">
             <img
               src={require("../assets/images/mouth.png")}
@@ -42,7 +42,7 @@ function InstructionsPage() {
         </div>
 
         {/* Heading */}
-        <h2 className="text-xl font-bold   mt-10 font-serif text-gray-900">
+        <h2 className="text-xl lg:text-2xl font-bold    text-gray-900">
           Assessment Instructions
         </h2>
 
@@ -73,7 +73,7 @@ function InstructionsPage() {
         {/* Start button - centered */}
         <div className=" w-full max-w-xs flex justify-center">
           <button
-            className="bg-black hover:bg-gray-800 text-white pl-16 pr-16 pt-2 pb-2 rounded-full"
+            className="bg-black hover:bg-gray-800 text-white pl-16 pr-16 pt-2 pb-2 rounded-full absolute bottom-5 "
             onClick={handleNavigate}
           >
             Start Now

@@ -4,6 +4,58 @@ import { useDataContext } from '../contexts/DataContext';
 import BaseURL from '../components/ApiCreds';
 import moment from 'moment';
 import { endSession, getToken } from "../utils/functions";
+const CircularProgress = ({ percentage, size = "lg", tintColor = "#FC4343", backgroundColor = "#71D860" }) => {
+  const radius = 75;
+  const circumference = 2 * Math.PI * radius;
+  const strokeWidth = size === "lg" ? 15 : 30;
+
+  return (
+    <div className={`relative ${size === "lg" ? "w-48 h-48" : "w-64 h-64"} flex items-center justify-center`}>
+      <svg className="transform -rotate-90 w-full h-full">
+        <circle
+          cx="50%"
+          cy="50%"
+          r={radius}
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{ stroke: backgroundColor }}
+        />
+        <circle
+          cx="50%"
+          cy="50%"
+          r={radius}
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{
+            stroke: tintColor,
+            strokeDasharray: circumference,
+            strokeDashoffset: circumference - (percentage / 100) * circumference,
+            strokeLinecap: "round",
+            transition: "stroke-dashoffset 0.5s ease-out"
+          }}
+        />
+      </svg>
+      <span className={`absolute ${size === "lg" ? "text-4xl" : "text-5xl"} font-medium text-red-500`}>
+        {percentage.toFixed(1)}%
+      </span>
+    </div>
+  );
+};
+
+const LinearProgressBar = ({ value, color }) => (
+  <div className="flex items-center w-full gap-4">
+    <div className="flex-1 bg-gray-200 rounded-full h-2">
+      <div
+        className="h-2 rounded-full transition-all duration-500"
+        style={{
+          width: `${value}%`,
+          backgroundColor: color
+        }}
+      />
+    </div>
+    <span className="text-sm font-medium min-w-[4rem]">{value.toFixed(1)}%</span>
+  </div>
+);
 
 
 const ResultExpressiveLanguage = () => {
@@ -190,10 +242,10 @@ const ResultExpressiveLanguage = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-4">
-        <header className="mb-8">
-          <h1 className="text-2xl font-bold">
+<div className="h-screen overflow-hidden bg-[#f2f1f1]">
+      <div className="h-[calc(100vh-64px)] p-4">
+        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl flex flex-col">
+          <h1 className="text-2xl text-center font-semibold mb-4">
             {isQuick ?
               (isExpressive ? "Quick Expressive Language Disorder Assessment Result Report" :
                 'Quick Receptive Language Disorder Assessment Result Report') :
@@ -204,138 +256,79 @@ const ResultExpressiveLanguage = () => {
                   "Receptive Language Disorder Assessment Result Report"))
             }
           </h1>
-        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 h-1/2 w-1/2 mx-auto">
-          <div className="relative ">
-            <svg className="transform -rotate-90" viewBox="0 0 100 100">
-              <circle
-                cx="50"
-                cy="50"
-                r="45"
-                fill="none"
-                stroke="#68d96c"
-                strokeWidth="8"
+          <div className="flex justify-center gap-8 mb-3">
+            <CircularProgress
+              percentage={percentage}
+              size={!isQuick ? "lg" : "xl"}
+            />
+            {(isExpressive && !isQuick) && (
+              <CircularProgress
+                percentage={expressionpercentage}
+                size="lg"
               />
-              <circle
-                cx="50"
-                cy="50"
-                r="45"
-                fill="none"
-                stroke="#FC4343"
-                strokeWidth="8"
-                strokeDasharray={`${percentage * 2.827} 282.7`}
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-3xl font-bold">{percentage.toFixed(1)}%</span>
-            </div>
+            )}
           </div>
 
           {(isExpressive && !isQuick) && (
-            <div className="relative">
-              <svg className="transform -rotate-90" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  fill="none"
-                  stroke="#e6e6e6"
-                  strokeWidth="8"
-                />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  fill="none"
-                  stroke="#FC4343"
-                  strokeWidth="8"
-                  strokeDasharray={`${expressionpercentage * 2.827} 282.7`}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold">{expressionpercentage.toFixed(1)}%</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {(isExpressive && !isQuick) && (
-          <>
-            <div className="mb-8">
-              <p className="text-lg font-medium mb-4">
+            <div className="mb-2">
+              <p className="text-lg mb-2">
                 Facial Expressions: {expressionsArray?.join(", ")}
               </p>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Correct Facial Expressions</h3>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-green-500 h-2 rounded-full"
-                      style={{ width: `${correctexpressionPercentage}%` }}
-                    />
-                  </div>
-                  <span className="text-sm mt-1">{correctexpressionPercentage.toFixed(1)}%</span>
+                  <p className="text-lg">Correct Facial Expressions</p>
+                  <LinearProgressBar
+                    value={correctexpressionPercentage}
+                    color="#71D860"
+                  />
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Incorrect Facial Expressions</h3>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-red-500 h-2 rounded-full"
-                      style={{ width: `${expressionpercentage}%` }}
-                    />
-                  </div>
-                  <span className="text-sm mt-1">{expressionpercentage.toFixed(1)}%</span>
+                  <p className="text-lg">Incorrect Facial Expressions</p>
+                  <LinearProgressBar
+                    value={expressionpercentage}
+                    color="#FC4343"
+                  />
                 </div>
               </div>
             </div>
-          </>
-        )}
+          )}
 
-        <div className="space-y-6 mb-8">
-          <div>
-            <h3 className="text-lg font-medium mb-2">Correct Answers</h3>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-green-500 h-2 rounded-full"
-                style={{ width: `${correctPercentage}%` }}
-              />
+          <div className="space-y-4 mb-2">
+            <div>
+              <p className="text-lg">Correct Answers</p>
+              <LinearProgressBar value={correctPercentage} color="#71D860" />
             </div>
-            <span className="text-sm mt-1">{correctPercentage.toFixed(1)}%</span>
+
+            <div>
+              <p className="text-lg">Incorrect Answers</p>
+              <LinearProgressBar value={percentage} color="#FC4343" />
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-2">Incorrect Answers</h3>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-red-500 h-2 rounded-full"
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
-            <span className="text-sm mt-1">{percentage.toFixed(1)}%</span>
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">List of Incorrect Answers:</h3>
-          <div className="space-y-2">
-            {expressiveReport?.map((item, index) => (
-              <div key={index} className="p-3 bg-gray-100 rounded">
-                {isExpressive ? item?.question : item?.question_text}
+          <div className="flex flex-col">
+            <h3 className="text-lg mt-2">List of Incorrect Answers:</h3>
+            <div className="max-h-[100px] overflow-y-auto rounded-lg">
+              <div className="">
+                {expressiveReport?.map((item, index) => (
+                  <div key={index} className="pl-3 rounded">
+                    {isExpressive ? item?.question : item?.question_text}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
 
-        <div className="flex justify-center">
-          <button
-            onClick={onPressBack()}
-            className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            Back to Home
-          </button>
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={onPressBack}
+              className="px-12 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
 

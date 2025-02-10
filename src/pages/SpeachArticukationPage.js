@@ -15,67 +15,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import LogoQuestionView from '../components/LogoQuestionView';
 import WaveIcon from '../assets/Wave';
 
-const RecordButton = (props) => {
-  return (
-    <button
-      disabled={props.disabled}
-      onClick={() => props.onPress()}
-      style={styles.recordButton}
-      aria-label="Record"
-    >
-      {'\u2B24'} {props.title}
-    </button>
-  );
-};
 
-const EndButton = (props) => {
-  return (
-    <button onClick={() => props.onPress()} style={styles.endButton}>
-      {props.title}
-    </button>
-  );
-};
-
-const NextButton = (props) => {
-  return (
-    <button onClick={() => props.onPress()} style={styles.nextButton}>
-      {props.title}
-    </button>
-  );
-};
-
-const PrevButton = (props) => {
-  return (
-    <button onClick={() => props.onPress()} style={styles.prevBtn}>
-      {props.title}
-    </button>
-  );
-};
-
-const PlayButton = (props) => {
-  return (
-    <div
-      style={{
-        borderWidth: '2px',
-        borderColor: '#FC4343',
-        marginBottom: '10%',
-        padding: '5px',
-        borderRadius: '100%',
-        marginTop: '20px',
-        display: 'inline-block',
-      }}
-    >
-      <button
-        disabled={props.disabled}
-        onClick={() => props.onPress()}
-        style={styles.playButton}
-        aria-label="Play"
-      >
-        <WaveSVG />
-      </button>
-    </div>
-  );
-};
 
 const SpeechArticulationPage = () => {
   const location = useLocation(); // Get the location object
@@ -538,7 +478,7 @@ const SpeechArticulationPage = () => {
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-gray-600 text-center mb-6"
+              className="text-gray-600 text-center mb-2 mt-4"
             >
               Place your face in the middle of the camera frame while speaking
             </motion.p>
@@ -631,18 +571,18 @@ const SpeechArticulationPage = () => {
             </div>
 
 
-            <div className=' flex flex-row justify-center gap-7 items-center  mt-7'  >
+            <div className=' flex flex-row justify-center items-center gap-4  mt-7'  >
               {/* Camera View */}
               <div ref={cameraContainerRef} className="">
-                <div className="rounded-2xl overflow-hidden  flex justify-center align-items-center">
+                <div className="rounded-2xl overflow-hidden  flex justify-center ">
                   <Webcam
                     audio={false}
                     ref={cameraRef}
                     screenshotFormat="image/jpeg"
                     videoConstraints={{
                       facingMode: "user",
-                      width: 220,
-                      height: 220,
+                      width: 192,
+                      height: 192,
                     }}
                     className='  rounded-2xl shadow-lg'
 
@@ -651,31 +591,31 @@ const SpeechArticulationPage = () => {
                 </div>
               </div>
 
-              <div className='w-56' >
+              <div className='w-48' >
                 {/* Buttons */}
                 <div className="flex justify-center items-center">
                   {recordingStatus === 'idle' && (
                     <button
-                    onClick={onStartRecord}
-                    className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
-                  >
-                    <span className="text-white font-semibold flex items-center gap-2 text-sm">
-                      <span className="text-red-500">●</span> Record
-                    </span>
-                  </button>
+                      onClick={onStartRecord}
+                      className="w-full   rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-16 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+                    >
+                      <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                        <span className="text-red-500">●</span> Record
+                      </span>
+                    </button>
                   )}
-                  
+
 
                   {recordingStatus === 'recording' && (
-                     <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-2 w-full">
-                     <button
-                       disabled={isStopButtonDisabled}
-                       onClick={onStopRecord}
-                       className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
-                     >
-                       <WaveIcon />
-                     </button>
-                   </div>
+                    <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-16 w-full">
+                      <button
+                        disabled={isStopButtonDisabled}
+                        onClick={onStopRecord}
+                        className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                      >
+                        <WaveIcon />
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -700,7 +640,7 @@ const SpeechArticulationPage = () => {
                             }}
                             className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
                           >
-                            <i className="fas fa-arrow-left mr-2 text-lg"></i> {/* Left arrow icon */}
+
                             Previous
                           </motion.button>
                         )}

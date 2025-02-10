@@ -1,91 +1,65 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';  // React Router for navigation
-import CustomHeader from '../components/CustomHeader';  // Assuming you have the same component for web
+import { useLocation, useNavigate } from 'react-router-dom';
+import CustomHeader from '../components/CustomHeader';
 
 const StammeringPassages = () => {
-  const history = useNavigate();  // React Router's useNavigate hook for navigation
+  const navigate = useNavigate();
   const location = useLocation();
-  // Extract sessionId and isAll from location props (assuming they're passed in via routing)
   const { sessionId, isAll } = location.state || {};
-  console.log("State:", location.state)
+  console.log("State:", location.state);
 
-  // DarkButton component
-  const DarkButton = ({ onPress, title }) => {
-    return (
-      <button onClick={onPress} style={styles.darkButton}>
-        {title}
-      </button>
-    );
-  };
-
-  // Card component
-  const Card = ({ title, onPress }) => {
-    return (
-      <div style={styles.cardContainer}>
-        <div>
-          <h2 style={styles.base}>{title}</h2>
-        </div>
-        <DarkButton onPress={onPress} title="Start" />
-      </div>
-    );
-  };
+  const passages = [
+    {
+      title: 'Grandfather Passage',
+      action: () => navigate('/passagePage', { state: { sessionId, isAll } })
+    },
+    {
+      title: 'The Rainbow Passage',
+      action: () => navigate('/passagePage2', { state: { sessionId, isAll } })
+    }
+  ];
 
   return (
-    <div style={styles.safeArea}>
-      <CustomHeader goBack={() => history(-1)} title="Stammering Passages" />
-      <div style={styles.content}>
-        <Card
-          onPress={() => history('/passagePage', { state: { sessionId, isAll } })}
-          title="Grandfather Passage"
+    <div className="h-screen overflow-hidden bg-[#f2f1f1]">
+      <CustomHeader title="Stammering Passages" goBack={() => navigate(-1)} />
+      
+      {/* Logo Section */}
+      <div className="h-20 w-40 mx-auto mt-2">
+        <img
+          src={require("../assets/images/logo.png")}
+          alt="Logo"
+          className="h-full w-full object-contain"
         />
-        <Card
-          onPress={() => history('/passagePage2', { state: { sessionId, isAll } })}
-          title="The Rainbow Passage"
-        />
+      </div>
+
+      {/* Main Content Container */}
+      <div className="h-[calc(100vh-64px)] p-4">
+        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl h-4/5 flex flex-col">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto pr-2">
+            {passages.map((passage, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl border border-[#0CC8E8] p-4 mb-4 hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-medium">{passage.title}</h3>
+                  </div>
+                  <button 
+                    onClick={passage.action}
+                    className="bg-[#111920] text-white px-6 py-2 rounded-full hover:opacity-90 transition-opacity"
+                  >
+                    Start
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default StammeringPassages;
-
-// Inline styles as a JavaScript object
-const styles = {
-  base: {
-    fontFamily: 'Arial, sans-serif',
-    color: '#111920',
-  },
-  cardContainer: {
-    borderWidth: '1px',
-    borderColor: '#0cc8e8',
-    borderRadius: '16px',
-    padding: '14px',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    marginTop: '30px',
-    gap: '20px',
-  },
-  darkButton: {
-    marginLeft: 'auto',
-    borderRadius: '50px',
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: '#111920',
-    padding: '10px 24px',
-    justifyContent: 'center',
-    color: 'white',
-    fontWeight: '600',
-    cursor: 'pointer',
-  },
-  safeArea: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-  },
-  content: {
-    flex: 1,
-    padding: '20px',
-  },
-};

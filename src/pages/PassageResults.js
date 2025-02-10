@@ -26,48 +26,46 @@ const CardContent = ({ children }) => (
 <div className="p-6">{children}</div>
 );
 
-const CircularProgress = ({ percentage, size = "lg" }) => {
-const radius = 75;
-const circumference = 2 * Math.PI * radius;
-const offset = circumference - (percentage / 100) * circumference;
+const CircularProgress = ({ percentage, size = "lg", tintColor = "#FC4343", backgroundColor = "#71D860" }) => {
+  const radius = 75;
+  const circumference = 2 * Math.PI * radius;
+  const strokeWidth = size === "lg" ? 15 : 30;
 
-const sizes = {
-  sm: "w-32 h-32",
-  lg: "w-48 h-48"
+  return (
+    <div className={`relative ${size === "lg" ? "w-48 h-48" : "w-64 h-64"} flex items-center justify-center`}>
+      <svg className="transform -rotate-90 w-full h-full">
+        <circle
+          cx="50%"
+          cy="50%"
+          r={radius}
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{ stroke: backgroundColor }}
+        />
+        <circle
+          cx="50%"
+          cy="50%"
+          r={radius}
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{
+            stroke: tintColor,
+            strokeDasharray: circumference,
+            strokeDashoffset: circumference - (percentage / 100) * circumference,
+            strokeLinecap: "round",
+            transition: "stroke-dashoffset 0.5s ease-out"
+          }}
+        />
+      </svg>
+      <span className={`absolute ${size === "lg" ? "text-4xl" : "text-5xl"} font-medium text-red-500`}>
+        {percentage.toFixed(1)}%
+      </span>
+    </div>
+  );
 };
 
-return (
-  <div className={`relative ${sizes[size]} flex items-center justify-center`}>
-    <svg className="transform -rotate-90 w-full h-full">
-      <circle
-        cx="50%"
-        cy="50%"
-        r={radius}
-        className="stroke-[#71D860] fill-none"
-        strokeWidth="15"
-      />
-      <circle
-        cx="50%"
-        cy="50%"
-        r={radius}
-        className="stroke-[#FC4343] fill-none"
-        strokeWidth="15"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        strokeLinecap="round"
-      />
-    </svg>
-    <span className="absolute text-4xl font-medium text-[#FC4343]">
-      {percentage?.toFixed(1)}%
-    </span>
-  </div>
-);
-};
-
-const LinearProgressBar = ({ label, value, color }) => (
-<div className="space-y-2">
-  <p className="text-base md:text-lg text-[#111920]">{label}</p>
-  <div className="flex items-center gap-4">
+const LinearProgressBar = ({ value, color }) => (
+  <div className="flex items-center w-full gap-4">
     <div className="flex-1 bg-gray-200 rounded-full h-2">
       <div
         className="h-2 rounded-full transition-all duration-500"
@@ -77,12 +75,10 @@ const LinearProgressBar = ({ label, value, color }) => (
         }}
       />
     </div>
-    <span className="text-sm font-medium text-[#111920] min-w-[4rem]">
-      {value?.toFixed(1)}%
-    </span>
+    <span className="text-sm font-medium min-w-[4rem]">{value.toFixed(1)}%</span>
   </div>
-</div>
 );
+
 
 const PassageResults = () => {
   const navigate = useNavigate();
@@ -224,94 +220,86 @@ const PassageResults = () => {
   };
 
   return (
-<motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50 flex flex-col"
-    >
-      <div className="p-4 md:p-6 flex-grow max-w-6xl mx-auto w-full">
-        {/* Header */}
-        <motion.div
-          initial={{ y: -20 }}
-          animate={{ y: 0 }}
-          className="flex items-center mb-8"
-        >
-          <button
-            onClick={() => navigate(-1)}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-semibold text-[#111920]">
-            {isQuick ? "Quick Stammering Assessment Result Report" :
-              isExercise ? "Stammering Exercise Result Report" :
-                "Stammering Assessment Result Report"}
-          </h1>
-        </motion.div>
+    <div className="h-screen overflow-hidden bg-[#f2f1f1]">
+    <div className="h-[calc(100vh-64px)] p-4">
+      <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl flex flex-col">
+        <h1 className="text-2xl text-center font-semibold mb-4">
+          {isQuick
+            ? "Quick Stammering Assessment Result Report"
+            : isExercise
+              ? "Stammering Exercise Result Report"
+              : "Stammering Assessment Result Report"
+          }
+        </h1>
 
-        {/* Progress Circles */}
-        <div className="flex justify-center gap-8 mb-12">
-          <CircularProgress percentage={stutteringPercentage} />
+        <div className="flex justify-center gap-8 mb-3">
+          <CircularProgress
+            percentage={stutteringPercentage}
+            size={!isQuick ? "lg" : "xl"}
+          />
           {!isQuick && (
-            <CircularProgress percentage={expressionpercentage} />
+            <CircularProgress
+              percentage={expressionpercentage}
+              size="lg"
+            />
           )}
         </div>
 
-        {/* Expressions Section */}
         {!isQuick && expressionsArray && (
-          <Card className="mb-6">
-            <CardContent className="space-y-6">
-              <p className="text-lg font-medium text-[#111920]">
-                Facial Expressions: {expressionsArray?.join(", ")}
-              </p>
-              
-              <LinearProgressBar 
-                label="Correct Facial Expressions"
-                value={correctexpressionPercentage}
-                color="#71D860"
-              />
-              
-              <LinearProgressBar 
-                label="Incorrect Facial Expressions"
-                value={expressionpercentage}
-                color="#FC4343"
-              />
-            </CardContent>
-          </Card>
+          <div className="mb-2">
+            <p className=" mb-2">
+              Facial Expressions: {expressionsArray?.join(", ")}
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-lg">Correct Facial Expressions</p>
+                <LinearProgressBar
+                  value={correctexpressionPercentage}
+                  color="#71D860"
+                />
+              </div>
+
+              <div>
+                <p className="text-lg">Incorrect Facial Expressions</p>
+                <LinearProgressBar
+                  value={expressionpercentage}
+                  color="#FC4343"
+                />
+              </div>
+            </div>
+          </div>
         )}
 
-        {/* Stuttering Analysis */}
-        <Card>
-          <CardContent className="space-y-6">
-            <LinearProgressBar 
-              label={isExercise ? "Correct Answers" : "No Stuttering"}
+        <div className="space-y-4 mb-2">
+          <div>
+            <p className="text-lg">{isExercise ? "Correct Answers" : "No Stuttering"}</p>
+            <LinearProgressBar
               value={isExercise ? (100 - percentage) : noStutteringPercentage}
               color="#71D860"
             />
-            
-            <LinearProgressBar 
-              label={isExercise ? "Wrong Answers" : "Stuttering"}
+          </div>
+
+          <div>
+            <p className="text-lg">{isExercise ? "Wrong Answers" : "Stuttering"}</p>
+            <LinearProgressBar
               value={isExercise ? percentage : stutteringPercentage}
               color="#FC4343"
             />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Action Button */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="mt-8 flex justify-center"
-        >
+        <div className="flex justify-center mt-4">
           <button
-            onClick={() => navigate("/home")}
-            className="px-12 py-4 bg-[#111920] text-white rounded-full hover:bg-gray-800 transition-colors"
+            onClick={() => navigate('/home')}
+            className="px-12 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
           >
             Back to Home
           </button>
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
+  </div>
   );
 };
 

@@ -193,19 +193,19 @@ const ReceptiveAssessment = () => {
           <main className="p-6">
             {/* Progress Section */}
 
-            <div className="mb-8">
-              <p className="text-center mb-4">
+            <div className="mb-4">
+              <p className="text-start  mb-1">
                 Question <span className="font-bold">{Math.min(questionCount, questions?.length || 0)}</span> out of{' '}
                 <span className="font-bold">{questions?.length || 0}</span>
               </p>
 
               {percentageCompleted.toString() !== 'Infinity' && (
                 <div className="flex items-center gap-4">
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2  bg-orange-200 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${percentageCompleted}%` }}
-                      className="h-full bg-green-500"
+                      className="h-full  bg-orange-500"
                       transition={{ duration: 0.5 }}
                     />
                   </div>
@@ -218,7 +218,7 @@ const ReceptiveAssessment = () => {
 
             {/* Question Section */}
             {questions?.[questionCount - 1] && (
-              <div className="mb-2">
+              <div className="mb-2 ml-36">
                 <LogoQuestionView
                   first_text={""}
                   second_text={questions[questionCount - 1].question_text}
@@ -228,35 +228,38 @@ const ReceptiveAssessment = () => {
 
             {/* Image Section */}
             {questions?.length > 0 ? (
-              <div className="mb-8">
+              <div className="mb-2">
                 {questions[questionCount - 1]?.image_url ? (
-                  <button
-                    disabled={questionResponse !== '' || !isVideoEnd}
-                    onClick={onPressImage}
-                    className="w-3/4 h-auto transition-transform hover:scale-105 disabled:opacity-50"
-                  >
-                    <img
-                      className="w-full h-auto object-cover rounded-xl shadow-lg"
-                      src={`${IMAGE_BASE_URL}${questions[questionCount - 1].image_url}`}
-                      alt="question"
-                    />
-                  </button>
+                  <div className="flex justify-center">
+                    <button
+                      disabled={questionResponse !== '' || !isVideoEnd}
+                      onClick={onPressImage}
+                      className="w-72 h-72 transition-transform hover:scale-105 disabled:opacity-50 relative border border-black rounded-xl overflow-hidden"
+                    >
+                      <img
+                        className="w-full h-full object-cover"
+                        src={`${IMAGE_BASE_URL}${questions[questionCount - 1].image_url}`}
+                        alt="question"
+                      />
+                    </button>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4">
-                    {currentImages?.map((item, index) => (
-                      <button
-                        key={index}
-                        disabled={questionResponse !== '' || !isVideoEnd}
-                        onClick={(evt) => onPressImage(item, evt)}
-                        className="relative w-1/2 mx-auto aspect-square transition-transform hover:scale-105 disabled:opacity-50"
-                      >
-                        <img
-                          className="w-full mx-auto h-auto object-cover rounded-xl shadow-lg"
-                          src={`${IMAGE_BASE_URL}${item}`}
-                          alt={`option ${index + 1}`}
-                        />
-                      </button>
-                    ))}
+                  <div className="border border-[#0CC8E8] rounded-2xl p-4 mx-auto max-w-xl">
+                    <div className="flex justify-center items-center gap-8 w-full">
+                      {currentImages?.map((item, index) => (
+                        <button
+                          key={index}
+                          onClick={(evt) => onPressImage(item, evt)}
+                          className="w-2/5 h-64 aspect-square transition-transform hover:scale-105 disabled:opacity-50 border border-black"
+                        >
+                          <img
+                            className="w-full h-full object-contain"
+                            src={`${IMAGE_BASE_URL}${item}`}
+                            alt={`option ${index + 1}`}
+                          />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -264,43 +267,108 @@ const ReceptiveAssessment = () => {
               <p className="text-xl text-center text-gray-500 my-4">No Questions Found</p>
             )}
 
-            {/* Response Message */}
-            <div className='h-6'>
-              {questionResponse && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`relative  pb-1 items-center rounded-lg  ${questionResponse === 'Correct!' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}
-                >
-                  <LogoQuestionView
-                    second_text={""}
-                    first_text={questionResponse}
-                    questionResponse={questionResponse}
-                  />
-                </motion.div>
-              )}
-            </div>
 
-            {/* Video Player */}
-            <div className="mb-4">
-              <VideoPlayer
-                ref={videoRef}
-                videoHeight={210}
-                source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
-                onEnd={() => setIsVideoEnd(true)}
-                onStart={() => setIsVideoEnd(false)}
-              />
-            </div>
+
+{/* Video and Buttons Row */}
+<div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+  {/* Video Player - Centered when no response, moves to side when response shows */}
+  <motion.div 
+    className={`w-48 h-48 ${!questionResponse ? 'mx-auto' : ''}`}
+    animate={{ 
+      x: questionResponse ? 0 : 0,
+    }}
+    transition={{ duration: 0.5 }}
+  >
+    <VideoPlayer
+      ref={videoRef}
+      source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
+      onEnd={() => setIsVideoEnd(true)}
+      onStart={() => setIsVideoEnd(false)}
+    />
+  </motion.div>
+
+  {/* Buttons Section with Fade In Animation */}
+  {questionResponse && (
+    <motion.div 
+      className="w-48 relative"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      {/* Response Message */}
+      <div className='absolute top-4 left-8'>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative pb-1 items-center rounded-lg"
+        >
+          <LogoQuestionView
+            second_text={""}
+            first_text={questionResponse}
+            questionResponse={questionResponse}
+          />
+        </motion.div>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="space-y-2 mt-24 h-1/2">
+        {questionCount < questions?.length && (
+          <div className="flex gap-4">
+            {questionCount !== 1 && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setQuestionResponse('');
+                  setIsVideoEnd(false);
+                  setQuestionCount(prev => prev - 1);
+                  setCurrentImages(shuffleArray(questions?.[questionCount - 2]?.images));
+                }}
+                className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors"
+              >
+                Previous
+              </motion.button>
+            )}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                if (questionCount < questions?.length) {
+                  setQuestionResponse('');
+                  setIsVideoEnd(false);
+                  setQuestionCount(prev => prev + 1);
+                  setCurrentImages(shuffleArray(questions?.[questionCount]?.images));
+                } else {
+                  navigateTo();
+                }
+              }}
+              className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors"
+            >
+              Next
+            </motion.button>
+          </div>
+        )}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={navigateTo}
+          className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors"
+        >
+          {questionCount < questions?.length ? 'End Now' : 'Finish'}
+        </motion.button>
+      </div>
+    </motion.div>
+  )}
+</div>
 
             {/* Loading State */}
             <Loader loading={isLoading} />
 
             {/* Navigation Buttons */}
-            {questionResponse !== '' && (
-              <div className="space-y-4">
+            {/* {questionResponse !== '' && (
+              <div className="space-y-4 flex flex-col items-center">
                 {questionCount < questions?.length && (
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 justify-center w-full max-w-64">
                     {questionCount !== 1 && (
                       <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -311,7 +379,7 @@ const ReceptiveAssessment = () => {
                           setQuestionCount(prev => prev - 1);
                           setCurrentImages(shuffleArray(questions?.[questionCount - 2]?.images));
                         }}
-                        className="flex-1 border border-black hover:bg-gray-50 rounded-full py-2 font-semibold transition-colors"
+                        className="flex-1 border border-black hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors"
                       >
                         Previous
                       </motion.button>
@@ -329,7 +397,7 @@ const ReceptiveAssessment = () => {
                           navigateTo();
                         }
                       }}
-                      className="flex-1 bg-green-400 hover:bg-green-500 text-gray-900 rounded-full py-2 font-semibold transition-colors"
+                      className="flex-1 py-2 px-4 bg-green-400 hover:bg-green-500 text-gray-900 rounded-full font-semibold transition-colors"
                     >
                       Next
                     </motion.button>
@@ -339,12 +407,12 @@ const ReceptiveAssessment = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={navigateTo}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 font-semibold transition-colors"
+                  className="w-full max-w-64 bg-red-500 py-2 px-4 hover:bg-red-600 text-white rounded-full font-semibold transition-colors"
                 >
                   {questionCount < questions?.length ? 'End Now' : 'Finish'}
                 </motion.button>
               </div>
-            )}
+            )} */}
           </main>
         </div>
       </div>

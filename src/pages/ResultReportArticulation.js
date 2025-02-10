@@ -8,31 +8,36 @@ import moment from 'moment';
 import { useDataContext } from '../contexts/DataContext';
 import CustomHeader from '../components/CustomHeader';
 
-// Custom Card Component
-const Card = ({ children, className = "" }) => (
-  <div className={`bg-white rounded-lg shadow-lg overflow-hidden ${className}`}>
-    {children}
-  </div>
-);
 
-const CardHeader = ({ children }) => (
-  <div className="p-6 border-b border-gray-200">{children}</div>
-);
+  const generateHighlightedText = (text, indexes) => {
+    return text.split('').map((letter, index) => {
+      const isHighlighted = indexes?.includes(index);
+      const isFirstLetter = index === 0;
+      
+      return (
+        <span
+          key={index}
+          className={`
+            inline-block
+            text-lg
+            ${isHighlighted ? 'text-red-500' : 'text-black'}
+            ${isFirstLetter ? 'uppercase' : 'lowercase'}
+            ${index > 0 ? 'ml-px' : ''}
+          `}
+        >
+          {letter}
+        </span>
+      );
+    });
+  };
 
-const CardTitle = ({ children }) => (
-  <h2 className="text-xl font-semibold text-gray-800">{children}</h2>
-);
-
-const CardContent = ({ children, className = "" }) => (
-  <div className={`p-6 ${className}`}>{children}</div>
-);
-
+  
 // Progress Components
 const CircularProgress = ({ percentage, size = "lg", tintColor = "#FC4343", backgroundColor = "#71D860" }) => {
   const radius = 75;
   const circumference = 2 * Math.PI * radius;
   const strokeWidth = size === "lg" ? 15 : 30;
-  
+
   return (
     <div className={`relative ${size === "lg" ? "w-48 h-48" : "w-64 h-64"} flex items-center justify-center`}>
       <svg className="transform -rotate-90 w-full h-full">
@@ -319,101 +324,105 @@ const ArticulationResult = () => {
 
 
   return (
-    <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    className="min-h-screen bg-gray-50 p-4 md:p-8"
-  >
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-8">
-        {isQuick 
-          ? "Quick Articulation Disorder Assessment Result Report"
-          : SessiontypId === 2 
-            ? "Articulation Disorder Exercise Result Report"
-            : "Articulation Disorder Assessment Result Report"
-        }
-      </h1>
+    <div className="h-screen overflow-hidden bg-[#f2f1f1]">
+      <div className="h-[calc(100vh-64px)]  p-4">
+        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl  flex flex-col">
+          <h1 className="text-2xl text-center font-semibold mb-4">
+            {isQuick
+              ? "Quick Articulation Disorder Assessment Result Report"
+              : SessiontypId === 2
+                ? "Articulation Disorder Exercise Result Report"
+                : "Articulation Disorder Assessment Result Report"
+            }
+          </h1>
 
-      <div className="flex justify-center gap-8 mb-12">
-        <CircularProgress 
-          percentage={percentage} 
-          size={!isQuick ? "lg" : "xl"}
-        />
-        {!isQuick && (
-          <CircularProgress 
-            percentage={expressionpercentage}
-            size="lg"
-          />
-        )}
-      </div>
 
-      {!isQuick && expressionsArray && (
-        <div className="mb-8">
-          <p className="text-lg font-medium mb-4">
-            Facial Expressions: {expressionsArray.join(" , ")}
-          </p>
-          
-          <div className="space-y-6">
-            <div>
-              <p className="text-lg mb-2">Correct Facial Expressions</p>
-              <LinearProgressBar 
-                value={(correctExpressions?.length / totalQuestions) * 100} 
-                color="#71D860"
+
+          <div className="flex justify-center gap-8 mb-3">
+            <CircularProgress
+              percentage={percentage}
+              size={!isQuick ? "lg" : "xl"}
+            />
+            {!isQuick && (
+              <CircularProgress
+                percentage={expressionpercentage}
+                size="lg"
               />
+            )}
+          </div>
+
+          {!isQuick && expressionsArray && (
+            <div className="mb-2">
+              <p className="text-  mb-2">
+                Facial Expressions: {expressionsArray.join(", ")}
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-lg ">Correct Facial Expressions</p>
+                  <LinearProgressBar
+                    value={(correctExpressions?.length / totalQuestions) * 100}
+                    color="#71D860"
+                  />
+                </div>
+
+                <div>
+                  <p className="text-lg ">Incorrect Facial Expressions</p>
+                  <LinearProgressBar
+                    value={(incorrectExpressions?.length / totalQuestions) * 100}
+                    color="#FC4343"
+                  />
+                </div>
+              </div>
             </div>
-            
+          )}
+
+          <div className="space-y-4 mb-2">
             <div>
-              <p className="text-lg mb-2">Incorrect Facial Expressions</p>
-              <LinearProgressBar 
-                value={(incorrectExpressions?.length / totalQuestions) * 100} 
-                color="#FC4343"
-              />
+              <p className="text-lg ">Correct Answers</p>
+              <LinearProgressBar value={correctPercentage} color="#71D860" />
+            </div>
+
+            <div>
+              <p className="text-lg ">Incorrect Answers</p>
+              <LinearProgressBar value={percentage} color="#FC4343" />
             </div>
           </div>
-        </div>
-      )}
 
-      <div className="space-y-6 mb-8">
-        <div>
-          <p className="text-lg mb-2">Correct Answers</p>
-          <LinearProgressBar value={correctPercentage} color="#71D860" />
-        </div>
-        
-        <div>
-          <p className="text-lg mb-2">Incorrect Answers</p>
-          <LinearProgressBar value={percentage} color="#FC4343" />
-        </div>
-      </div>
+          <div className="flex flex-col">
+      <h3 className="text-lg mt-2  ">List of Incorrect Pronunciations:</h3>
+      <div className="max-h-[100px] overflow-y-auto  rounded-lg">
+        <div className="">
+          {incorrectQuestions.map((item, index) => {
+            const highlightIndexes = item?.HighlightWord 
+              ? JSON.parse(item.HighlightWord)
+              : [];
 
-      {incorrectQuestions?.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">List of Incorrect Pronunciations:</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {incorrectQuestions.map((item, index) => (
+            return (
               <div
-                key={index}
-                className="flex items-center gap-2 p-3 bg-red-50 rounded-lg"
+                key={`${item.WordText}-${index}`}
+                className="flex items-center"
               >
-                <AlertCircle className="w-5 h-5 text-red-500" />
                 <span className="text-red-700">
-                  {item.WordText || item.wordtext}
+                  {generateHighlightedText(item.WordText, highlightIndexes)}
                 </span>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
-      )}
-
-      <div className="flex justify-center">
-        <button
-          onClick={onPressBack}
-          className="px-12 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
-        >
-          Back to Home
-        </button>
       </div>
     </div>
-  </motion.div>
+          <div className="flex justify-center">
+            <button
+              onClick={onPressBack}
+              className="px-12 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

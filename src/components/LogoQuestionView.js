@@ -18,7 +18,7 @@ const LogoQuestionView = ({
         flex 
         ${questionResponse ? 'justify-center' : 'justify-start'} 
         items-start 
-        mt-3 md:mt-4 
+        
         ${style}
         max-w-full
       `}
@@ -29,7 +29,7 @@ const LogoQuestionView = ({
             <div className="flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 md:h-6 md:w-6 text-green-500"
+                className="h-5 w-5 md:h-6 md:w-6 text-green-700"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

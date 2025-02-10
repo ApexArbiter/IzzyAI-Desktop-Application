@@ -1,11 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 
-const VideoPlayer = ({ source, onEnd, onStart, videoHeight }) => {
+const VideoPlayer = ({ source, onEnd, onStart, videoHeight, className }) => {
   const videoRef = useRef(null); // Create a reference for the video element
 
   // Handle video end and start events
   useEffect(() => {
-    console.log(source);
     const videoElement = videoRef.current;
 
     // Attach event listeners
@@ -36,15 +35,13 @@ const VideoPlayer = ({ source, onEnd, onStart, videoHeight }) => {
   }, [onEnd, onStart]); // Dependency array to reattach event listeners if the callbacks change
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', marginTop: '20px' }}>
+    <div className="h-full  flex items-center justify-center">
       <video
-        ref={videoRef} // Reference to the video element
+        ref={videoRef}
         src={source}
-        style={{ maxWidth: '100%', height: videoHeight || 'auto', borderRadius: '8px' }}
-        controls
-        width="300"
-        height="200"
-        autoPlay // Automatically starts the video
+        className={` h-full object-cover ${className}`}
+        controls={false}
+        autoPlay
       />
     </div>
   );

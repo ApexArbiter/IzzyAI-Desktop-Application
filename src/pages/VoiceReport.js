@@ -1,72 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import moment from 'moment';
 import { motion } from 'framer-motion';
-import { AlertCircle, CheckCircle, ChevronLeft } from 'lucide-react';
-import { useDataContext } from '../contexts/DataContext';
-import BaseURL from '../components/ApiCreds';
+import { ChevronLeft } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import moment from 'moment';
 import { endSession, getToken } from '../utils/functions';
+import BaseURL from '../components/ApiCreds';
 
-const CircularProgress = ({ percentage, size = "lg", color = "error" }) => {
-  const radius = 45;
+const CircularProgress = ({ percentage, size = "lg", tintColor = "#FC4343", backgroundColor = "#71D860" }) => {
+  const radius = 75;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
-
-  const sizes = {
-    sm: "w-32 h-32",
-    lg: "w-48 h-48",
-    xl: "w-64 h-64"
-  };
-
-  const colors = {
-    error: "stroke-red-500",
-    success: "stroke-green-500"
-  };
+  const strokeWidth = size === "lg" ? 15 : 30;
 
   return (
-    <div className={`relative ${sizes[size]} flex items-center justify-center`}>
+    <div className={`relative ${size === "lg" ? "w-48 h-48" : "w-64 h-64"} flex items-center justify-center`}>
       <svg className="transform -rotate-90 w-full h-full">
         <circle
           cx="50%"
           cy="50%"
           r={radius}
-          className="stroke-gray-200 fill-none"
-          strokeWidth="8"
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{ stroke: backgroundColor }}
         />
         <circle
           cx="50%"
           cy="50%"
           r={radius}
-          className={`${colors[color]} fill-none`}
-          strokeWidth="8"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
+          strokeWidth={strokeWidth}
+          className="fill-none"
+          style={{
+            stroke: tintColor,
+            strokeDasharray: circumference,
+            strokeDashoffset: circumference - (percentage / 100) * circumference,
+            strokeLinecap: "round",
+            transition: "stroke-dashoffset 0.5s ease-out"
+          }}
         />
       </svg>
-      <span className="absolute text-2xl font-bold">
+      <span className={`absolute ${size === "lg" ? "text-4xl" : "text-5xl"} font-medium text-red-500`}>
         {percentage.toFixed(1)}%
       </span>
     </div>
   );
 };
 
-const LinearProgressBar = ({ value, color = "success" }) => {
-  const colors = {
-    error: "bg-red-500",
-    success: "bg-green-500"
-  };
-
-  return (
-    <div className="w-full bg-gray-200 rounded-full h-2.5">
+const LinearProgressBar = ({ value, color }) => (
+  <div className="flex items-center w-full gap-4">
+    <div className="flex-1 bg-gray-200 rounded-full h-2">
       <div
-        className={`h-2.5 rounded-full ${colors[color]}`}
-        style={{ width: `${value}%` }}
+        className="h-2 rounded-full transition-all duration-500"
+        style={{
+          width: `${value}%`,
+          backgroundColor: color
+        }}
       />
     </div>
-  );
-};
-
+    <span className="text-sm font-medium min-w-[4rem]">{value.toFixed(1)}%</span>
+  </div>
+);
 const VoiceDisorderResult = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -245,25 +236,10 @@ const VoiceDisorderResult = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50 p-4 md:p-8"
-    >
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ y: -20 }}
-          animate={{ y: 0 }}
-          className="flex items-center mb-8"
-        >
-          <button
-            onClick={onPressBack}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-bold">
+    <div className="h-screen overflow-hidden bg-[#f2f1f1]">
+      <div className="h-[calc(100vh-64px)] p-4">
+        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl flex flex-col">
+          <h1 className="text-2xl text-center font-semibold mb-4">
             {isQuick
               ? "Quick Voice Disorder Assessment Result Report"
               : isExercise
@@ -271,106 +247,71 @@ const VoiceDisorderResult = () => {
                 : "Voice Disorder Assessment Result Report"
             }
           </h1>
-        </motion.div>
 
-        {/* Progress Circles */}
-        <div className="flex justify-center mb-8 space-x-4">
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            className="flex flex-col items-center"
-          >
+          <div className="flex justify-center gap-8 mb-3">
             <CircularProgress
               percentage={percentage}
-              color="error"
+              size={!isQuick ? "lg" : "xl"}
             />
-            {/* <p className="mt-4 text-lg font-semibold">Overall Score</p> */}
-          </motion.div>
-
-          {!isQuick && (
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              className="flex flex-col items-center"
-            >
+            {!isQuick && (
               <CircularProgress
                 percentage={expressionpercentage}
-                color={expressionpercentage >= 50 ? "success" : "error"}
+                size="lg"
               />
-              <p className="mt-4 text-lg font-semibold">Expressions</p>
-            </motion.div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Detailed Results */}
-        {!isQuick && (
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4">Facial Expressions</h3>
-            <p className="mb-4">{`Expressions: ${expressionArray?.join(" , ")}`}</p>
+          {!isQuick && expressionArray && (
+            <div className="mb-2">
+              <p className="text-lg mb-2">
+                Facial Expressions: {expressionArray?.join(", ")}
+              </p>
 
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-md font-medium mb-2">Correct Facial Expressions</h4>
-                <div className="flex items-center space-x-4">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-lg">Correct Facial Expressions</p>
                   <LinearProgressBar
                     value={correctexpressionPercentage}
-                    color="success"
+                    color="#71D860"
                   />
-                  <span className="font-semibold">
-                    {isNaN(correctexpressionPercentage) ? 0 : correctexpressionPercentage.toFixed(1)}%
-                  </span>
                 </div>
-              </div>
 
-              <div>
-                <h4 className="text-md font-medium mb-2">Incorrect Facial Expressions</h4>
-                <div className="flex items-center space-x-4">
+                <div>
+                  <p className="text-lg">Incorrect Facial Expressions</p>
                   <LinearProgressBar
                     value={expressionpercentage}
-                    color="error"
+                    color="#FC4343"
                   />
-                  <span className="font-semibold">
-                    {expressionpercentage.toFixed(1)}%
-                  </span>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {questionScores?.map((item, index) => (
-          <div key={index} className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium">
-                {`Sound ${index + 1}`}
-              </span>
-              <span className={`font-semibold ${typeof item === 'number' ? (item >= 50 ? 'text-green-600' : 'text-red-600') : (parseFloat(item['Voice-Disorder']) >= 50 ? 'text-green-600' : 'text-red-600')}`}>
-                {(typeof item === 'number' ? item : parseFloat(item['Voice-Disorder']) || 0).toFixed(1)}%
-              </span>
-            </div>
-            <LinearProgressBar
-              value={typeof item === 'number' ? item : parseFloat(item['Voice-Disorder']) || 0}
-              color={typeof item === 'number' ? (item >= 50 ? "success" : "error") : (parseFloat(item['Voice-Disorder']) >= 50 ? "success" : "error")}
-            />
+          <div className="space-y-4">
+            {questionScores?.map((item, index) => (
+              <div key={index}>
+                <p className="text-lg">Sound {index + 1}</p>
+                <LinearProgressBar
+                  value={typeof item === 'number' ? item : parseFloat(item['Voice-Disorder']) || 0}
+                  color={typeof item === 'number' 
+                    ? (item >= 50 ? "#71D860" : "#FC4343")
+                    : (parseFloat(item['Voice-Disorder']) >= 50 ? "#71D860" : "#FC4343")}
+                />
+              </div>
+            ))}
           </div>
-        ))}
 
-        {/* Action Button */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="mt-8 flex justify-center"
-        >
-          <button
-            onClick={onPressBack}
-            className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            Back to Home
-          </button>
-        </motion.div>
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={onPressBack}
+              className="px-12 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Modal Feedback */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl">
@@ -394,7 +335,7 @@ const VoiceDisorderResult = () => {
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 

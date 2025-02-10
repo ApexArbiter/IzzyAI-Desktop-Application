@@ -466,43 +466,43 @@ const PassagePage = () => {
 
 
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50"
-    >
-      {/* Header */}
-      <CustomHeader title="Stammering Assessment" goBack={navigateBack} />
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="min-h-screen bg-gray-50"
+  >
+    {/* Header */}
+    <CustomHeader title="Stammering Assessment" goBack={navigateBack} />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        {/* Instructions */}
-        <motion.p
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="text-center text-gray-600 mb-4 text-sm"
+    {/* Main Content */}
+    <main className="max-w-3xl mx-auto  flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-4">
+      {/* Instructions */}
+      <motion.p
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="text-center text-gray-600 mb-6 mt-4"
+      >
+        Place your face in the middle of the camera frame while speaking
+      </motion.p>
+
+      {/* First Row: Passage and Video */}
+      <div className=" grid grid-cols-2 gap-4 mb-4">
+        {/* Left Column: Passage */}
+        <motion.div
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="bg-white rounded-xl shadow-md overflow-hidden"
         >
-          Place your face in the middle of the camera frame while speaking
-        </motion.p>
-
-        {/* First Row: Passage and Video */}
-        <div className="grid lg:grid-cols-2 gap-4 mb-4">
-          {/* Left Column: Passage */}
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="bg-white rounded-xl shadow-md overflow-hidden"
-          >
-            <div className="p-4">
-              <h2 className="text-lg font-semibold mb-2">Read this Paragraph:</h2>
-              <div
-                className="prose max-w-none h-[230px] overflow-y-auto custom-scrollbar"
-                style={{
-                  fontSize: '16px',
-                  lineHeight: '1.5',
-                  paddingRight: '10px'
-                }}
-              >
-                <p className="text-gray-700">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-2">Read this Paragraph:</h2>
+            <div
+              className="prose max-w-none h-[180px] overflow-y-auto custom-scrollbar"
+              style={{
+                fontSize: '16px',
+                lineHeight: '1.5',
+                paddingRight: '10px'
+              }}
+            >
+              <p className="text-gray-700 text-lg">
                   When the sunlight strikes raindrops in the air, they act as a
                   prism and form a rainbow. The rainbow is a division of white
                   light into many beautiful colors. These take the shape of a
@@ -534,7 +534,7 @@ const PassagePage = () => {
                   mixed form yellow. This is a very common type of bow, one
                   showing mainly red and yellow, with little or no green or
                   blue.
-                </p>
+                  </p>
               </div>
             </div>
           </motion.div>
@@ -543,12 +543,11 @@ const PassagePage = () => {
           <motion.div
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="bg-white rounded-xl shadow-md overflow-hidden"
+            className=" rounded-xl  overflow-hidden h-64"
           >
-            <div className="aspect-w-16 aspect-h-9">
+            <div className="h-full ">
               <VideoPlayer
-                videoHeight="100%"
-                style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+                className="rounded-xl w-[192px] h-[192px] "
                 source={`${IMAGE_BASE_URL}${videoUrl}`}
                 onEnd={() => setIsVideoEnd(true)}
               />
@@ -556,58 +555,16 @@ const PassagePage = () => {
           </motion.div>
         </div>
 
-        {/* Expressions */}
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-2 min-h-[64px]">
-          {/* Initial Expression */}
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{
-              scale: initialExpression ? 1 : 0.9,
-              opacity: initialExpression ? 1 : 0
-            }}
-            className="bg-white p-2 rounded-lg shadow min-h-[64px] flex items-center justify-center"
-          >
-            <p className="text-gray-700 text-sm">
-              {initialExpression ? `Initial Expression: ${initialExpression}` : 'Waiting for initial expression...'}
-            </p>
-          </motion.div>
 
-          {/* Middle Expression */}
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{
-              scale: middleExpression ? 1 : 0.9,
-              opacity: middleExpression ? 1 : 0
-            }}
-            className="bg-white p-2 rounded-lg shadow min-h-[64px] flex items-center justify-center"
-          >
-            <p className="text-gray-700 text-sm">
-              {middleExpression ? `Middle Expression: ${middleExpression}` : 'Waiting for middle expression...'}
-            </p>
-          </motion.div>
 
-          {/* Last Expression */}
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{
-              scale: lastExpression ? 1 : 0.9,
-              opacity: lastExpression ? 1 : 0
-            }}
-            className="bg-white p-2 rounded-lg shadow min-h-[64px] flex items-center justify-center"
-          >
-            <p className="text-gray-700 text-sm">
-              {lastExpression ? `Last Expression: ${lastExpression}` : 'Waiting for last expression...'}
-            </p>
-          </motion.div>
-        </div>
 
         {/* Second Row: Webcam and Controls */}
-        <div className="grid lg:grid-cols-2 gap-4 mt-4 ">
+        <div className="grid grid-cols-2 gap-4 mt-4 ">
           {/* Left Column: Webcam */}
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="bg-white rounded-xl shadow-md  overflow-hidden h-[350px]"
+            className="bg-white rounded-xl shadow-md  overflow-hidden h-[250px]"
           >
             <div className=" ">
               <ReactWebcam
@@ -625,31 +582,52 @@ const PassagePage = () => {
           <motion.div
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="bg-white rounded-xl shadow-md overflow-hidden flex items-center justify-center"
+            className=" rounded-xl overflow-hidden flex items-center justify-center"
           >
-            <div className="p-8 flex flex-col items-center gap-4">
-              {isVideoEnd && status === 'idle' && (
-               <button
-               onClick={onStartRecord}
-               className=" rounded-full bg-slate-900 py-2 px-32 w-full h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
-             >
-               <span className="text-white font-semibold flex items-center gap-2 text-sm">
-                 <span className="text-red-500">●</span> Record
-               </span>
-             </button>
-              )}
-              {status === 'recording' && (
-               <div className="border-2 border-red-500 mb-4 p-1 rounded-full w-full mt-2">
+            {(isVideoEnd && status === 'idle' || status === 'recording') && (
+              <div className="p-8 flex flex-col items-center gap-4">
+                {isVideoEnd && status === 'idle' && (
                   <button
-                    disabled={isStopButtonDisabled}
-                    onClick={onStopRecord}
-                    className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                    onClick={onStartRecord}
+                    className=" rounded-full bg-slate-900 py-2 px-32 w-4/5 h-10 flex items-center justify-center mt-16  transition-all hover:bg-slate-800 active:bg-slate-700"
                   >
-                    <WaveIcon />
+                    <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                      <span className="text-red-500">●</span> Record
+                    </span>
                   </button>
-                </div>
-              )}
-            </div>
+                )}
+                {status === 'recording' && (
+                  <div className="border-2 border-red-500  p-1 rounded-full w-4/5  mt-16">
+                    <button
+                      disabled={isStopButtonDisabled}
+                      onClick={onStopRecord}
+                      className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                    >
+                      <WaveIcon />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Expressions */}
+
+            {status === 'stop' && (
+              <div className='w-full h-full flex flex-col items-center justify-around p-8 gap-4'>
+                <p className="text-gray-700  font-medium">
+                  {initialExpression ? `Initial Expression: ${initialExpression}` : 'Waiting for initial expression...'}
+                </p>
+
+                <p className="text-gray-700 font-medium">
+                  {middleExpression ? `Middle Expression: ${middleExpression}` : 'Waiting for middle expression...'}
+                </p>
+
+                <p className="text-gray-700 font-medium">
+                  {lastExpression ? `Last Expression: ${lastExpression}` : 'Waiting for last expression...'}
+                </p>
+              </div>
+            )}
+
           </motion.div>
         </div>
 
@@ -659,22 +637,22 @@ const PassagePage = () => {
 
       {/* Custom Scrollbar Styles */}
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-      `}</style>
-    </motion.div>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    `}</style>
+    </motion.div >
 
   );
 }

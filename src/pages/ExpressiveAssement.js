@@ -11,7 +11,7 @@ import Loader from '../components/Loader';
 import LogoQuestionView from '../components/LogoQuestionView';
 import WaveIcon from '../assets/Wave'; // Make sure to convert your WaveSVG to React component
 import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
-
+import { motion } from 'framer-motion';
 // Button Components
 const RecordButton = ({ onPress, title, disabled }) => (
   <button
@@ -135,6 +135,7 @@ function ExpressiveAssessment() {
       const response = await getExpressiveQuestions(userId, userDetail?.AvatarID);
       if (response) {
         console.log("Questions from response", response?.[questionCount - 1]?.question);
+        question = response;
         setQuestions(response);
       }
     } catch (error) {
@@ -301,11 +302,13 @@ function ExpressiveAssessment() {
       );
 
       if (isMatched) {
-        onCorrectAnswer(questions[questionCount - 1]?.question);
+        onCorrectAnswer(question[questionCount - 1]?.question);
       } else {
+        console.log("Question", question)
         console.log("Questions", questions)
         console.log("Wrong answer", questions?.[questionCount - 1]?.question)
-        onWrongAnswer(questions?.[questionCount - 1]?.question);
+
+        onWrongAnswer(question?.[questionCount - 1]?.question);
       }
 
     } catch (error) {
@@ -329,10 +332,11 @@ function ExpressiveAssessment() {
   };
 
   const onWrongAnswer = (ques) => {
+    console.log("onWrongAnswer:",ques)
     if (!incorrectQuestions.some(q => q?.questiontext === ques + questionCount)) {
       setIncorrectQuestions(prevQuestions => [
         ...prevQuestions,
-        { ...questions?.[questionCount - 1], questiontext: ques + ques + questionCount },
+        { ...question?.[questionCount - 1], questiontext: ques + ques + questionCount },
       ]);
     }
     if (correctQuestions.includes(ques + ques + questionCount)) {
@@ -380,203 +384,232 @@ function ExpressiveAssessment() {
   const percentageCompleted = ((questionCount) / questions?.length) * 100;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <CustomHeader
-        title="Expressive Language Disorder"
-        goBack={() => navigate(-1)}
-      />
+    <div className="bg-gray-100 mb-0 overflow-hidden min-h-screen">
+    <CustomHeader
+      title="Expressive Language Disorder"
+      goBack={() => navigate(-1)}
+    />
 
-      <div className="flex-1 p-3 md:p-4">
-        <div className="max-w-4xl mx-auto w-full pb-4">
-          <p className="text-center mt-2 text-slate-900 text-xs sm:text-sm">
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-0 overflow-hidden">
+        <main className="">
+          {/* Instructions */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-gray-600 text-center mb-2 mt-4"
+          >
             Place your face in the middle of the camera frame while speaking
+          </motion.p>
+
+          {/* Question Counter */}
+          <p className="text-left ml-0 mb-4">
+            Question{' '}
+            <span className="font-bold">
+              {questionCount > questions?.length ? questions?.length : questionCount}{' '}
+            </span>
+            out of
+            <span className="font-bold"> {questions?.length}</span>
           </p>
 
-          <div className="mt-3">
-            <p className="text-sm sm:text-base text-slate-900">
-              Question{' '}
-              <span className="font-bold">
-                {questionCount > questions?.length ? questions?.length : questionCount}{' '}
-              </span>
-              out of
-              <span className="font-bold"> {questions?.length}</span>
-            </p>
+          {/* Progress Bar */}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="flex-1 h-2 bg-orange-200 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${percentageCompleted}%` }}
+                className="h-full bg-orange-500"
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              {percentageCompleted > 0 ? percentageCompleted.toFixed(1) : 0}%
+            </span>
           </div>
 
-          {percentageCompleted.toString() !== "Infinity" && (
-            <div className="flex items-center mt-2">
-              {(questionCount > 0 && questions?.length > 0) && (
-                <div className="flex-1 bg-slate-200 rounded-full h-1.5">
-                  <div
-                    className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                    style={{ width: `${percentageCompleted}%` }}
+          {/* Question Image and Video */}
+          {questions?.[questionCount - 1] && (
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              className="flex justify-center mb-6"
+            >
+              <div className="flex gap-4">
+                <div className="px-6 py-3 border border-sky-400 rounded-xl">
+                  <img
+                    className="w-48 h-48 rounded-lg shadow-lg object-cover"
+                    src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
+                    alt="Question"
                   />
                 </div>
-              )}
-              <span className="ml-2 text-xs font-medium text-slate-900">
-                {percentageCompleted > 0 ? percentageCompleted.toFixed(1) : 0}%
-              </span>
-            </div>
+                <div className="w-48 h-48 ">
+                  <VideoPlayer
+                    source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
+                    onEnd={() => setIsVideoEnd(true)}
+                    onStart={() => setIsVideoEnd(false)}
+                    ref={videoRef}
+                    videoHeight={192}
+                    className="rounded-xl shadow-lg object-cover mt-6 "
+                  />
+                </div>
+              </div>
+            </motion.div>
           )}
 
-          <div className="border grid grid-cols-1 sm:grid-cols-2 border-cyan-500 rounded-lg mt-2 p-2 sm:p-3">
-            <div className="">
-              <div className="px-20">
-                <div>
-                  {questions?.[questionCount - 1] && (
-                    <LogoQuestionView
-                      first_text="Answer this..."
-                      second_text={questions[questionCount - 1]?.question}
-                    />
-                  )}
-                </div>
-                <VideoPlayer
-                  source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
-                  onEnd={() => setIsVideoEnd(true)}
-                  onStart={() => setIsVideoEnd(false)}
-                  ref={videoRef}
-                  // style={{ width: '100%' }}
-                  videoHeight={150}
+          <div className="flex justify-center items-center">
+            <div className="w-48">
+              {/* Question Text */}
+              <div className="flex justify-start">
+                <LogoQuestionView
+                  first_text="Answer this..."
+                  second_text={questions?.[questionCount - 1]?.question}
                 />
               </div>
             </div>
 
-            <div className="flex justify-center items-center">
-              {questions?.[questionCount - 1] && (
-                <img
-                  className="my-2 w-60 h-60 object-contain"
-                  src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
-                  alt="Question"
+            {/* Response and Expression */}
+            <div className="flex flex-col gap-2 justify-center items-center p-3 w-56 h-20">
+              {recordingStatus === 'stop' && questionResponse && (
+                <LogoQuestionView
+                  second_text={null}
+                  first_text={questionResponse}
+                  questionResponse={questionResponse}
                 />
+              )}
+              {recordingStatus === 'stop' && expression && (
+                <p className="text-center">
+                  Facial Expression: {expression}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-row justify-center items-center gap-4 mt-7">
+            {/* Camera View */}
+            <div className="">
+              <div className="rounded-2xl overflow-hidden flex justify-center">
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={{
+                    facingMode: "user",
+                    width: 192,
+                    height: 192
+                  }}
+                  className="rounded-2xl shadow-lg"
+                />
+              </div>
+            </div>
+
+            {/* Recording and Navigation Controls */}
+            <div className="w-48">
+              <ReactMic
+                record={recordingStatus === 'recording'}
+                className="sr-only"
+                onStop={handleAudioStop}
+                strokeColor="#000000"
+                backgroundColor="#FF4081"
+              />
+
+              {/* Record Button */}
+              {recordingStatus === 'idle' && isVideoEnd && (
+                <button
+                  onClick={onStartRecord}
+                  className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-16 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+                >
+                  <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                    <span className="text-red-500">●</span> Record
+                  </span>
+                </button>
+              )}
+
+              {/* Recording Wave Button */}
+              {recordingStatus === 'recording' && (
+                <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-16">
+                  <button
+                    disabled={isStopButtonDisabled}
+                    onClick={onStopRecord}
+                    className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                  >
+                    <WaveIcon />
+                  </button>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              {recordingStatus === 'stop' && (
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    {questionCount !== 1 && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          setRecordingStatus('idle');
+                          setExpression(null);
+                          setQuestionResponse('');
+                          if (questionCount >= 1) {
+                            setIsVideoEnd(false);
+                            if (videoRef.current) {
+                              videoRef.current.stop();
+                              videoRef.current.seek(0.1);
+                              videoRef.current.resume();
+                            }
+                            setQuestionCount(prev => prev - 1);
+                          }
+                        }}
+                        className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                      >
+                        Previous
+                      </motion.button>
+                    )}
+
+                    {questionCount < questions?.length && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          setRecordingStatus('idle');
+                          setExpression(null);
+                          setQuestionResponse('');
+                          if (questionCount < questions?.length) {
+                            setIsVideoEnd(false);
+                            if (videoRef.current) {
+                              videoRef.current.stop();
+                              videoRef.current.seek(0.1);
+                              videoRef.current.resume();
+                            }
+                            setQuestionCount(prev => prev + 1);
+                          } else {
+                            navigateTo();
+                          }
+                        }}
+                        className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                      >
+                        Next
+                      </motion.button>
+                    )}
+                  </div>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={endAssessment}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                  >
+                    {questionCount < questions?.length ? "End Now" : "Finish"}
+                  </motion.button>
+                </div>
               )}
             </div>
           </div>
 
           <Loader loading={isLoading || recordingStatus === 'loading'} />
-
-          <div className='h-14'>
-            {recordingStatus === 'stop' && questionResponse && (
-              <LogoQuestionView
-                className="mt-3"
-                second_text={null}
-                questionResponse={questionResponse}
-                first_text={questionResponse}
-              />
-            )}
-
-            {recordingStatus === 'stop' && expression && (
-              <p className="text-sm text-center mt-2 font-semibold text-slate-900">
-                Facial Expression: {expression}
-              </p>
-            )}
-          </div>
-
-          <div className="w-32 h-32 sm:w-60 sm:h-60 mt-3 rounded-lg mx-auto mb-2 overflow-hidden">
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              className="w-full h-full object-cover"
-              videoConstraints={{
-                facingMode: "user"
-              }}
-            />
-          </div>
-
-          <ReactMic
-            record={recordingStatus === 'recording'}
-            className="sr-only"
-            onStop={handleAudioStop}
-            strokeColor="#000000"
-            backgroundColor="#FF4081"
-          />
-
-          <div className="mt-3">
-            {recordingStatus === 'idle' && isVideoEnd && (
-              <button
-                onClick={onStartRecord}
-                className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
-              >
-                <span className="text-white font-semibold flex items-center gap-2 text-sm">
-                  <span className="text-red-500">●</span> Record
-                </span>
-              </button>
-            )}
-
-            {recordingStatus === 'recording' && (
-              <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-2">
-                <button
-                  disabled={isStopButtonDisabled}
-                  onClick={onStopRecord}
-                  className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
-                >
-                  <WaveIcon />
-                </button>
-              </div>
-            )}
-
-            {recordingStatus === 'stop' && (
-              <div className="flex justify-between items-center mt-3 gap-2">
-                {questionCount !== 1 && (
-                  <button
-                    onClick={() => {
-                      setRecordingStatus('idle');
-                      setExpression(null);
-                      setQuestionResponse('');
-                      if (questionCount >= 1) {
-                        setIsVideoEnd(false);
-                        if (videoRef.current) {
-                          videoRef.current.stop();
-                          videoRef.current.seek(0.1);
-                          videoRef.current.resume();
-                        }
-                        setQuestionCount(prev => prev - 1);
-                      }
-                    }}
-                    className="w-[42%] rounded-full border border-slate-900 py-2 px-3 h-10 flex items-center justify-center transition-all hover:bg-slate-50 active:bg-slate-100"
-                  >
-                    <span className="text-slate-900 font-semibold text-sm">Previous</span>
-                  </button>
-                )}
-
-                {questionCount < questions?.length && (
-                  <button
-                    onClick={() => {
-                      setRecordingStatus('idle');
-                      setExpression(null);
-                      setQuestionResponse('');
-                      if (questionCount < questions?.length) {
-                        setIsVideoEnd(false);
-                        if (videoRef.current) {
-                          videoRef.current.stop();
-                          videoRef.current.seek(0.1);
-                          videoRef.current.resume();
-                        }
-                        setQuestionCount(prev => prev + 1);
-                      } else {
-                        navigateTo();
-                      }
-                    }}
-                    className="w-[42%] rounded-full bg-green-400 py-2 px-3 h-10 flex items-center justify-center transition-all hover:bg-green-500 active:bg-green-600"
-                  >
-                    <span className="text-slate-900 font-semibold text-sm">Next</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={endAssessment}
-                  className="w-[42%] rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all hover:bg-red-600 active:bg-red-700"
-                >
-                  <span className="text-white font-semibold text-sm">
-                    {questionCount < questions?.length ? "End Now" : "Finish"}
-                  </span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        </main>
       </div>
     </div>
+  </div>
   );
 };
 

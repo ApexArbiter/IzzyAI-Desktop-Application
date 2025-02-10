@@ -222,15 +222,15 @@ const ResultExpressiveLanguage = () => {
     console.log(response)
   };
 
-  // updateSession();
+  updateSession();
 
-  // useEffect(() => {
-  //   if (isExercise) {
-  //     addExerciseResult()
-  //   } else {
-  //     addAssessmentResult();
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (isExercise) {
+      addExerciseResult()
+    } else {
+      addAssessmentResult();
+    }
+  }, []);
 
   const onPressBack = () => {
     if (isQuick) {

@@ -222,6 +222,14 @@ const SpeechArticulationPage = () => {
       setLoading(false)
     }
   };
+  useEffect(() => {
+    // Only play video when URL changes (initial load or lip video switch)
+    const videoElement = document.querySelector('video');
+    if (videoElement && videoUrl) {
+      videoElement.currentTime = 0;
+      videoElement.play();
+    }
+  }, [videoUrl]);
 
   useEffect(() => {
     if (questionCount <= 44) {
@@ -229,86 +237,99 @@ const SpeechArticulationPage = () => {
     }
   }, [questionCount]);
 
+  const handleWrongAnswer = () => {
+    onWrongAnswer(questionData, questionData?.WordText);
+    setVoiceResult("UnMatched");
+
+    // Show the response for 2 seconds, then reset for next try
+    if (tries < 4) {  // Change from <= 3 to < 4
+      setTimeout(() => {
+        setVoiceResult('');
+        setRecordingStatus('idle');
+        setExpression(null);
+
+        // Set lip video URL only on the 3rd try
+        if (tries === 3) {
+          setVideoUrl(lipUrl);
+        }
+
+        // Only now play the video once
+        const videoElement = document.querySelector('video');
+        if (videoElement) {
+          videoElement.currentTime = 0;
+          videoElement.play();
+        }
+      }, 2000);
+    } else {
+      // On the last try (4th), just show the response without replaying
+      setRecordingStatus('stop');
+    }
+  };
 
 
   const onStartRecord = async () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        setIsStopButtonDisabled(true)
+        setIsStopButtonDisabled(true);
         setTimeout(() => {
           setIsStopButtonDisabled(false);
         }, 2000);
-        // Start audio recording
+
         const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorderRef.current = new MediaRecorder(audioStream);
-        const audioChunks = []; // This will store audio data chunks
+        const audioChunks = [];
 
         mediaRecorderRef.current.ondataavailable = (e) => {
-          audioChunks.push(e.data); // Store audio data as chunks
+          audioChunks.push(e.data);
         };
 
         mediaRecorderRef.current.onstop = async () => {
-          setLoading(true)
+          setLoading(true);
           const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-          setAudioBlobMain(audioBlob); // Set the audio blob in state
-          console.log("audio Blob state", audioBlobMain)
-          console.log("audio Blob current", audioBlob)
-          setAudioUrl(URL.createObjectURL(audioBlob)); // Set the audio URL for playback
-          console.log("audioUrl", audioUrl);
-          audioChunks.length = 0; // Reset chunks after recording stops
-          // Send audio after recording is stopped
-          // sendAudio(audioBlob); // Pass the audio blob directly
+          setAudioBlobMain(audioBlob);
+          setAudioUrl(URL.createObjectURL(audioBlob));
+          audioChunks.length = 0;
+
           const expression = await checkExpression();
           const result = await sendAudio(audioBlob);
-          console.log("expressions", expression)
-          console.log("result of Speech", result)
 
           if (!result) {
             setVoiceResult("Failed to process speech");
+            handleWrongAnswer();
+            setLoading(false);
             return;
           }
-          if (tries === 3) {
-            console.log("4")
-            setVideoUrl(lipUrl)
-          }
+
+
 
           if (result.message?.toLowerCase() === 'matched' || tries >= 4) {
             setRecordingStatus('stop');
             if (tries >= 4) {
-
-
-              onWrongAnswer(questionData, questionData?.WordText);
-              setVoiceResult("UnMatched");
+              handleWrongAnswer();
             } else {
               onCorrectAnswer(questionData?.WordText);
-
               setVoiceResult("Matched");
             }
             setExpressionsArray(prev => [...prev, expression]);
           } else {
+            handleWrongAnswer();
             setTries(prev => prev + 1);
-            setRecordingStatus('idle');
           }
-          setLoading(false)
+          setLoading(false);
         };
 
         mediaRecorderRef.current.start();
-        setRecordingStatus('recording'); // Update recording status to 'recording'
+        setRecordingStatus('recording');
 
         // Start video recording
         const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
         cameraRef.current = new MediaRecorder(videoStream);
 
         cameraRef.current.ondataavailable = (e) => {
-          const videoBlob = e.data; // This is the actual video blob
-          sendVideo(videoBlob); // Send the video blob directly
+          sendVideo(e.data);
         };
 
-        cameraRef.current.onstop = () => {
-          // You can implement any necessary cleanup here after the video recording stops
-        };
-
-        cameraRef.current.start(); // Start video recording
+        cameraRef.current.start();
       } catch (error) {
         console.error('Error starting media recording:', error);
       }
@@ -555,7 +576,7 @@ const SpeechArticulationPage = () => {
 
   return (
     <div className="bg-gray-100 mb-0 overflow-hidden min-h-screen">
-      <CustomHeader title="Articulation Disorder Exercise" goBack={navigateBack} />
+      <CustomHeader title="Articulation Disorder Exercise" goBack={() => navigate(-1)} />
 
       <div className="max-w-4xl mx-auto">
         <div className="mb-0 overflow-hidden">
@@ -564,7 +585,7 @@ const SpeechArticulationPage = () => {
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-gray-600 text-center mb-6"
+              className="text-gray-600 text-center mb-2 mt-4"
             >
               Place your face in the middle of the camera frame while speaking
             </motion.p>
@@ -589,7 +610,7 @@ const SpeechArticulationPage = () => {
               </span>
             </div>
 
-            {/* Question Image */}
+            {/* Question Image and Video */}
             {questionData && questionData.PictureUrl && (
               <motion.div
                 initial={{ scale: 0.95 }}
@@ -605,7 +626,7 @@ const SpeechArticulationPage = () => {
                   <video
                     key={`${videoUrl}-${tries}`}
                     className="rounded-xl shadow-lg object-cover"
-                    autoPlay
+                    // autoPlay
                     width={192}
                     height={192}
                     playsInline
@@ -620,17 +641,12 @@ const SpeechArticulationPage = () => {
             <div className="flex justify-center items-center">
               <div className="w-48">
                 {/* Question Text */}
-                {/* <div className="flex justify-start">
-                  <p className="text-xl font-bold">
-                    Say this: {questionData?.WordText}
-                  </p>
-                </div> */}
-                <div className='flex justify-start' >
+                <div className="flex justify-start">
                   <LogoQuestionView
-                    first_text={"Say this..."}
-                    second_text={questionData && questionData.WordText}
-                    highlighted={questionData && questionData?.code_color?.[0]
-                      ? JSON.parse(questionData?.code_color?.[0])
+                    first_text="Say this..."
+                    second_text={questionData?.WordText}
+                    highlighted={questionData?.code_color?.[0]
+                      ? JSON.parse(questionData.code_color[0])
                       : []}
                   />
                 </div>
@@ -641,67 +657,60 @@ const SpeechArticulationPage = () => {
                 {voiceResult && (
                   <LogoQuestionView
                     second_text={null}
-                    first_text={voiceResult} questionResponse={voiceResult} />
+                    first_text={voiceResult}
+                    questionResponse={voiceResult}
+                  />
                 )}
                 {expression && (
-                  <p className="text-left">
+                  <p className="text-center">
                     Facial Expression: {expression}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex flex-row justify-center gap-7 items-center mt-7">
+            <div className="flex flex-row justify-center items-center gap-4 mt-7">
               {/* Camera View */}
-              <div ref={cameraContainerRef} className="">
-                <div className="rounded-2xl overflow-hidden flex justify-center align-items-center">
+              <div ref={cameraContainerRef}>
+                <div className="rounded-2xl overflow-hidden flex justify-center">
                   <Webcam
                     audio={false}
                     ref={cameraRef}
                     screenshotFormat="image/jpeg"
                     videoConstraints={{
                       facingMode: "user",
-                      width: 220,
-                      height: 220,
+                      width: 192,
+                      height: 192,
                     }}
                     className="rounded-2xl shadow-lg"
                   />
                 </div>
               </div>
 
-              <div className="w-56">
+              <div className="w-48">
                 {/* Recording Controls */}
                 <div className="flex justify-center items-center">
                   {recordingStatus === 'idle' && tries <= 4 && (
                     <button
-                    onClick={onStartRecord}
-                    className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
-                  >
-                    <span className="text-white font-semibold flex items-center gap-2 text-sm">
-                      <span className="text-red-500">●</span> Record
-                    </span>
-                  </button>
-                    // <motion.button
-                    //   whileHover={{ scale: 1.02 }}
-                    //   whileTap={{ scale: 0.98 }}
-                    //   onClick={onStartRecord}
-                    //   className="flex items-center justify-center bg-black text-white rounded-full py-2 px-4 font-semibold transition-colors mb-6"
-                    // >
-                    //   <i className="fas fa-record-vinyl text-xl mr-2"></i>
-                    //   Start Recording (Try {tries}/4)
-                    // </motion.button>
+                      onClick={onStartRecord}
+                      className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-16 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+                    >
+                      <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                        <span className="text-red-500">●</span> Record
+                      </span>
+                    </button>
                   )}
 
                   {recordingStatus === 'recording' && (
-                    <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-2 w-full">
-                    <button
-                      disabled={isStopButtonDisabled}
-                      onClick={onStopRecord}
-                      className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
-                    >
-                      <WaveIcon />
-                    </button>
-                  </div>
+                    <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-16 w-full">
+                      <button
+                        disabled={isStopButtonDisabled}
+                        onClick={onStopRecord}
+                        className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                      >
+                        <WaveIcon />
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -717,14 +726,14 @@ const SpeechArticulationPage = () => {
                             onClick={() => {
                               setRecordingStatus('idle');
                               setExpression(null);
-                              setQuestionResponse('');
+                              setVoiceResult('');
+                              setTries(1);
                               if (questionCount >= 1) {
                                 setQuestionCount(prevCount => prevCount - 1);
                               }
                             }}
                             className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
                           >
-                            <i className="fas fa-arrow-left mr-2 text-lg"></i>
                             Previous
                           </motion.button>
                         )}
@@ -734,7 +743,7 @@ const SpeechArticulationPage = () => {
                           onClick={() => {
                             setRecordingStatus('idle');
                             setExpression(null);
-                            setQuestionResponse('');
+                            setVoiceResult('');
                             setTries(1);
                             if (questionCount <= 271) {
                               setQuestionCount(prevCount => prevCount + 1);
@@ -751,17 +760,17 @@ const SpeechArticulationPage = () => {
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => endAssessment()}
+                      onClick={endAssessment}
                       className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
                     >
                       {questionCount < 271 ? 'End Now' : 'Finish'}
                     </motion.button>
                   </div>
                 )}
-
-                <Loader loading={loading} />
               </div>
             </div>
+
+            <Loader loading={loading} />
           </main>
         </div>
       </div>

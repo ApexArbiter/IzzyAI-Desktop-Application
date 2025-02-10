@@ -1,27 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Button,
-  LinearProgress,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions
-} from '@mui/material';
 import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
-// import VideoPlayer from './VideoPlayer';
-import { getToken, detectExpression, getStammeringWords, capitalize } from '../utils/functions';
 import VideoPlayer from '../components/VideoPlayer';
-import { useDataContext } from '../contexts/DataContext';
+import { getToken, detectExpression, getStammeringWords, capitalize } from '../utils/functions';
 import CustomHeader from '../components/CustomHeader';
 import Loader from '../components/Loader';
 import WaveIcon from '../assets/Wave';
 import LogoQuestionView from '../components/LogoQuestionView';
+import { motion } from 'framer-motion';
+import { useDataContext } from '../contexts/DataContext';
 
 const StammeringExercisePage = () => {
   const { setExercisesReport, userId, userDetail } = useDataContext();
@@ -512,165 +500,164 @@ const StammeringExercisePage = () => {
   const percentageCompleted = (exerciseCount / 5) * 100;
 
   return (
-    <Box sx={{ padding: 2, maxWidth: 600, margin: 'auto' }}>
+    <div className="bg-gray-100 mb-0 overflow-hidden min-h-screen">
+    <CustomHeader title="Stammering Exercise" goBack={navigateBack} />
 
-      <CustomHeader title="Stammering Excercise" goBack={() => { navigate(-1) }} />
-      <div className='mt-4' ></div>
-      <Typography variant="body1" paragraph>
-        Take a deep long breath and say the answer while exhaling/breathing out.
-      </Typography>
-
-      <Typography variant="body2" color="textSecondary" paragraph>
-        Exercise {exerciseCount} out of 5
-      </Typography>
-
-      <LinearProgress
-        variant="determinate"
-        value={percentageCompleted}
-        sx={{ marginBottom: 2 }}
-      />
-
-<LogoQuestionView
-            style={{ marginTop: 20 }}
-            first_text={"Say this..."}
-            second_text={(isWrong ? capitalize(questionWordsArray?.[wordCount]) : capitalize(exerciseData?.Sentence)) || 'Loading...'}
-          />
-
-      {/* Video Player */}
-      {avatarPath && (
-        <VideoPlayer
-          source={`${IMAGE_BASE_URL}${avatarPath}`}
-          onEnd={() => setIsVideoEnd(true)}
-          onStart={() => setIsVideoEnd(false)}
-          videoHeight={200}
-        />
-      )}
-      {/* Text showing Ready
-      {isDelay && (
-  <Typography 
-    variant="body1" 
-    align="center" 
-    sx={{ 
-      mt: 8, 
-      color: 'text.primary' 
-    }}
-  >
-    Please be ready for next attempt
-  </Typography>
-)} */}
-      {/* Expression Display */}
-      {expression && (
-        <Typography variant="body1" align="center" sx={{ marginBottom: 2 }}>
-          Facial Expression: {expression}
-        </Typography>
-      )}
-
-      {/* Question Response */}
-      {questionResponse && (
-        <Typography
-          variant="body1"
-          color={questionResponse.includes('Correct') ? 'success.main' : 'error.main'}
-          align="center"
-          sx={{ marginBottom: 2 }}
-        >
-          {questionResponse}
-        </Typography>
-      )}
-
-      {mispronouncedWord && (
-        <p className='text-center' >
-          Mispronounced Word: <strong className='text-red-600'  >{mispronouncedWord}</strong>
-        </p>
-      )}
-
-      {isDelay && (
-        <Typography
-          variant="body1"
-          align="center"
-          sx={{
-            mt: 2,
-            mb: 2,
-            padding: 2,
-            backgroundColor: 'rgba(0, 0, 0, 0.05)',
-            borderRadius: 1
-          }}
-        >
-          {questionResponse ? `Result: ${questionResponse}` : 'Please wait for next attempt...'}
-        </Typography>
-      )}
-
-      {/* Webcam */}
-
-      <div className=' mt-7 mb-4 flex justify-center'>
-        <Webcam
-          audio={false}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          videoConstraints={{ facingMode: 'user' }}
-          width="50%"
-          height={200}
-        />
-      </div>
-
-
-
-
-      {/* Recording Controls */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-        {recordingStatus === 'idle' && isVideoEnd && (
-            <button
-            onClick={onStartRecord}
-            className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-2 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-0 overflow-hidden">
+        <main className="">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-gray-600 text-center mb-2 mt-4"
           >
-            <span className="text-white font-semibold flex items-center gap-2 text-sm">
-              <span className="text-red-500">●</span> Record
+            Take a deep long breath and say the answer while exhaling/breathing out
+          </motion.p>
+
+          <p className="text-left ml-0 mb-4">
+            Exercise <span className="font-bold">{exerciseCount}</span> out of <span className="font-bold">5</span>
+          </p>
+
+          <div className="flex items-center gap-4 mb-8">
+            <div className="flex-1 h-2 bg-orange-200 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${percentageCompleted}%` }}
+                className="h-full bg-orange-500"
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              {percentageCompleted.toFixed(1)}%
             </span>
-          </button>
-        )}
+          </div>
 
-        {recordingStatus === 'recording' && (
-          <div className="border-2 border-red-500 mb-4 p-1 rounded-full mt-2 w-full">
-          <button
-            disabled={isStopButtonDisabled}
-            onClick={onStopRecord}
-            className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
-          >
-            <WaveIcon />
-          </button>
-        </div>
-        )}
+          <div className="flex gap-4 justify-center mb-6">
+            {/* Left Box: Question and Response */}
+            <div className="w-48 flex flex-col gap-2 justify-center">
+              <LogoQuestionView
+                first_text={"Say this..."}
+                second_text={(isWrong ? capitalize(questionWordsArray?.[wordCount]) : capitalize(exerciseData?.Sentence)) || 'Loading...'}
+              />
+              
+              {expression && (
+                <div className="text-sm text-center">
+                  Facial Expression: {expression}
+                </div>
+              )}
 
-        {recordingStatus === 'stop' && (
-          <>
-            {exerciseCount < 5 && (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  setExerciseCount(prev => prev + 1);
-                  setRecordingStatus('idle');
-                  setQuestionResponse('');
-                  setIsVideoEnd(false);
-                  setTries(0);
+              {questionResponse && (
+                <div className={`text-sm text-center ${
+                  questionResponse.includes('Correct') ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {questionResponse}
+                </div>
+              )}
+
+              {mispronouncedWord && (
+                <div className="text-sm text-center">
+                  Mispronounced Word: <span className="text-red-600">{mispronouncedWord}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Right Box: Video Player */}
+            <div className="w-48 h-48 rounded-xl overflow-hidden">
+              {avatarPath && (
+                <VideoPlayer
+                  source={`${IMAGE_BASE_URL}${avatarPath}`}
+                  onEnd={() => setIsVideoEnd(true)}
+                  onStart={() => setIsVideoEnd(false)}
+                />
+              )}
+            </div>
+          </div>
+
+          {isDelay && (
+            <div className="text-center mb-4">
+              <p className="text-gray-700">
+                Please be ready for next attempt
+              </p>
+            </div>
+          )}
+
+          <div className="flex flex-row justify-center items-center gap-4 mt-7">
+            {/* Webcam Box */}
+            <div className="rounded-2xl overflow-hidden flex justify-center">
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={{
+                  facingMode: "user",
+                  width: 192,
+                  height: 192,
                 }}
-              >
-                Next Exercise
-              </Button>
-            )}
-            <Button
-              variant="contained"
-              color="success"
-              onClick={navigateToReport}
-            >
-              Finish
-            </Button>
-          </>
-        )}
-      </Box>
+                className="rounded-2xl shadow-lg"
+              />
+            </div>
 
-      {/* Loading Indicator */}
-      <Loader loading={loading} />
-    </Box>
+            {/* Controls Box */}
+            <div className="w-48">
+              <div className="flex justify-center items-center">
+                {recordingStatus === 'idle' && isVideoEnd && (
+                  <button
+                    onClick={onStartRecord}
+                    className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-16 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+                  >
+                    <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                      <span className="text-red-500">●</span> Record
+                    </span>
+                  </button>
+                )}
+
+                {recordingStatus === 'recording' && (
+                  <div className="mt-16 mb-4">
+                    <div className="border-2 border-red-500 rounded-full p-1">
+                      <button
+                        disabled={isStopButtonDisabled}
+                        onClick={onStopRecord}
+                        className="w-full rounded-full bg-red-500 py-2 px-3 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 active:bg-red-700"
+                      >
+                        <WaveIcon />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {recordingStatus === 'stop' && (
+                  <div className="space-y-4 w-full mt-16">
+                    {exerciseCount < 5 && (
+                      <button
+                        onClick={() => {
+                          setExerciseCount(prev => prev + 1);
+                          setRecordingStatus('idle');
+                          setQuestionResponse('');
+                          setIsVideoEnd(false);
+                          setTries(0);
+                        }}
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                      >
+                        Next Exercise
+                      </button>
+                    )}
+                    <button
+                      onClick={navigateToReport}
+                      className="w-full bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                    >
+                      Finish
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    
+    <Loader loading={loading} />
+  </div>
   );
 };
 

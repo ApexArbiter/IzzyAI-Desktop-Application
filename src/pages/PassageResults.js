@@ -202,6 +202,13 @@ const PassageResults = () => {
     updateSession()
   }, [])
 
+  const onPressBack = () => {
+    if (isQuick) {
+      navigate(-1);
+    } else {
+      navigate('/home');
+    }
+  };
 
 
 
@@ -235,7 +242,7 @@ const PassageResults = () => {
         <div className="flex justify-center gap-8 mb-3">
           <CircularProgress
             percentage={stutteringPercentage}
-            size={!isQuick ? "lg" : "xl"}
+            size={!isQuick ? "lg" : "lg"}
           />
           {!isQuick && (
             <CircularProgress
@@ -291,7 +298,7 @@ const PassageResults = () => {
 
         <div className="flex justify-center mt-4">
           <button
-            onClick={() => navigate('/home')}
+            onClick={onPressBack}
             className="px-12 py-4 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
           >
             Back to Home

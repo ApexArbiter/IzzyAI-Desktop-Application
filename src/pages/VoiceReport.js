@@ -133,8 +133,8 @@ const VoiceDisorderResult = () => {
       console.log('Full response:', await response.text());
       setLoading(false);
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || response.statusText);
+        // const errorData = await response.json();
+        // throw new Error(errorData.message || response.statusText);
       }
     } catch (error) {
       setLoading(false);
@@ -251,7 +251,7 @@ const VoiceDisorderResult = () => {
           <div className="flex justify-center gap-8 mb-3">
             <CircularProgress
               percentage={percentage}
-              size={!isQuick ? "lg" : "xl"}
+              size={!isQuick ? "lg" : "lg"}
             />
             {!isQuick && (
               <CircularProgress
@@ -290,12 +290,10 @@ const VoiceDisorderResult = () => {
           <div className="space-y-4">
             {questionScores?.map((item, index) => (
               <div key={index}>
-                <p className="text-lg">Sound {index + 1}</p>
+                <p className="text-lg">{`Percentage of incorrect sound ${item?.wordtext?.[0]}`}</p>
                 <LinearProgressBar
                   value={typeof item === 'number' ? item : parseFloat(item['Voice-Disorder']) || 0}
-                  color={typeof item === 'number' 
-                    ? (item >= 50 ? "#71D860" : "#FC4343")
-                    : (parseFloat(item['Voice-Disorder']) >= 50 ? "#71D860" : "#FC4343")}
+                  color={typeof item === 'number' ? (item >= 50 ? "#FC4343" :  "#71D860"): (parseFloat(item['Voice-Disorder']) >= 50 ? "#FC4343" : "#71D860")}
                 />
               </div>
             ))}

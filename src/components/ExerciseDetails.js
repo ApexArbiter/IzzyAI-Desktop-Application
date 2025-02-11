@@ -29,6 +29,13 @@ function ExerciseDetails({ closeDetails, detailsOpen, reportData, itemNum }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto relative">
+      <div className="h-20 w-40 mx-auto  ">
+          <img
+            src={require("../assets/images/logo.png")}
+            alt="Logo"
+            className="h-full w-full object-contain"
+          />
+        </div>
         <button
           onClick={() => closeDetails(false)}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -39,7 +46,9 @@ function ExerciseDetails({ closeDetails, detailsOpen, reportData, itemNum }) {
         </button>
 
         <h2 className="text-center text-xl font-medium text-gray-900 mb-8">
-          {data.DisorderName} Exercise
+          {data.DisorderName} {data.DisorderName !== 'Stammering'
+                ? ` Disorder`
+                : ""} Exercise
         </h2>
 
         <div className="space-y-4">
@@ -94,8 +103,8 @@ function ExerciseDetails({ closeDetails, detailsOpen, reportData, itemNum }) {
           <div>
             <p className="text-base text-gray-900">
               {data.DisorderName !== 'Stammering'
-                ? `${data.DisorderName} Disorder`
-                : data.DisorderName}
+                ? `${data.DisorderName} Disorder:`
+                : `${data.DisorderName}:`}
             </p>
             <p className="text-base text-gray-900">
               {data?.Score ? data?.Score?.toFixed() : 0}%

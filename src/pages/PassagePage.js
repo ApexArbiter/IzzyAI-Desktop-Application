@@ -543,9 +543,9 @@ const PassagePage = () => {
             animate={{ x: 0, opacity: 1 }}
             className=" rounded-xl  overflow-hidden h-64"
           >
-            <div className="h-full ">
+            <div className="h-full w-full ">
               <VideoPlayer
-                className="rounded-xl w-[192px] h-[192px] "
+                className="rounded-xl  h-[192px] "
                 source={`${IMAGE_BASE_URL}${videoUrl}`}
                 onEnd={() => setIsVideoEnd(true)}
               />

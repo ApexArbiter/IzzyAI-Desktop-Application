@@ -10,7 +10,8 @@ import { useDataContext } from '../contexts/DataContext';
 import axios from 'axios';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import LogoQuestionView from '../components/LogoQuestionView';
-
+import CustomHeader from '../components/CustomHeader';
+import { motion } from 'framer-motion';
 const VoiceDisorderPage = () => {
   const location = useLocation();
   const { sessionId, isAll } = location.state || {};
@@ -32,8 +33,9 @@ const VoiceDisorderPage = () => {
   const [voiceResponse, setVoiceResponse] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [loader, setLoader] = useState(false)
-  const [attempts, setAttempts] = useState(0);
+  const [attempts, setAttempts] = useState(4);
   const [nextButton, setNextButton] = useState(false);
+  const [isDelay, setIsDelay] = useState(false);
 
 
 
@@ -110,7 +112,7 @@ const VoiceDisorderPage = () => {
 
       if (exerciseCount <= 3) {
         const response = await axios.get(
-          `${BaseURL}/get_voice_disorders/${userDetail?.AvatarID}`,
+          `${BaseURL}/get_voice_disorders/${1}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -237,11 +239,12 @@ const VoiceDisorderPage = () => {
               console.log('Complete video response:', videoResponse);
             } else {
               // If attempts is not 4, schedule a restart after 5 seconds
+              setIsDelay(true)
               setTimeout(() => {
                 restartExercise();
-                // Increment the attempts counter
+                setIsDelay(false)
                 setAttempts(prev => prev + 1);
-              }, 5000);
+              }, 7000);
             }
 
             resolve();
@@ -377,6 +380,7 @@ const VoiceDisorderPage = () => {
       setIsVideoEnd(false);
       setVoiceResponse(null);
       setExpression('');
+      setAttempts(4)
       setTimer(5);
       setCounter(100);
     } else {
@@ -390,7 +394,8 @@ const VoiceDisorderPage = () => {
           startTime,
           totalQuestions: 3,
           incorrectExpressions,
-          correctExpressions
+          correctExpressions,
+          isExcercise: true
         }
       });
       console.log({
@@ -437,189 +442,139 @@ const VoiceDisorderPage = () => {
   const percentageCompleted = (exerciseCount / 3) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg">
-        {/* Header */}
-        <div className="bg-gray-800 text-white p-4 flex items-center justify-between rounded-t-2xl">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={navigateBack}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+    <div className="bg-gray-100 mb-0 overflow-hidden min-h-screen">
+      <CustomHeader title="Voice Disorder Excercise" goBack={navigateBack} />
+
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-0 overflow-hidden">
+          <main className="">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-gray-600 text-center mb-2 mt-4"
             >
-              Back
-            </Button>
-            <h1 className="text-2xl font-semibold">Voice Disorder Excercise</h1>
-          </div>
-        </div>
+              Place your face in the middle of the camera frame while speaking
+            </motion.p>
 
-        <div className="p-6 space-y-6">
-          {/* Instructions */}
-          <p className="text-gray-600 text-center text-lg">
-            Place your face in the middle of the camera frame while speaking
-          </p>
-
-          {/* Assessment Progress */}
-          <div className="bg-gray-50 p-4 rounded-xl">
-            <p className="text-xl text-center mb-4">
-              Assessment <strong className="text-blue-600">{exerciseCount}</strong> out of <strong className="text-blue-600">3</strong>
+            <p className="text-left ml-0 mb-4">
+              Assessment <span className="font-bold">{exerciseCount}</span> out of <span className="font-bold">3</span>
             </p>
 
-            <div className="flex items-center gap-4">
-              <LinearProgress
-                variant="determinate"
-                value={percentageCompleted}
-                className="flex-1"
-              />
-              <span className="text-sm font-medium text-gray-600 min-w-[4rem]">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="flex-1 h-2 bg-orange-200 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percentageCompleted}%` }}
+                  className="h-full bg-orange-500"
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+              <span className="text-sm text-gray-500 whitespace-nowrap">
                 {percentageCompleted.toFixed(1)}%
               </span>
             </div>
-          </div>
-
-          {/* Video Player */}
-          {exerciseData && (
-            <div className="rounded-xl overflow-hidden shadow-lg">
-              <p>Attemts:{attempts}</p>
-              <VideoPlayer
-                ref={videoRef}
-                onEnd={() => {
-                  setIsVideoEnd(true);
-                  setRecordingStatus('idle');
-                }}
-                onStart={() => {
-                  setIsVideoEnd(false);
-                  setRecordingStatus('idle');
-                }}
-                source={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
-              />
-            </div>
-          )}
-
-          {/* Exercise Text */}
-          <div className="flex justify-center">
-            <LogoQuestionView
-              first_text={"Say this..."}
-              second_text={exerciseData?.[exerciseCount - 1]?.WordText || 'loading'}
-
-            />
-          </div>
 
 
-          {/* Expression Display */}
-          {expression && (
-            <div className="bg-green-50 text-green-800 p-4 rounded-xl text-center text-lg font-medium">
-              Facial Expression: {expression.expression}
-            </div>
-          )}
+            <div className="flex gap-4 justify-center relative mb-6">
+              {/* Box 1: Question, Expression, Voice Response */}
+              <div className="w-52 flex flex-col gap-2  justify-center">
+                <p className="text-sm  top-[-15px] absolute  ">Attempts: {attempts}</p>
+                <LogoQuestionView
+                  first_text={"Say this..."}
+                  second_text={exerciseData?.[exerciseCount - 1]?.WordText || "loading"}
+                />
+                {expression && (
+                  <div className="mt-2 text-center">
+                    Facial Expression: {expression.expression}
+                  </div>
+                )}
+                {/* {recordingStatus === "stop" && voiceResponse?.predictions && (
+                <div className="text-sm text-center">
+                  <p>Label: Normal</p>
+                  <p className="text-green-600">Score: {voiceResponse.predictions.Normal}</p>
+                </div>
+              )}
+              */}
+              </div>
 
-          {/* Voice Disorder Prediction Display */}
-          {recordingStatus === 'stop' && voiceResponse?.predictions && (
-            <div className="bg-white p-4 rounded-xl shadow-sm border mt-4">
-              <div className="space-y-2">
-                <p className="text-lg font-medium">Label: Normal</p>
-                <p className="text-green-600 font-medium">
-                  Score: {voiceResponse.predictions.Normal}
-                </p>
+
+              {/* Box 2: Video Player */}
+              <div className="w-48 h-48 rounded-xl overflow-hidden">
+                {exerciseData && (
+                  <VideoPlayer
+                    ref={videoRef}
+                    onEnd={() => {
+                      setIsVideoEnd(true);
+                      setRecordingStatus("idle");
+                    }}
+                    onStart={() => {
+                      setIsVideoEnd(false);
+                      setRecordingStatus("idle");
+                    }}
+                    source={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
+                  />
+                )}
               </div>
             </div>
-          )}
 
-          {/* Camera View */}
-          <div className="camera-view rounded-xl overflow-hidden shadow-lg mx-auto max-w-2xl">
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={{
-                facingMode: 'user',
-              }}
-              className="w-full"
-            />
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="bg-red-50 text-red-800 p-4 rounded-xl">
-              <p>{error}</p>
+            <div className='h-6'>
+              {isDelay && <p className=' text-center '>Please be ready for next attempt</p>}
             </div>
-          )}
-
-          {/* Recording Controls */}
-          <div className="space-y-4">
-            {recordingStatus === 'idle' && isVideoEnd && (
-              <Button
-                onClick={() => {
-                  setDisableRecordingButton(true);
-                  setExpression('');
-                  onStartRecord();
-                }}
-                variant="contained"
-                color="primary"
-                className="w-full py-4 text-lg font-semibold rounded-xl"
-              >
-                Record
-              </Button>
-            )}
-
-            {recordingStatus === 'recording' && (
-              <div className="text-center space-y-4">
-                <p className="text-xl font-semibold text-red-500">
-                  0:0{timer > 0 ? timer : 0} Seconds Left
-                </p>
-                <CircularProgress
-                  variant="determinate"
-                  value={counter}
-                  color="error"
-                  size={60}
-                  thickness={4}
+            <div className="flex flex-row justify-center items-center gap-4 mt-7">
+              {/* Box 3: Webcam */}
+              <div className="rounded-2xl overflow-hidden flex justify-center">
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={{
+                    facingMode: "user",
+                    width: 192,
+                    height: 192,
+                  }}
+                  className="rounded-2xl shadow-lg"
                 />
               </div>
-            )}
-            {recordingStatus === 'stop' && voiceResponse?.predictions && nextButton && (
-              <div className="space-y-4">
-                <Button
-                  onClick={() => {
-                    if (exerciseCount < 3) {
-                      handleNextExercise();
-                    } else {
-                      history('/voiceReport', {
-                        state: {
-                          startTime, expressionArray: expressionArray,
-                          questionScores: questionScores,
-                          sessionId,
-                          isExercise: true,
-                          totalQuestions: 3,
-                          incorrectExpressions,
-                          correctExpressions
-                        }
-                      });
-                      console.log({
-                        date: formattedDate,
-                        expressionArray,
-                        questionScores,
-                        sessionId,
-                        startTime,
-                        totalQuestions: 3,
-                        incorrectExpressions,
-                        correctExpressions
-                      })
-                    }
-                  }}
-                  variant="contained"
-                  color="primary"
-                  className="w-full py-3 text-lg font-semibold rounded-xl"
-                >
-                  {exerciseCount < 3 ? 'Next Exercise' : 'Finish'}
-                </Button>
+
+              {/* Box 4: Controls */}
+              <div className="w-48">
+                <div className="flex justify-center items-center">
+                  {recordingStatus === "idle" && isVideoEnd && (
+                    <button
+                      onClick={onStartRecord}
+                      className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-16 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+                    >
+                      <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                        <span className="text-red-500">●</span> Record
+                      </span>
+                    </button>
+                  )}
+
+                  {recordingStatus === "recording" && (
+                    <div className="mt-16 mb-4 text-center">
+                      <p className="text-lg font-semibold text-red-500 mb-2">
+                        0:0{timer > 0 ? timer : 0} Seconds Left
+                      </p>
+                      <CircularProgress variant="determinate" value={counter} color="error" size={40} thickness={4} />
+                    </div>
+                  )}
+
+                  {recordingStatus === "stop" && voiceResponse?.predictions && nextButton && (
+                    <div className="space-y-4 w-full mt-16">
+                      <button
+                        onClick={handleNextExercise}
+                        className="w-full bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                      >
+                        {exerciseCount < 3 ? "Next Exercise" : "Finish"}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
+            </div>
 
-
-          {/* Loader */}
-          <div className="p-4 flex justify-center">
             <Loader loading={loader} />
-          </div>
+          </main>
         </div>
       </div>
     </div>

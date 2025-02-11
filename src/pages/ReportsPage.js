@@ -10,12 +10,13 @@ import { getReports, getGameReports } from "../utils/functions";
 import { useNavigate } from 'react-router-dom';
 
 // Card for each report
+// Assessment Card
 function Card({ reportData, assessment, itemNum }) {
   if (!assessment) return null;
 
   const { AssessmentDate, DisorderName, Score } = assessment;
   const [detailsOpen, setDetailsOpen] = useState(false);
-  console.log(reportData, AssessmentDate, DisorderName, Score)
+
   const closeDetails = (val) => {
     setDetailsOpen(val);
   };
@@ -56,7 +57,7 @@ function Card({ reportData, assessment, itemNum }) {
   );
 }
 
-// Card for each exercise
+// Exercise Card - Updated to match Assessment Card layout
 function ExerciseCard({ reportData, exercise, itemNum }) {
   if (!exercise) return null;
 
@@ -75,8 +76,8 @@ function ExerciseCard({ reportData, exercise, itemNum }) {
       >
         <div className="bg-gradient-to-br from-[#FF8C00] to-[#FFD700] p-0.5 rounded-2xl">
           <div className="flex justify-between items-center bg-white rounded-2xl p-4">
-            <div className="py-2.5">
-              <h3 className="text-lg font-medium text-gray-900 max-w-[250px]">
+            <div className="flex-1 mr-2.5">
+              <h3 className="text-lg font-medium text-gray-900">
                 {DisorderName} Exercise
               </h3>
               <div className="flex items-center mt-1.5">
@@ -103,6 +104,8 @@ function ExerciseCard({ reportData, exercise, itemNum }) {
   );
 }
 
+export { Card, ExerciseCard };
+
 // Main reports page component
 function ReportsPage({ }) {
   // const { userId } = useDataContext();
@@ -121,8 +124,9 @@ function ReportsPage({ }) {
   const getReportsData = async () => {
     setLoading(true);
     const reports = await getReports(userId);
+    console.log(reports)
     const gamereport = await getGameReports(userId);
-    // console.log(gamereport);
+    console.log(gamereport);
     // console.log(reports);
     setLoading(false);
     setReportData(reports);

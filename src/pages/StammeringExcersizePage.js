@@ -72,7 +72,7 @@ const StammeringExercisePage = () => {
 
       if (data) {
         setExerciseData(data);
-        fetchAvatarPath(data.Sentence);
+       await fetchAvatarPath(data.Sentence);
       }
       console.log(data)
     } catch (error) {
@@ -96,12 +96,11 @@ const StammeringExercisePage = () => {
 
   // Fetch avatar path
   const fetchAvatarPath = async (wordtext) => {
-    console.log('userDetail.AvatarID', userDetail.AvatarID)
     const token = await getToken();
     try {
       setLoading(true)
       const response = await fetch(
-        `${BaseURL}/get_avatar_path/${wordtext?.toLowerCase()}/1`,
+        `${BaseURL}/get_avatar_path/${wordtext?.toLowerCase()}/${userDetail.AvatarID}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       if (response.ok) {
@@ -217,6 +216,7 @@ const StammeringExercisePage = () => {
   const onStopRecord = async () => {
     try {
       if (!mediaRecorderRef.current) return;
+    
 
       return new Promise((resolve) => {
         mediaRecorderRef.current.onstop = async () => {
@@ -282,7 +282,7 @@ const StammeringExercisePage = () => {
       setMispronouncedWord('');
       setIsVideoEnd(true);
       setRecordingStatus('stop');
-      setAvatarPath(null);
+      // setAvatarPath(null);
       setCorrectAnswersCount(prev => prev + 1);
 
       if (isCorrectExpression) {
@@ -554,11 +554,11 @@ const StammeringExercisePage = () => {
                 </div>
               )}
 
-              {mispronouncedWord && (
+              {/* {mispronouncedWord && (
                 <div className="text-sm text-center">
                   Mispronounced Word: <span className="text-red-600">{mispronouncedWord}</span>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Right Box: Video Player */}
@@ -612,7 +612,7 @@ const StammeringExercisePage = () => {
                 )}
 
                 {recordingStatus === 'recording' && (
-                  <div className="mt-16 mb-4">
+                  <div className="mt-16 mb-4 w-full">
                     <div className="border-2 border-red-500 rounded-full p-1">
                       <button
                         disabled={isStopButtonDisabled}

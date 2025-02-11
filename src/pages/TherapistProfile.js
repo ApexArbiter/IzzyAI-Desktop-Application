@@ -7,7 +7,7 @@ import CustomHeader from '../components/CustomHeader';
 const CustomButton = ({ onPress, title }) => (
   <motion.button
     onClick={onPress}
-    className="rounded-full bg-[#111920] p-3 h-[50px] flex items-center justify-center w-full"
+    className="rounded-full bg-[#111920]  h-[50px] flex items-center justify-center mx-auto py-3 px-8"
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
     initial={{ opacity: 0, y: 20 }}
@@ -24,7 +24,7 @@ function TherapistProfilePage() {
   return (
     <div className="h-screen flex flex-col bg-white">
       <CustomHeader title="IzzyAI Chatbot" goBack={() => navigate(-1)} />
-      <div className="flex-1 p-5 overflow-auto">
+      <div className="flex-1 p-5 overflow-hidden max-w-3xl mx-auto">
         <div className="flex flex-col mt-26">
           <motion.img
             src={TherapistImage}

@@ -6,50 +6,56 @@ import Loader from '../components/Loader';
 import CustomHeader from '../components/CustomHeader';
 import LogoQuestionView from '../components/LogoQuestionView';
 
+import { motion } from 'framer-motion';
+
 // Button Components
 const EndButton = ({ onPress, title }) => (
-  <button onClick={onPress} className="w-[42%] rounded-3xl flex items-center justify-center bg-red-500 p-3 h-[50px]">
-    <span className="text-white font-semibold">{title}</span>
-  </button>
+    <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onPress}
+        className="w-full bg-red-500 text-white rounded-full py-2 px-4 font-semibold"
+    >
+        {title}
+    </motion.button>
 );
 
 const NextButton = ({ onPress, title }) => (
-  <button onClick={onPress} className="w-[42%] rounded-[50px] flex items-center justify-center bg-[#71D860] p-3 h-[50px]">
-    <span className="text-[#111920] font-semibold">{title}</span>
-  </button>
+    <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onPress}
+        className="w-full bg-green-500 text-white rounded-full py-2 px-4 font-semibold"
+    >
+        {title}
+    </motion.button>
 );
 
 const PrevButton = ({ onPress, title }) => (
-  <button onClick={onPress} className="w-[42%] rounded-[50px] flex items-center justify-center border border-solid p-3 h-[50px]">
-    <span className="text-[#111920] font-semibold">{title}</span>
-  </button>
+    <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onPress}
+        className="w-full border border-gray-300 text-gray-700 rounded-full py-2 px-4 font-semibold"
+    >
+        {title}
+    </motion.button>
 );
 
-// Progress Bar Component
-const LinearProgress = ({ value }) => (
-  <div className="relative w-full h-2 bg-gray-200 rounded-2xl overflow-hidden">
-    <div
-      className="absolute top-0 left-0 h-full bg-[#FF7A2F] transition-all duration-300 ease-in-out rounded-2xl"
-      style={{ width: `${value * 100}%` }}
-    />
-  </div>
-);
-
-// Loader Wave Component
+// LoaderWave Component
 const LoaderWave = ({ isAnimation, isDark }) => (
-  <div className={`flex items-center justify-center gap-1 ${isAnimation ? 'animate-pulse' : ''}`}>
-    {[...Array(5)].map((_, i) => (
-      <div
-        key={i}
-        className={`w-1 h-4 ${isDark ? 'bg-gray-800' : 'bg-gray-400'} rounded-full transform transition-all duration-150`}
-        style={{
-          animation: isAnimation ? `wave 1s infinite ${i * 0.1}s` : 'none'
-        }}
-      />
-    ))}
-  </div>
+    <div className={`flex items-center justify-center gap-1 ${isAnimation ? 'animate-pulse' : ''}`}>
+        {[...Array(5)].map((_, i) => (
+            <div
+                key={i}
+                className={`w-1 h-4 ${isDark ? 'bg-gray-800' : 'bg-gray-400'} rounded-full transform transition-all duration-150`}
+                style={{
+                    animation: isAnimation ? `wave 1s infinite ${i * 0.1}s` : 'none'
+                }}
+            />
+        ))}
+    </div>
 );
-
 const VoiceDisorderPage = () => {
   const location = useLocation();
   const { sessionId } = location.state || {};
@@ -195,105 +201,130 @@ const VoiceDisorderPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <CustomHeader title="Quick Voice Disorder Assessment" goBack={() => { navigate(-1) }} />
+    <div className="min-h-screen overflow-hidden bg-gray-50 px-5 py-3">
+            <div className="max-w-4xl mx-auto">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <CustomHeader 
+                        title="Quick Voice Disorder Assessment" 
+                        goBack={() => navigate(-1)} 
+                    />
 
-      <main className="flex-1 p-5">
-        <div className="max-w-3xl mx-auto">
-          <div className="mb-8">
-            <p className="text-lg mb-4">
-              Assessment <span className="font-bold">{exerciseCount}</span> out of <span className="font-bold">3</span>
-            </p>
+                    <main className="p-6">
+                        {/* Progress Section */}
+                        <div className="mb-4">
+                            <p className="text-start mb-1">
+                                Assessment <span className="font-bold">{exerciseCount}</span> out of{' '}
+                                <span className="font-bold">3</span>
+                            </p>
 
-            <div className="flex items-center gap-4">
-              <LinearProgress value={percentageCompleted} />
-              <span className="text-sm font-medium">{(percentageCompleted * 100).toFixed(1)}%</span>
+                            <div className="flex items-center gap-4">
+                                <div className="flex-1 h-2 bg-orange-200 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${percentageCompleted * 100}%` }}
+                                        className="h-full bg-orange-500"
+                                        transition={{ duration: 0.5 }}
+                                    />
+                                </div>
+                                <span className="text-sm text-gray-500 whitespace-nowrap">
+                                    {(percentageCompleted * 100).toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Video Section */}
+                        {exerciseData && (
+                            <div className="border border-[#0CC8E8] rounded-2xl p-4 mx-auto max-w-xl mb-8">
+                                <div className="aspect-video w-full relative">
+                                    <video
+                                        className="w-full h-full object-contain rounded-lg"
+                                        controls
+                                        autoPlay
+                                        src={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
+                                        onEnded={() => setRecordingStatus('idle')}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Question Text */}
+                        <div className="mb-8">
+                            <LogoQuestionView
+                                first_text="Say this..."
+                                second_text={exerciseData?.[exerciseCount - 1] ? exerciseData[exerciseCount - 1]?.WordText : 'loading'}
+                            />
+                        </div>
+
+                        {/* Recording Interface */}
+                        {recordingStatus !== 'stop' && recordingStatus !== 'result' && (
+                            <div className="flex items-center justify-center gap-4 border-t border-gray-200 pt-6">
+                                <LoaderWave isAnimation={recordingStatus === 'recording'} isDark={true} />
+
+                                <button
+                                    onClick={() => recordingStatus === 'idle' ? onStartRecord() : onStopRecord()}
+                                    className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                                >
+                                    {recordingStatus === 'recording' ? (
+                                        <div className="w-5 h-5 bg-black rounded-sm" />
+                                    ) : (
+                                        <svg viewBox="0 0 24 24" className="w-6 h-6">
+                                            <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3z" />
+                                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Navigation Buttons */}
+                        {recordingStatus === 'result' && (
+                            <motion.div
+                                className="space-y-4 max-w-xs mx-auto"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <div className="space-y-3">
+                                    <div className="flex gap-3">
+                                        {exerciseCount !== 1 && (
+                                            <div className="w-1/2">
+                                                <PrevButton
+                                                    onPress={() => {
+                                                        setRecordingStatus('idle');
+                                                        setExerciseCount(prev => prev - 1);
+                                                        setVoiceResponse(null);
+                                                    }}
+                                                    title="Previous"
+                                                />
+                                            </div>
+                                        )}
+                                        <div className="w-1/2">
+                                            <NextButton
+                                                onPress={handleNextExercise}
+                                                title={exerciseCount < 3 ? "Next" : "Finish"}
+                                            />
+                                        </div>
+                                    </div>
+                                    <EndButton
+                                        onPress={() => navigate('/voiceReport', {
+                                            state: {
+                                                date: formattedDate,
+                                                isQuick: true,
+                                                questionScores,
+                                                sessionId,
+                                                startTime
+                                            }
+                                        })}
+                                        title="End Now"
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+                    </main>
+                </div>
             </div>
-          </div>
-
-          {exerciseData && (
-            <div className="border border-[#0CC8E8] rounded-2xl p-5 flex justify-center mb-8 mx-auto w-1/2">
-              <video
-                className="w-full h-auto"
-                controls
-                autoPlay
-                src={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
-                onEnded={() => setRecordingStatus('idle')}
-              />
-            </div>
-          )}
-
-
-          <LogoQuestionView
-            style={{ marginTop: 80 }}
-            first_text={"Say this..."}
-            second_text={exerciseData?.[exerciseCount - 1] ? exerciseData?.[exerciseCount - 1]?.WordText : 'loading'}
-          />
-
-          {/* {voiceResponse?.predictions && (
-            <div className="p-4 rounded-lg mb-8 bg-green-100">
-              <p className="text-lg font-semibold">
-                Score: {voiceResponse.predictions.Normal}
-              </p>
-            </div>
-          )} */}
-
-          {recordingStatus !== 'stop' && recordingStatus !== 'result' && (
-            <div className="flex items-center justify-center gap-4 border-t pt-4 mt-8">
-              <LoaderWave isAnimation={recordingStatus === 'recording'} isDark={true} />
-
-              <button
-                onClick={() => recordingStatus === 'idle' ? onStartRecord() : onStopRecord()}
-                className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full"
-              >
-                {recordingStatus === 'recording' ? (
-                  <div className="w-5 h-5 bg-black rounded-sm" />
-                ) : (
-                  <svg viewBox="0 0 24 24" className="w-6 h-6">
-                    <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3z" />
-                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          )}
-
-          {recordingStatus === 'result' && (
-            <div className="flex flex-col items-center gap-4 mt-8">
-              <div className="flex justify-between w-full gap-4">
-                {exerciseCount !== 1 && (
-                  <PrevButton
-                    onPress={() => {
-                      setRecordingStatus('idle');
-                      setExerciseCount(prev => prev - 1);
-                      setVoiceResponse(null);
-                    }}
-                    title="Previous"
-                  />
-                )}
-                <NextButton
-                  onPress={handleNextExercise}
-                  title={exerciseCount < 3 ? "Next" : "Finish"}
-                />
-              </div>
-              <EndButton
-                onPress={() => navigate('/voiceReport', {
-                  state: {
-                    date: formattedDate,
-                    isQuick: true,
-                    questionScores,
-                    sessionId, startTime
-
-                  }
-                })}
-                title="End Now"
-              />
-            </div>
-          )}
+            <Loader loading={loading} />
         </div>
-      </main>
-      <Loader loading={loading} />
-    </div>
   );
 };
 

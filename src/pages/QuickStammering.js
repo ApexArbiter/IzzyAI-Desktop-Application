@@ -8,6 +8,7 @@ import Loader from '../components/Loader';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import { ArrowLeft } from 'lucide-react';
 import CustomHeader from '../components/CustomHeader';
+import LogoQuestionView from '../components/LogoQuestionView';
 
 
 // Button Components
@@ -222,55 +223,74 @@ const SpeechArticulationPage = () => {
     }, [backendResponseText, recordingStatus]);
 
     return (
-        <div className="flex flex-col min-h-screen bg-white">
-            <CustomHeader title="Quick Stammering Assessment" goBack={() => { navigate(-1) }} />
+        <div className="min-h-screen overflow-hidden bg-gray-50 px-5 py-3">
+        <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <CustomHeader 
+                    title="Quick Stammering Assessment" 
+                    goBack={() => navigate(-1)} 
+                />
 
-            <main className="flex-1 p-5">
-                <div className="max-w-3xl mx-auto">
-
-
-                    {/* Question Image */}
-                    <div className="border border-[#0CC8E8] rounded-2xl p-5 flex justify-center mb-8">
-
-                        <div className="mb-8">
-                            <p className="text-lg mb-2">Read this Paragraph:</p>
-                            <p className="text-xl font-semibold">
-                                Well, he is nearly 93 years old, yet he still thinks as
-                                swiftly as ever. He dresses himself in an old black frock
-                                coat, usually several buttons missing. A long beard clings to
-                                his chin, giving those who observe him a pronounced feeling of
-                                the utmost respect. When he speaks, his voice is just a bit
-                                cracked and quivers a bit. Twice each day he plays skillfully
-                                and with zest upon a small organ. Except in the winter when
-                                the snow or ice prevents, he slowly takes a short walk in the
-                                open air each day. We have often urged him to walk more and
-                                smoke less, but he always answers, “Banana oil!” Grandfather
-                                likes to be modern in his language.
-                            </p>
+                <main className="p-6">
+                    {/* Reading Section */}
+                    <div className="mb-8">
+                        <div className="border border-[#0CC8E8] rounded-2xl p-6 mx-auto">
+                            <div className="mb-6">
+                                <LogoQuestionView
+                                    second_text="Read this Paragraph:"
+                                    className="mt-4"
+                                />
+                            </div>
+                            
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                                className="prose prose-lg max-w-none"
+                            >
+                                <p className="text-lg text-gray-800 leading-relaxed">
+                                    Well, he is nearly 93 years old, yet he still thinks as
+                                    swiftly as ever. He dresses himself in an old black frock
+                                    coat, usually several buttons missing. A long beard clings to
+                                    his chin, giving those who observe him a pronounced feeling of
+                                    the utmost respect. When he speaks, his voice is just a bit
+                                    cracked and quivers a bit. Twice each day he plays skillfully
+                                    and with zest upon a small organ. Except in the winter when
+                                    the snow or ice prevents, he slowly takes a short walk in the
+                                    open air each day. We have often urged him to walk more and
+                                    smoke less, but he always answers, "Banana oil!" Grandfather
+                                    likes to be modern in his language.
+                                </p>
+                            </motion.div>
                         </div>
-
-
                     </div>
 
-
-
-                    {/* Response */}
+                    {/* Response Message */}
                     {recordingStatus === 'stop' && questionResponse && (
-                        <div className={`p-4 rounded-lg mb-8 ${questionResponse === 'Correct!' ? 'bg-green-100' : 'bg-red-100'
-                            }`}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`p-4 rounded-lg mb-8 ${
+                                questionResponse === 'Correct!' ? 'bg-green-100' : 'bg-red-100'
+                            }`}
+                        >
                             <p className="text-lg font-semibold">{questionResponse}</p>
-                        </div>
+                        </motion.div>
                     )}
 
                     {/* Recording Interface */}
                     {recordingStatus !== 'stop' && (
-                        <div className="flex items-center justify-center gap-4 border-t pt-4 mt-8">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex items-center justify-center gap-4 border-t border-gray-200 pt-6"
+                        >
                             <LoaderWave isAnimation={recordingStatus === 'recording'} isDark={true} />
 
                             <button
                                 disabled={recordingStatus === 'loading'}
                                 onClick={() => recordingStatus === 'idle' ? onStartRecord() : onStopRecord()}
-                                className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full"
+                                className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
                             >
                                 {recordingStatus === 'recording' ? (
                                     <div className="w-5 h-5 bg-black rounded-sm" />
@@ -281,14 +301,13 @@ const SpeechArticulationPage = () => {
                                     </svg>
                                 )}
                             </button>
-                        </div>
+                        </motion.div>
                     )}
-                    <Loader loading={loading} />
-
-
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
+        <Loader loading={loading} />
+    </div>
     );
 }
 

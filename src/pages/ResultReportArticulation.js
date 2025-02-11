@@ -9,29 +9,31 @@ import { useDataContext } from '../contexts/DataContext';
 import CustomHeader from '../components/CustomHeader';
 
 
-  const generateHighlightedText = (text, indexes) => {
-    return text.split('').map((letter, index) => {
-      const isHighlighted = indexes?.includes(index);
-      const isFirstLetter = index === 0;
-      
-      return (
-        <span
-          key={index}
-          className={`
-            inline-block
-            text-lg
-            ${isHighlighted ? 'text-red-500' : 'text-black'}
-            ${isFirstLetter ? 'uppercase' : 'lowercase'}
-            ${index > 0 ? 'ml-px' : ''}
-          `}
-        >
-          {letter}
-        </span>
-      );
-    });
-  };
+const generateHighlightedText = (text, indexes) => {
+  if (!text) return null;
 
-  
+  return text.split('').map((letter, index) => {
+    const isHighlighted = indexes?.includes(index);
+    const isFirstLetter = index === 0;
+
+    return (
+      <span
+        key={index}
+        className={`
+          inline-block
+          text-lg
+          ${isHighlighted ? 'text-red-500' : 'text-black'}
+          ${isFirstLetter ? 'uppercase' : 'lowercase'}
+          ${index > 0 ? 'ml-px' : ''}
+        `}
+      >
+        {letter}
+      </span>
+    );
+  });
+};
+
+
 // Progress Components
 const CircularProgress = ({ percentage, size = "lg", tintColor = "#FC4343", backgroundColor = "#71D860" }) => {
   const radius = 75;
@@ -316,7 +318,7 @@ const ArticulationResult = () => {
 
   const onPressBack = () => {
     if (isQuick) {
-      navigate(-2);
+      navigate(-1);
     } else {
       navigate('/home');
     }
@@ -341,7 +343,7 @@ const ArticulationResult = () => {
           <div className="flex justify-center gap-8 mb-3">
             <CircularProgress
               percentage={percentage}
-              size={!isQuick ? "lg" : "xl"}
+              size={!isQuick ? "lg" : "lg"}
             />
             {!isQuick && (
               <CircularProgress
@@ -390,28 +392,40 @@ const ArticulationResult = () => {
           </div>
 
           <div className="flex flex-col">
-      <h3 className="text-lg mt-2  ">List of Incorrect Pronunciations:</h3>
-      <div className="max-h-[100px] overflow-y-auto  rounded-lg">
-        <div className="">
-          {incorrectQuestions.map((item, index) => {
-            const highlightIndexes = item?.HighlightWord 
-              ? JSON.parse(item.HighlightWord)
-              : [];
+  <h3 className="text-lg mt-2">List of Incorrect Pronunciations:</h3>
+  <div className="max-h-[100px] overflow-y-auto rounded-lg">
+    <div className="">
+      {incorrectQuestions.map((item, index) => {
+        // Handle both quick and regular assessment cases
+        const word = item?.WordText || item?.wordtext;
+        const highlightStr = item?.HighlightWord || item?.highlightword;
+        
+        // Parse highlight indexes, handling both string and array formats
+        let highlightIndexes = [];
+        try {
+          if (highlightStr) {
+            highlightIndexes = typeof highlightStr === 'string' 
+              ? JSON.parse(highlightStr)
+              : highlightStr;
+          }
+        } catch (error) {
+          console.error('Error parsing highlight indexes:', error);
+        }
 
-            return (
-              <div
-                key={`${item.WordText}-${index}`}
-                className="flex items-center"
-              >
-                <span className="text-red-700">
-                  {generateHighlightedText(item.WordText, highlightIndexes)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+        return word ? (
+          <div
+            key={`${word}-${index}`}
+            className="flex items-center"
+          >
+            <span className="text-red-700">
+              {generateHighlightedText(word, highlightIndexes)}
+            </span>
+          </div>
+        ) : null;
+      })}
     </div>
+  </div>
+</div>
           <div className="flex justify-center">
             <button
               onClick={onPressBack}

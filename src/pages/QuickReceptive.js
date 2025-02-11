@@ -1,41 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { LinearProgress } from '@mui/material';
 import { getQuickReceptiveQuestions, shuffleArray } from '../utils/functions';
 import { IMAGE_BASE_URL } from '../components/ApiCreds';
 import LogoQuestionView from '../components/LogoQuestionView';
 import Loader from '../components/Loader';
 import { useDataContext } from '../contexts/DataContext';
 import CustomHeader from '../components/CustomHeader';
+import { motion } from 'framer-motion';
 
-// Button Components
+// Button Components with updated styles
 const EndButton = ({ onClick, title }) => (
-    <button
+    <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         onClick={onClick}
-        className="w-[42%] rounded-[50px] text-center bg-red-500 p-2.5 h-[50px] flex justify-center items-center"
+        className="w-full bg-red-500 text-white rounded-full py-2 px-4 font-semibold"
     >
-        <span className="text-white font-semibold">{title}</span>
-    </button>
+        {title}
+    </motion.button>
 );
 
 const NextButton = ({ onClick, title }) => (
-    <button
+    <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         onClick={onClick}
-        className="w-[42%] rounded-[50px] text-center bg-[#71D860] p-2.5 h-[50px] flex justify-center items-center"
+        className="w-full bg-green-500 text-white rounded-full py-2 px-4 font-semibold"
     >
-        <span className="text-[#111920] font-semibold">{title}</span>
-    </button>
+        {title}
+    </motion.button>
 );
 
 const PrevButton = ({ onClick, title }) => (
-    <button
+    <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         onClick={onClick}
-        className="w-[42%] rounded-[50px] text-center border border-solid p-2.5 h-[50px] flex justify-center items-center"
+        className="w-full border border-gray-300 text-gray-700 rounded-full py-2 px-4 font-semibold"
     >
-        <span className="text-[#111920] font-semibold">{title}</span>
-    </button>
+        {title}
+    </motion.button>
 );
+
 
 function QuickReceptive() {
     const location = useLocation();
@@ -68,7 +74,7 @@ function QuickReceptive() {
     const fetchQuestionData = async () => {
         const userId = localStorage.getItem('userId');
         try {
-            setLoading(true)
+            setLoading(true);
             const response = await getQuickReceptiveQuestions(userId);
             if (response) {
                 setQuestions(response);
@@ -85,9 +91,9 @@ function QuickReceptive() {
         fetchQuestionData();
     }, []);
 
-    // Answer handling functions
+    // Existing function implementations remain the same
     const onCorrectAnswer = (ques) => {
-        setQuestionResponse('Correct!');
+        setQuestionResponse('Matched');
         setCorrectAnswersCount(prevCount => prevCount + 1);
         if (!correctQuestions.includes(ques)) {
             setCorrectQuestions(prevQuestions => [...prevQuestions, ques]);
@@ -112,10 +118,9 @@ function QuickReceptive() {
                 prevQuestions.filter(q => q !== ques)
             );
         }
-        setQuestionResponse('Incorrect!');
+        setQuestionResponse('UnMatched');
     };
 
-    // Image click handler
     const onPressImage = async (item, evt) => {
         const currentQuestion = questions?.[questionCount - 1];
         if (currentQuestion?.image_url) {
@@ -151,7 +156,6 @@ function QuickReceptive() {
         }
     };
 
-    // Navigation functions
     const navigateTo = () => {
         setExpressiveReport(incorrectQuestions);
         navigate('/result-expressive-language', {
@@ -176,137 +180,144 @@ function QuickReceptive() {
     const percentageCompleted = (questionCount / questions?.length) * 100;
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
+        <div className="min-h-screen overflow-hidden bg-gray-50 px-5 py-3">
+            <div className="max-w-4xl mx-auto">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <CustomHeader
+                        title="Quick Receptive Language Disorder Assessment"
+                        goBack={() => navigate(-1)}
+                    />
 
-            <CustomHeader title=" Quick Receptive Language Disorder Assessment" goBack={() => navigate(-1)} />
+                    <main className="p-6">
+                        {/* Progress Section */}
+                        <div className="mb-4">
+                            <p className="text-start mb-1">
+                                Question <span className="font-bold">{Math.min(questionCount, questions?.length || 0)}</span> out of{' '}
+                                <span className="font-bold">{questions?.length || 0}</span>
+                            </p>
 
-            {/* Main Content */}
-            <main className="max-w-7xl mx-auto p-5">
-                {isLoading ? (
-                    <Loader loading={isLoading} />
-                ) : (
-                    <div className="space-y-6">
-                        {/* Question Counter */}
-                        <div className="text-lg">
-                            Question{' '}
-                            <span className="font-bold">
-                                {questionCount > questions?.length ? questions?.length : questionCount}{' '}
-                            </span>
-                            out of
-                            <span className="font-bold"> {questions?.length}</span>
+                            {percentageCompleted.toString() !== 'Infinity' && (
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-1 h-2 bg-orange-200 rounded-full overflow-hidden">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${percentageCompleted}%` }}
+                                            className="h-full bg-orange-500"
+                                            transition={{ duration: 0.5 }}
+                                        />
+                                    </div>
+                                    <span className="text-sm text-gray-500 whitespace-nowrap">
+                                        {percentageCompleted.toFixed(1)}%
+                                    </span>
+                                </div>
+                            )}
                         </div>
-
-                        {/* Progress Bar */}
-                        {percentageCompleted.toString() !== "Infinity" && (
-                            <div className="flex items-center gap-4">
-                                <LinearProgress
-                                    className="flex-1 rounded-full h-2"
-                                    value={percentageCompleted}
-                                    variant="determinate"
-                                    color="primary"
-                                />
-                                <span className="text-sm font-medium">
-                                    {percentageCompleted > 0 ? percentageCompleted?.toFixed(1) : 0}%
-                                </span>
-                            </div>
-                        )}
 
                         {/* Question */}
                         {questions?.[questionCount - 1] && (
-                            <LogoQuestionView
-                                second_text={questions?.[questionCount - 1]?.question_text}
-                            />
-                        )}
-
-                        {/* Images Section */}
-                        {questions?.length > 0 && (
-                            <div className="mt-5">
-                                {questions?.[questionCount - 1]?.image_url ? (
-                                    <div className="flex justify-center items-center">
-                                        <button
-                                            disabled={questionResponse !== ''}
-                                            onClick={(evt) => onPressImage(questions?.[questionCount - 1], evt)}
-                                            className="w-[300px] h-[300px] rounded-xl border relative flex items-center justify-center"
-                                        >
-                                            <img
-                                                className="w-full h-full rounded-xl object-contain"
-                                                src={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.image_url}`}
-                                                alt="Question"
-                                            />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="border border-[#0CC8E8] rounded-2xl mt-10 p-3 pb-5 flex justify-between mx-auto">
-                                        {currentImages?.map((item, index) => (
-                                            <button
-                                                key={index}
-                                                disabled={questionResponse !== ''}
-                                                onClick={(evt) => onPressImage(item, evt)}
-                                                className="mt-5 w-[48%] h-[200px] border"
-                                            >
-                                                <img
-                                                    className="w-full h-full object-contain"
-                                                    src={`${IMAGE_BASE_URL}${item}`}
-                                                    alt={`Option ${index + 1}`}
-                                                />
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Response Message */}
-                        {questionResponse !== '' && (
-                            <LogoQuestionView
-                                second_text={null}
-                                questionResponse={questionResponse}
-                                first_text={questionResponse}
-                            />
-                        )}
-
-                        {/* Navigation Buttons */}
-                        {questionResponse !== '' && (
-                            <div className="flex flex-col items-center gap-5 mt-5 mb-[5%]">
-                                {questionCount < questions?.length && (
-                                    <div className="flex justify-between items-center w-full gap-2.5 mb-5">
-                                        {questionCount !== 1 && (
-                                            <PrevButton
-                                                onClick={() => {
-                                                    setQuestionResponse('');
-                                                    if (questionCount >= 1) {
-                                                        setQuestionCount(prevCount => prevCount - 1);
-                                                        setCurrentImages(shuffleArray(questions?.[questionCount - 2]?.images));
-                                                    }
-                                                }}
-                                                title="Previous"
-                                            />
-                                        )}
-                                        <NextButton
-                                            onClick={() => {
-                                                setQuestionResponse('');
-                                                if (questionCount < questions?.length) {
-                                                    setQuestionCount(prevCount => prevCount + 1);
-                                                    setCurrentImages(shuffleArray(questions?.[questionCount]?.images));
-                                                } else {
-                                                    navigateTo();
-                                                }
-                                            }}
-                                            title="Next"
-                                        />
-                                    </div>
-                                )}
-                                <EndButton
-                                    onClick={endAssessment}
-                                    title={questionCount < questions?.length ? "End Now" : "Finish"}
+                            <div className="mb-2 ml-36">
+                                <LogoQuestionView
+                                    second_text={questions[questionCount - 1]?.question_text}
                                 />
                             </div>
                         )}
-                    </div>
-                )}
-                <Loader loading={loading} />
-            </main>
+
+                        {/* Images Section */}
+                        <div className="border border-[#0CC8E8] rounded-2xl p-4 mx-auto max-w-xl mb-8">
+                            {questions?.[questionCount - 1]?.image_url ? (
+                                <div className="flex justify-center">
+                                    <button
+                                        disabled={questionResponse !== ''}
+                                        onClick={(evt) => onPressImage(questions[questionCount - 1], evt)}
+                                        className="relative w-2/5 h-64 aspect-square"
+                                    >
+                                        <img
+                                            className="w-full h-full object-contain  border border-gray-800"
+                                            src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_url}`}
+                                            alt="Question"
+                                        />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex justify-center items-center gap-8 w-full">
+                                    {currentImages?.map((item, index) => (
+                                        <button
+                                            key={index}
+                                            disabled={questionResponse !== ''}
+                                            onClick={(evt) => onPressImage(item, evt)}
+                                            className="w-2/5 h-64 aspect-square transition-transform hover:scale-105 disabled:opacity-50 border border-gray-800 "
+                                        >
+                                            <img
+                                                className="w-full h-full object-contain"
+                                                src={`${IMAGE_BASE_URL}${item}`}
+                                                alt={`Option ${index + 1}`}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Response and Navigation */}
+                        {questionResponse && (
+                            <motion.div
+                                className="space-y-4 max-w-xs mx-auto"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <div className="mb-6">
+                                    <LogoQuestionView
+                                        second_text={null}
+                                        first_text={questionResponse}
+                                        questionResponse={questionResponse}
+                                    />
+                                </div>
+
+                                <div className="space-y-3">
+                                    {questionCount < questions?.length && (
+                                        <div className="flex gap-3">
+                                            {questionCount !== 1 && (
+                                                <div className="w-1/2">
+                                                    <PrevButton
+                                                        onClick={() => {
+                                                            setQuestionResponse('');
+                                                            if (questionCount >= 1) {
+                                                                setQuestionCount(prev => prev - 1);
+                                                                setCurrentImages(shuffleArray(questions?.[questionCount - 2]?.images));
+                                                            }
+                                                        }}
+                                                        title="Previous"
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="w-1/2">
+                                                <NextButton
+                                                    onClick={() => {
+                                                        setQuestionResponse('');
+                                                        if (questionCount < questions?.length) {
+                                                            setQuestionCount(prev => prev + 1);
+                                                            setCurrentImages(shuffleArray(questions?.[questionCount]?.images));
+                                                        } else {
+                                                            navigateTo();
+                                                        }
+                                                    }}
+                                                    title="Next"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                    <EndButton
+                                        onClick={endAssessment}
+                                        title={questionCount < questions?.length ? "End Now" : "Finish"}
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+                    </main>
+                </div>
+            </div>
+            <Loader loading={loading} />
         </div>
     );
 }

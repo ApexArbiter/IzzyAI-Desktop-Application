@@ -9,6 +9,7 @@ const LogoQuestionView = ({
   questionResponse = null,
   image = null,
   style = {},
+  className
 }) => {
   const isMatched = questionResponse === 'Matched' || questionResponse === "Correct!";
 
@@ -89,8 +90,8 @@ const LogoQuestionView = ({
               <HighlightedText indexes={highlighted} text={second_text} />
             </div>
           ) : (
-            <p className="text-sm  md:text-base lg:text-lg font-normal text-gray-900 
-                         break-words leading-relaxed">
+            <p className={` text-sm ${className}  md:text-lg lg:text-xl font-normal text-gray-900 
+                         break-words leading-relaxed `}>
               {second_text}
             </p>
           )}

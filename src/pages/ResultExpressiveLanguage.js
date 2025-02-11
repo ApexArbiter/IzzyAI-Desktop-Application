@@ -260,7 +260,7 @@ const ResultExpressiveLanguage = () => {
           <div className="flex justify-center gap-8 mb-3">
             <CircularProgress
               percentage={percentage}
-              size={!isQuick ? "lg" : "xl"}
+              size={!isQuick ? "lg" : "lg"}
             />
             {(isExpressive && !isQuick) && (
               <CircularProgress

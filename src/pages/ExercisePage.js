@@ -252,6 +252,7 @@ function ExercisePage() {
       checkAssess = await checkExpressiveAssessment(userId);
     }
     if (checkAssess?.data) {
+      try{
       const token = await getToken();
       console.log(JSON.parse(localStorage.getItem("userDetails")))
       const userId = JSON.parse(localStorage.getItem("userDetails"))
@@ -260,14 +261,18 @@ function ExercisePage() {
       formData.append('UserID', userId);
       formData.append('SessionTypeID', 2);
 
-      fetch(`${BaseURL}/insert_session_first_data`, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Authorization': 'Bearer ' + token }
-      })
-        .then(response => response.json())
-        .then(data => {
+      const sessionResponse = await fetch(`${BaseURL}/insert_session_first_data`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+              'Authorization': 'Bearer ' + token,
+          },
+      });
+       
+      
           setLoading(false);
+          if (sessionResponse.ok) {
+            const data = await sessionResponse.json();
           history(isReceptive ? "/ReceptiveExercise" : '/ExpressiveExercise', {
             state: {
               sessionId: data.SessionID,
@@ -275,11 +280,14 @@ function ExercisePage() {
               isAll: false,
             }
           });
-        })
-        .catch(error => {
+        } else {
+          throw new Error(sessionResponse.statusText);
+      }
+      
+      }catch(error) {
           setLoading(false);
           console.error('Error:', error);
-        });
+        };
     } else {
       alert(isReceptive ? 'Complete your receptive language disorder assessment' : 'Complete your expressive language disorder assessment');
     }

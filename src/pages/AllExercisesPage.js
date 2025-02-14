@@ -59,6 +59,7 @@ function AllExercisesPage() {
     const [loading, setLoading] = useState(false);
     const [receptiveQuestions, setReceptiveQuestions] = useState([]);
     const [expressiveQuestions, setExpressiveQuestions] = useState([]);
+    
 
     const navigate = useNavigate();
 
@@ -68,14 +69,7 @@ function AllExercisesPage() {
 
     useEffect(() => {
         const fetchData = () => {
-            try {
-                const storedUserDetail = localStorage.getItem("userDetails");
-                if (storedUserDetail) {
-                    setUserDetail(JSON.parse(storedUserDetail));
-                }
-            } catch (error) {
-                console.error("Error retrieving or parsing userDetails from localStorage", error);
-            }
+           
         };
         fetchData();
     }, []);
@@ -94,6 +88,7 @@ function AllExercisesPage() {
             );
 
             if (response.ok) {
+                console.log("hello")
                 const reportData = await response.json();
                 let sum = 0;
                 const names = [];

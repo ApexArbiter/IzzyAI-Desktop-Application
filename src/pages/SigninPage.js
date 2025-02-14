@@ -46,11 +46,11 @@ function SignInPage() {
 
   const navigateAfterLogin = (isFace = false, route = 'main', params = {}) => {
     if (isFace) {
-      navigate('/scanfaceInstruction', { 
-        state: { 
-          routeName: 'baselineQuestions', 
+      navigate('/scanfaceInstruction', {
+        state: {
+          routeName: 'baselineQuestions',
           nextPage: 'faceauthenticationscreen'
-        } 
+        }
       });
     } else {
       navigate(route, { state: params });
@@ -61,9 +61,9 @@ function SignInPage() {
     if (data?.access_token) {
       localStorage.setItem('token', data?.access_token);
     }
-    
+
     updateUserId(data?.USERID);
-    
+
     if (data?.error) {
       setIsLoading(false);
       setError(data.error);
@@ -73,11 +73,11 @@ function SignInPage() {
     if (!data?.IsOTPVerified) {
       setIsLoading(false);
       await resendOtp({ email: data?.email ?? email?.trim()?.toLowerCase() });
-      navigate("/otpScreen", { 
-        state: { 
-          isSignup: true, 
-          email: data?.email ?? email?.trim()?.toLowerCase() 
-        } 
+      navigate("/otpScreen", {
+        state: {
+          isSignup: true,
+          email: data?.email ?? email?.trim()?.toLowerCase()
+        }
       });
       return;
     }
@@ -87,7 +87,7 @@ function SignInPage() {
         headers: { 'Authorization': 'Bearer ' + data?.access_token }
       });
       const responseData = await response.json();
-      console.log("userdata_info",responseData)
+      console.log("userdata_info", responseData)
 
       localStorage.setItem("isTerms", JSON.stringify(true));
       const quesReport = localStorage.getItem("questionReport");
@@ -150,7 +150,7 @@ function SignInPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${BaseURL}/new_login`, {
+      const response = await fetch(`${BaseURL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -224,140 +224,136 @@ function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 overflow-hidden">
-   
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="flex flex-col items-center justify-center min-h-screen  p-4">
+        <div className="w-full max-w-sm lg:max-w-sm bg-white rounded-2xl  shadow-xl overflow-hidden">
+          <div className="p-4 sm:p-6 lg:p-8 flex flex-col h-full">
+            {/* Header Section - Dynamically sized */}
+            <div className="flex flex-col items-center space-y-2 mb-4">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Sign In</h1>
 
-      <div className="flex flex-col  items-center justify-center min-h-screen px-4">
+              {/* Logo with dynamic sizing */}
+              <div className="w-28 h-10 md:w-32 md:h-12 lg:w-36 lg:h-14">
+                <img
+                  src={require("../assets/images/logo.png")}
+                  alt="Logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
 
-        <div className="w-full  max-w-sm  lg:max-w-md space-y-8  bg-white p-8 rounded-2xl shadow-xl">
-          <div className="space-y-2">
-            <h1 className=" text-xl  md:text-2xl  lg:text-3xl font-bold text-center pb-4 text-gray-900">Sign In</h1>
-
-            <div
-              className=" w-36  h-12  md:w-36 md:h-12    lg:w-48 lg:h-16 mx-auto mb-8"
-            >
-              <img
-                src={require("../assets/images/logo.png")}
-                alt="Logo"
-                className="w-full h-full object-contain"
-              />
+              <p className="text-sm lg:text-base text-gray-500">Please enter your details to sign in</p>
             </div>
-            <p className="text-center text-base lg:text-lg pb-0 text-gray-500">Please enter your details to sign in</p>
-          </div>
 
-          {/* Form Container */}
-          <div className="   md:space-y-2  lg:space-y-6">
-            {/* Email Input */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Email<span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
+            {/* Form Section - Compact spacing */}
+            <div className="space-y-3 md:space-y-4">
+              {/* Email Input */}
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Email<span className="text-red-500">*</span>
+                </label>
                 <input
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
                   focus:ring-blue-500 focus:border-transparent transition-all duration-300
-                  placeholder:text-gray-400"
+                  placeholder:text-gray-400 text-sm"
                 />
               </div>
-            </div>
 
-            {/* Password Input */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Password<span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type={hidePassword ? 'password' : 'text'}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
-                  focus:ring-blue-500 focus:border-transparent transition-all duration-300
-                  placeholder:text-gray-400"
-                />
+              {/* Password Input */}
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Password<span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={hidePassword ? 'password' : 'text'}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
+                    focus:ring-blue-500 focus:border-transparent transition-all duration-300
+                    placeholder:text-gray-400 text-sm"
+                  />
+                  <button
+                    onClick={() => setHidePassword(!hidePassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    type="button"
+                  >
+                    {hidePassword ? (
+                      <EyeOffIcon className="w-4 h-4" />
+                    ) : (
+                      <EyeIcon className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Forgot Password Link */}
+              <div className="flex justify-end">
                 <button
-                  onClick={() => setHidePassword(!hidePassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowEmailPopup(true)}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                   type="button"
                 >
-                  {hidePassword ? (
-                    <EyeOffIcon className="w-5 h-5" />
-                  ) : (
-                    <EyeIcon className="w-5 h-5" />
-                  )}
+                  Forgot Password?
                 </button>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="text-red-500 text-xs text-center bg-red-50 p-2 rounded-lg border border-red-100">
+                  {error}
+                </div>
+              )}
+
+              {/* Login Button */}
+              <CustomButton
+                onPress={handleLogin}
+                title="Sign In"
+                loading={isLoading}
+              />
+
+              {/* Sign Up Prompt */}
+              <p className="text-center text-sm text-gray-600">
+                Don't have an account?{' '}
+                <button
+                  onClick={() => navigate('/SignUpConsent')}
+                  className="text-blue-600 hover:text-blue-800 font-semibold"
+                  type="button"
+                >
+                  Sign Up
+                </button>
+              </p>
             </div>
 
-            {/* Forgot Password Link - Now properly positioned */}
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowEmailPopup(true)}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-300"
-                type="button"
-              >
-                Forgot Password?
-              </button>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-100">
-                {error}
+            {/* Divider - Compact version */}
+            <div className="relative py-3">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
               </div>
-            )}
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 text-sm bg-white text-gray-500">or continue with</span>
+              </div>
+            </div>
 
-            {/* Login Button */}
-            <CustomButton
-              onPress={handleLogin}
-              title="Sign In"
-              loading={isLoading}
-            />
-
-            {/* Sign Up Prompt */}
-            <p className="text-center text-gray-600">
-              Don't have an account?{' '}
+            {/* Social Auth Buttons - Compact */}
+            <div className="flex justify-center space-x-4 mt-2">
               <button
-                onClick={() => navigate('/SignUpConsent')}
-                className="text-blue-600 hover:text-blue-800 font-semibold transition-colors duration-300"
+                className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-300"
                 type="button"
               >
-                Sign Up
+                <GoogleIcon />
               </button>
-            </p>
-          </div>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <button
+                className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-300"
+                type="button"
+              >
+                <AppleIcon />
+              </button>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4  text-base lg:text-lg bg-white text-gray-500">or continue with</span>
-            </div>
-          </div>
-
-          {/* Social Auth Buttons */}
-          <div className="flex justify-center space-x-4">
-            <button
-              className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-300
-              shadow-sm hover:shadow-md"
-              type="button"
-            >
-              <GoogleIcon />
-            </button>
-            <button
-              className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-300
-              shadow-sm hover:shadow-md"
-              type="button"
-            >
-              <AppleIcon />
-            </button>
           </div>
         </div>
       </div>

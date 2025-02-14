@@ -15,7 +15,7 @@ function ReceptiveLanguageInstructions() {
         <div className="flex flex-col min-h-screen">
             <CustomHeader
                 title="Receptive Language Disorder"
-                goBack={() => navigate(-1)}
+                goBack={() => history(isAll ? "/allAssessmentPage" : "/assessmentPage")}
             />
             <div className="h-14 w-28 md:h-16 md:w-32  lg:h-20 lg:w-40 mx-auto mt-2 ">
                 <img

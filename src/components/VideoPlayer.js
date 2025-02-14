@@ -1,48 +1,98 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Play, Pause } from 'lucide-react';
 
-const VideoPlayer = ({ source, onEnd, onStart, videoHeight, className }) => {
-  const videoRef = useRef(null); // Create a reference for the video element
+const VideoPlayer = ({ source, onEnd, onStart, className, controls = false }) => {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-  // Handle video end and start events
   useEffect(() => {
     const videoElement = videoRef.current;
+    if (!videoElement) return;
 
-    // Attach event listeners
-    if (videoElement) {
-      videoElement.addEventListener('ended', () => {
-        if (onEnd) {
-          onEnd(); // Trigger onEnd callback
-        }
-      });
+    const handleTimeUpdate = () => {
+      const progress = (videoElement.currentTime / videoElement.duration) * 100;
+      setProgress(progress);
+    };
 
-      videoElement.addEventListener('play', () => {
-        if (onStart) {
-          onStart(); // Trigger onStart callback when video starts
-        }
-      });
-    }
+    const handleEnded = () => {
+      setIsPlaying(false);
+      if (onEnd) onEnd();
+    };
+
+    const handlePlay = () => {
+      setIsPlaying(true);
+      if (onStart) onStart();
+    };
+
+    const handlePause = () => {
+      setIsPlaying(false);
+    };
+
+    videoElement.addEventListener('timeupdate', handleTimeUpdate);
+    videoElement.addEventListener('ended', handleEnded);
+    videoElement.addEventListener('play', handlePlay);
+    videoElement.addEventListener('pause', handlePause);
 
     return () => {
-      // Cleanup event listeners when the component is unmounted
-      return () => {
-        if (videoElement) {
-          // Update to use the callback functions
-          videoElement.removeEventListener('ended', () => onEnd?.());
-          videoElement.removeEventListener('play', () => onStart?.());
-        }
-      };
+      videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+      videoElement.removeEventListener('ended', handleEnded);
+      videoElement.removeEventListener('play', handlePlay);
+      videoElement.removeEventListener('pause', handlePause);
     };
-  }, [onEnd, onStart]); // Dependency array to reattach event listeners if the callbacks change
+  }, [onEnd, onStart]);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+    }
+  };
+
+  const handleProgressClick = (e) => {
+    const progressBar = e.currentTarget;
+    const clickPosition = (e.clientX - progressBar.getBoundingClientRect().left) / progressBar.offsetWidth;
+    const newTime = clickPosition * videoRef.current.duration;
+    videoRef.current.currentTime = newTime;
+  };
 
   return (
-    <div className="h-full  flex items-center justify-center">
+    <div className="relative w-full">
       <video
         ref={videoRef}
         src={source}
-        className={` h-full object-cover ${className}`}
-        controls={false}
+        className={`w-full object-cover ${className}`}
+        playsInline
         autoPlay
       />
+      
+      {controls && (
+        <>
+          <div 
+            className="absolute bottom-0 left-0 w-full h-1 bg-gray-200 cursor-pointer"
+            onClick={handleProgressClick}
+          >
+            <div 
+              className="h-full bg-[#2DEEAA]"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <button
+            onClick={togglePlay}
+            className="absolute bottom-2 left-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? (
+              <Pause className="w-6 h-6 fill-cyan-500 stroke-cyan-400" />
+            ) : (
+              <Play className="w-6 h-6 fill-cyan-400 stroke-cyan-400" />
+            )}
+          </button>
+        </>
+      )}
     </div>
   );
 };

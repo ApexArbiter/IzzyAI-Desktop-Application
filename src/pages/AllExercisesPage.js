@@ -55,7 +55,7 @@ const ExerciseCard = ({ title, subtitle, onStart }) => {
 function AllExercisesPage() {
     const { updateUserDetail, questionReport } = useDataContext();
     const SessiontypId = 2;
-    const [userDetail, setUserDetail] = useState(null);
+    
     const [loading, setLoading] = useState(false);
     const [receptiveQuestions, setReceptiveQuestions] = useState([]);
     const [expressiveQuestions, setExpressiveQuestions] = useState([]);
@@ -64,6 +64,7 @@ function AllExercisesPage() {
 
     const User = () => localStorage.getItem("userId");
     const userId = User();
+    const userDetail = JSON.parse(localStorage.getItem("userDetails"))
 
     useEffect(() => {
         const fetchData = () => {
@@ -300,7 +301,7 @@ function AllExercisesPage() {
               <div className="space-y-4">
                 <ExerciseCard
                   title="Articulation Disorder"
-                  subtitle="271 Words"
+                  subtitle={`${userDetail.totalQuestion} Words`}
                   onStart={handleButtonClick}
                 />
     

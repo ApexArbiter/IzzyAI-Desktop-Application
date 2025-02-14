@@ -121,7 +121,7 @@ function App() {
           <Route path="/therapistsPage" element={<TherapistsPage />} />
           <Route path="/therapistProfile" element={<TherapistProfilePage />} />
           <Route path="/AvatarTherapistName" element={<TherapistName />} />
-          <Route path="/profile" element={<ProfilePage/>} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/result-expressive-language" element={<ResultExpressiveLanguage />} />
           <Route path="/resultReport" element={<ResultReportArticulation />} />
           <Route path="/reportsPage" element={<ReportsPage />} />

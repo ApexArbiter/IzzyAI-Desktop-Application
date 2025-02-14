@@ -214,57 +214,62 @@ const StammeringExercisePage = () => {
 
   // Stop recording
   const onStopRecord = async () => {
+    setRecordingStatus("");
+    setLoading(true);
+    
     try {
       if (!mediaRecorderRef.current) return;
-    
-
+  
       return new Promise((resolve) => {
         mediaRecorderRef.current.onstop = async () => {
           try {
-            setLoading(true)
             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-            console.log('Audio blob created:', audioBlob.size, 'bytes');
-
             const token = await getToken();
             const formData = new FormData();
             formData.append('audio', audioBlob, 'recording.wav');
             formData.append('sentence', mispronouncedWord || exerciseData.Sentence);
-
-            const options = {
-              method: 'POST',
-              body: formData,
-              headers: {
-                Accept: 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-            };
-
-            const response = await fetch(`${BaseURL}/process_sentence`, options);
-            const data = await response.json();
-            console.log('Recording response:', data.mispronounced_words);
-            setMispronouncedWord(data.mispronounced_words);
-            const isMatched = data.message?.toLowerCase() === 'matched';
-
-            console.log("Message:", data.message)
-            console.log("isMatched", isMatched)
-            console.log("Hello 1")
-            setLoading(false)
-            handleRecordingResponse(isMatched);
+  
+            // Process both speech and expression in parallel
+            const [speechResponse, expressionResponse] = await Promise.all([
+              fetch(`${BaseURL}/process_sentence`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                  Accept: 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              }).then(res => res.json()),
+              sendSnapshot()
+            ]);
+  
+            setLoading(false);
+            setIsDelay(true);
+            
+            // Update UI with results
+            setMispronouncedWord(speechResponse.mispronounced_words);
+            const isMatched = speechResponse.message?.toLowerCase() === 'matched';
+            
+            // Show results for 3 seconds
+            setTimeout(() => {
+              setIsDelay(false);
+              handleRecordingResponse(isMatched);
+            }, 3000);
+  
             resolve();
           } catch (error) {
             console.error('Error processing recording:', error);
             setRecordingStatus('idle');
+            setLoading(false);
             resolve();
           }
         };
-
+  
         mediaRecorderRef.current.stop();
       });
     } catch (error) {
       console.error('Error stopping recording:', error);
       setRecordingStatus('idle');
-    } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -562,12 +567,13 @@ const StammeringExercisePage = () => {
             </div>
 
             {/* Right Box: Video Player */}
-            <div className="w-48 h-48 rounded-xl overflow-hidden">
+            <div className="w-48 h-48 rounded-xl relative bg-white overflow-hidden">
               {avatarPath && (
                 <VideoPlayer
                   source={`${IMAGE_BASE_URL}${avatarPath}`}
                   onEnd={() => setIsVideoEnd(true)}
                   onStart={() => setIsVideoEnd(false)}
+                  controls={true}
                 />
               )}
             </div>

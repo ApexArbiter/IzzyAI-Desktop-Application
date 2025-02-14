@@ -6,12 +6,20 @@ import CustomHeader from '../components/CustomHeader';
 import { UserIcon, Mail, Lock } from 'lucide-react';
 import { setToken, calculateAge, signup } from '../utils/functions';
 import moment from 'moment';
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog"
 const CustomButton = ({ onPress, title, loading, className }) => {
   return (
     <button
       onClick={onPress}
-      className={`w-full px-6 py-3 text-white bg-black rounded-full font-semibold 
+      className={`w-4/5 min-w-md px-6 py-3 mx-auto text-white bg-black rounded-full font-semibold 
       transition-all duration-300 hover:bg-gray-800 disabled:opacity-50 
       disabled:cursor-not-allowed ${className}`}
       disabled={loading}
@@ -69,6 +77,10 @@ const SignUpPage = () => {
   const location = useLocation();
   const { type } = location.state;
 
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
   const handleNavigate = async () => {
     if (!email || !password || !firstName || !username || !confirmPassword || !gender) {
       setError('Please fill all fields');
@@ -84,7 +96,7 @@ const SignUpPage = () => {
       setError('Invalid email address');
       return;
     }
-    
+
     if (!isValidPassword(password)) {
       setError('Invalid password. It should contain at least 8 characters, 1 uppercase letter, and 1 special character.');
       return;
@@ -108,34 +120,48 @@ const SignUpPage = () => {
     };
 
     if (type === 'adult') {
-      setIsLoading(true);
-      try {
-        const response = await signup(userData)
+      const age = calculateAge(date);
+      if (age < 18) {
+        setAlertMessage("It looks like you're under 18. No worries—head over to the 'My Child' Account and enter your Parent/Guardian's email address to continue.");
+        setShowAlert(true);
+      } else {
+        setIsLoading(true);
+        const response = await signup(userData);
+        setIsLoading(false);
         if (response?.data?.access_token) {
-          console.log(response?.data?.access_token)
           await setToken(response?.data?.access_token);
-          navigate('/otpScreen', { state: { email: userData?.email, isSignup: true } });
-        } else {
-          setError(response?.response?.data?.error || response?.data?.error || 'Something went wrong');
         }
-      } catch (error) {
-        console.log(error);
-        console.log(error?.response?.data?.error);
-        setError(error?.response?.data?.error || 'An error occurred while signing up');
+        if (response?.response?.data?.error || response?.data?.error) {
+          setError(response?.response?.data?.error || response?.data?.error);
+        } else {
+          navigate("/otpScreen", {
+            state: {
+              email: userData?.email,
+              isSignup: true
+            }
+          });
+        }
       }
-      setIsLoading(false);
     } else if (type === 'child') {
       const age = calculateAge(date);
-      console.log(age)
-      if (age >= 18) {
-        alert("Oops! Looks like you're under 18. No worries—just pop in your Parent/Guardian's email address to keep going");
-       
+      if (age <= 18) {
+        setAlertMessage("Looks like you're under 18. No worries—just pop in your Parent/Guardian's email address to keep going");
+        setShowAlert(true);
       }
-      navigate("/ConsentGuardian", { state: { data: userData, isChild: true } });
+      navigate("/consent-guardian", {
+        state: {
+          data: userData,
+          isChild: true
+        }
+      });
     } else {
-      navigate("/SomeoneCareScreen", { state: { data: userData } });
+      navigate("/someone-care", {
+        state: {
+          data: userData
+        }
+      });
     }
-  };
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -219,7 +245,7 @@ const SignUpPage = () => {
                 <label className="block text-sm font-medium text-gray-700">
                   Your Gender<span className="text-red-500">*</span>
                 </label>
-                <select 
+                <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
                   className="w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white"
@@ -269,12 +295,33 @@ const SignUpPage = () => {
             </div>
           )}
 
-          <div className="mt-6 max-w-md mx-auto">
+          <div className="mt-6 max-w-md mx-auto flex justify-center flex-col">
             <CustomButton
               onPress={handleNavigate}
               title="Sign Up"
               loading={isLoading}
             />
+            <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+              <AlertDialogContent className="bg-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Oops!</AlertDialogTitle>
+                  <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction
+                    onClick={() => {
+                      setShowAlert(false);
+                      if (type === 'adult') {
+                        navigate("/SignUpConsent");
+                      }
+                    }}
+                    className="w-full bg-black text-white rounded-full hover:bg-gray-800"
+                  >
+                    Got it
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             <p className="text-center text-sm text-gray-600 mt-4">
               Already have an account?{' '}

@@ -5,54 +5,52 @@ import { useDataContext } from '../contexts/DataContext';
 import BaseURL from '../components/ApiCreds';
 import { getToken } from '../utils/functions';
 
-const CustomButton = (props) => {
-  return (
-    <div className="flex justify-center">
-      <button 
-        onClick={() => props.onClick()} 
-        className="rounded-full bg-[#111920] py-3 px-6 w-64 h-12 flex items-center justify-center mt-5 mb-8"
-        disabled={props.loading}
-      >
-        {props.loading ? (
-          <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        ) : (
-          <span className="text-white font-semibold">{props.title}</span>
-        )}
-      </button>
-    </div>
-  );
-};
+const CustomButton = ({ onClick, title, loading }) => (
+  <button 
+    onClick={onClick} 
+    disabled={loading}
+    className="rounded-full bg-[#111920] text-white px-6 py-3 font-semibold w-64 flex items-center justify-center mt-5 mb-8 hover:bg-gray-800 transition-colors disabled:opacity-50"
+  >
+    {loading ? (
+      <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin" />
+    ) : (
+      <span>{title}</span>
+    )}
+  </button>
+);
 
-
-const Question = ({ num, questionText, onSelect, selectedValue }) => {
-  return (
-    <div className="my-4">
-      <p className="mb-3 text-lg font-semibold text-left">
+// Question Component with enhanced styling
+const Question = ({ num, questionText, onSelect, selectedValue }) => (
+  <div className="bg-white rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow border border-[#0CC8E8] flex items-center">
+    <div className="flex-grow">
+      <p className="text-lg font-medium text-gray-800">
         {`Q${num}). ${questionText}`}
       </p>
-
-      <div className="flex justify-between">
-        <button
-          onClick={() => onSelect('Yes')}
-          className={`border-2 w-[48%] rounded-full py-2 ${
-            selectedValue === 'Yes' ? 'border-[#71D860]' : 'border-gray-300'
-          }`}
-        >
-          <span className="text-center font-bold">Yes</span>
-        </button>
-
-        <button
-          onClick={() => onSelect('No')}
-          className={`border-2 w-[48%] rounded-full py-2 ${
-            selectedValue === 'No' ? 'border-[#FC4343]' : 'border-gray-300'
-          }`}
-        >
-          <span className="text-center font-bold">No</span>
-        </button>
-      </div>
     </div>
-  );
-};
+    <div className="flex gap-3 ml-4 min-w-[200px]">
+      <button
+        onClick={() => onSelect('Yes')}
+        className={`px-8 py-2 rounded-full border-2 transition-all ${
+          selectedValue === 'Yes' 
+            ? 'border-[#71D860] bg-[#71D860]/10 text-[#71D860]' 
+            : 'border-gray-200 hover:border-gray-300'
+        }`}
+      >
+        <span className="font-semibold">Yes</span>
+      </button>
+      <button
+        onClick={() => onSelect('No')}
+        className={`px-8 py-2 rounded-full border-2 transition-all ${
+          selectedValue === 'No' 
+            ? 'border-[#FC4343] bg-[#FC4343]/10 text-[#FC4343]' 
+            : 'border-gray-200 hover:border-gray-300'
+        }`}
+      >
+        <span className="font-semibold">No</span>
+      </button>
+    </div>
+  </div>
+);
 
 const baselineQuestionsArray = [
   {
@@ -469,23 +467,70 @@ function BaselineQuestions() {
   };
 
   return (
-    <div style={styles.safeArea} className='mx-5'>
-      <CustomHeader title="Setup Profile" goBack={() => history.goBack()} />
-      <div style={styles.mainView}>
-        <div style={{ marginVertical: 15 }}>
-          {questions.map((item, index) => (
-            <Question
-              key={item.id}
-              num={index + 1}
-              questionText={item.question}
-              onSelect={(value) => handleSelect(index, value, item.type)}
-              selectedValue={responses[index]}
-            />
-          ))}
+    <div className="min-h-screen bg-[#f2f1f1]">
+    <CustomHeader title="Setup Profile" goBack={() => history(-1)} />
+    
+    <div className="container mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto">
+        {/* Logo Section */}
+        <div className="h-20 w-40 mx-auto mt-2 mb-6">
+          <img
+            src={require("../assets/images/logo.png")}
+            alt="Logo"
+            className="h-full w-full object-contain"
+          />
         </div>
-        <CustomButton onClick={handleSubmit} title="Submit" loading={isLoading} />
+
+        {/* Questions Container */}
+        <div className="bg-white rounded-2xl shadow-xl">
+          <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+            <div className="p-6">
+              <div className="space-y-4">
+                {questions.map((item, index) => (
+                  <Question
+                    key={item.id}
+                    num={index + 1}
+                    questionText={item.question}
+                    onSelect={(value) => handleSelect(index, value, item.type)}
+                    selectedValue={responses[index]}
+                  />
+                ))}
+              </div>
+              
+              {/* Submit Button */}
+              <div className="mt-8 flex justify-center">
+                <CustomButton 
+                  onClick={handleSubmit} 
+                  title="Submit" 
+                  loading={isLoading} 
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <style>{`
+      .overflow-y-auto::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .overflow-y-auto::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+
+      .overflow-y-auto::-webkit-scrollbar-thumb {
+        background: #0CC8E8;
+        border-radius: 4px;
+      }
+
+      .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+        background: #0bb1cc;
+      }
+    `}</style>
+  </div>
   );
 }
 

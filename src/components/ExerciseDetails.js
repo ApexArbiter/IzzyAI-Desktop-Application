@@ -48,7 +48,7 @@ function ExerciseDetails({ closeDetails, detailsOpen, reportData, itemNum }) {
         <h2 className="text-center text-xl font-medium text-gray-900 mb-8">
           {data.DisorderName} {data.DisorderName !== 'Stammering'
                 ? ` Disorder`
-                : ""} Exercise
+                : ""} Exercise Report
         </h2>
 
         <div className="space-y-4">

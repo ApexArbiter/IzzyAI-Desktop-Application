@@ -88,7 +88,7 @@ const Settings = () => {
         </motion.div>
 
         {/* Settings Options */}
-        <motion.div className="space-y-6 mt-16" variants={itemVariants}>
+        <motion.div className="space-y-6 mt-10" variants={itemVariants}>
           {/* Update Avatar Button */}
           <motion.button
             onClick={() => navigate('/UpdateAvatar')}

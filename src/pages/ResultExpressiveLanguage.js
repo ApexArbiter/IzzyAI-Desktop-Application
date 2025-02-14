@@ -158,11 +158,11 @@ const ResultExpressiveLanguage = () => {
       }
 
 
-      // const response = await fetch(`${BaseURL}/receptive_expressive_user_exercise`, {
-      //   method: 'POST',
-      //   body: formData,
-      //   headers: { 'Authorization': "Bearer " + token }///}
-      // });
+      const response = await fetch(`${BaseURL}/receptive_expressive_user_exercise`, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Authorization': "Bearer " + token }///}
+      });
       if (response.ok) {
 
       } else {

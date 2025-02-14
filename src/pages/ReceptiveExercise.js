@@ -530,7 +530,7 @@ function ReceptiveExercise() {
             <div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
               {/* Video Player */}
               <motion.div
-                className={`w-48 h-48 ${!questionResponse ? 'mx-auto' : ''}`}
+                className={`w-48 rounded-xl h-48 ${!questionResponse ? 'mx-auto' : ''}`}
                 animate={{ x: questionResponse ? 0 : 0 }}
                 transition={{ duration: 0.5 }}
               >
@@ -540,6 +540,7 @@ function ReceptiveExercise() {
                   source={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.exercise}`}
                   onEnd={() => setIsVideoEnd(true)}
                   onStart={() => setIsVideoEnd(false)}
+                  controls={true}
                 />
               </motion.div>
 

@@ -33,7 +33,7 @@ const VoiceDisorderPage = () => {
   const [voiceResponse, setVoiceResponse] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [loader, setLoader] = useState(false)
-  const [attempts, setAttempts] = useState(4);
+  const [attempts, setAttempts] = useState(0);
   const [nextButton, setNextButton] = useState(false);
   const [isDelay, setIsDelay] = useState(false);
 
@@ -112,7 +112,7 @@ const VoiceDisorderPage = () => {
 
       if (exerciseCount <= 3) {
         const response = await axios.get(
-          `${BaseURL}/get_voice_disorders/${1}`,
+          `${BaseURL}/get_voice_disorders/${userDetail.AvatarID}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -380,7 +380,7 @@ const VoiceDisorderPage = () => {
       setIsVideoEnd(false);
       setVoiceResponse(null);
       setExpression('');
-      setAttempts(4)
+      setAttempts(0)
       setTimer(5);
       setCounter(100);
     } else {
@@ -457,7 +457,7 @@ const VoiceDisorderPage = () => {
             </motion.p>
 
             <p className="text-left ml-0 mb-4">
-              Assessment <span className="font-bold">{exerciseCount}</span> out of <span className="font-bold">3</span>
+              Excercise <span className="font-bold">{exerciseCount}</span> out of <span className="font-bold">3</span>
             </p>
 
             <div className="flex items-center gap-4 mb-8">
@@ -499,21 +499,24 @@ const VoiceDisorderPage = () => {
 
 
               {/* Box 2: Video Player */}
-              <div className="w-48 h-48 rounded-xl overflow-hidden">
-                {exerciseData && (
-                  <VideoPlayer
-                    ref={videoRef}
-                    onEnd={() => {
-                      setIsVideoEnd(true);
-                      setRecordingStatus("idle");
-                    }}
-                    onStart={() => {
-                      setIsVideoEnd(false);
-                      setRecordingStatus("idle");
-                    }}
-                    source={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
-                  />
-                )}
+              <div className="w-48 h-48 rounded-xl overflow-hidden ">
+                <div className='w-full h-full relative' >
+                  {exerciseData && (
+                    <VideoPlayer
+                      ref={videoRef}
+                      onEnd={() => {
+                        setIsVideoEnd(true);
+                        setRecordingStatus("idle");
+                      }}
+                      onStart={() => {
+                        setIsVideoEnd(false);
+                        setRecordingStatus("idle");
+                      }}
+                      controls={true}
+                      source={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
+                    />
+                  )}
+                </div>
               </div>
             </div>
 
@@ -563,9 +566,27 @@ const VoiceDisorderPage = () => {
                     <div className="space-y-4 w-full mt-16">
                       <button
                         onClick={handleNextExercise}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                        className="w-full bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center mb-2"
                       >
                         {exerciseCount < 3 ? "Next Exercise" : "Finish"}
+                      </button>
+                      <button
+                        onClick={() => history('/voiceReport', {
+                          state: {
+                            date: formattedDate,
+                            expressionArray,
+                            questionScores,
+                            sessionId,
+                            startTime,
+                            totalQuestions: 3,
+                            incorrectExpressions,
+                            correctExpressions,
+                            isExcercise: true
+                          }
+                        })}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                      >
+                        End Exercise
                       </button>
                     </div>
                   )}

@@ -140,7 +140,7 @@ const NewPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <CustomHeader title="Change Password" />
+      <CustomHeader title="Change Password" goBack={()=>{navigate(-1)}} />
       
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl mx-4">

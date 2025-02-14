@@ -55,7 +55,6 @@ const VideoPlayer = forwardRef(({ source, onEnd, onStart, videoHeight }, ref) =>
       style={{ height: videoHeight }}
       onEnded={handleVideoEnd}
       onPlay={handlePlay}
-      autoPlay
       controls
       playsInline
     />

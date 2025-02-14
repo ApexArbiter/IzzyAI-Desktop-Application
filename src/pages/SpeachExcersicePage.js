@@ -89,7 +89,6 @@ const SpeechArticulationPage = () => {
   const [expression, setExpression] = useState(null);
   const [expressionsArray, setExpressionsArray] = useState([]);
   const [videoUrl, setVideoUrl] = useState(null);
-  const [userDetail, setUserDetail] = useState(null);
   const [userId, setUserId] = useState(null);
   const cameraRef = useRef(null);
   const [audioUrl, setAudioUrl] = useState('');
@@ -99,6 +98,7 @@ const SpeechArticulationPage = () => {
   const [lipUrl, setLipUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [isStopButtonDisabled, setIsStopButtonDisabled] = useState(false);
+  const userDetail = JSON.parse(localStorage.getItem("userDetails"))
   // Ref for camera
   const mediaRecorderRef = useRef(null); // Ref for the MediaRecorder API
   const audioChunksRef = useRef([]);
@@ -592,7 +592,7 @@ const SpeechArticulationPage = () => {
 
             {/* Question Counter */}
             <p className="text-left ml-0 mb-4">
-              Question <span className="font-bold">{questionCount}</span> out of <span className="font-bold">271</span>
+              Question <span className="font-bold">{questionCount}</span> out of <span className="font-bold">{userDetail.totalQuestion}</span>
             </p>
 
             {/* Progress Bar */}

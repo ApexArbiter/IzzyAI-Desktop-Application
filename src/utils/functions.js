@@ -347,16 +347,18 @@ export const getGameReports = async id => {
   const token = getToken()
   try {
     const response = await axios.get(
-      `${BaseURL}/get_game_reports/${id}/1`,
+      `${BaseURL}/get_game_reports/${id}/6`,
       {
         headers: { 'Authorization': 'Bearer ' + token }
       }
     );
+    console.log(response)
     if (response?.data) {
       return response?.data;
     }
     return [];
   } catch (error) {
+    console.log(error)
     return [];
   }
 };
@@ -951,7 +953,7 @@ export const clinicSignup = async (data) => {
 export const signup = async (data) => {
   try {
     const response = await axios.post(
-      `${BaseURL}/new_signup`,
+      `${BaseURL}/signup`,
       data,
       {
         headers: {

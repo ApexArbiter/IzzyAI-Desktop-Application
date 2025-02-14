@@ -88,7 +88,7 @@ function AllAssessmentPage() {
 
   return (
     <div className="h-screen overflow-hidden bg-[#f2f1f1]">
-    <CustomHeader title="All Assessments" goBack={() => history(-1)} />
+    <CustomHeader title="All Assessments" goBack={() => history("/home")} />
     <div className="h-20 w-40 mx-auto mt-2 ">
               <img
                 src={require("../assets/images/logo.png")}

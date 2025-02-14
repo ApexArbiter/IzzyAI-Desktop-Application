@@ -545,7 +545,7 @@ const PassagePage = () => {
           >
             <div className="h-full w-full ">
               <VideoPlayer
-                className="rounded-xl  h-[192px] "
+                className="rounded-xl  h-full  "
                 source={`${IMAGE_BASE_URL}${videoUrl}`}
                 onEnd={() => setIsVideoEnd(true)}
               />

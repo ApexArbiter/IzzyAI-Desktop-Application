@@ -31,7 +31,8 @@ export const getExpressiveExerciseQuestions = async (id, avatar) => {
   const token = getToken()
   try {
     const response = await axios.get(
-      `${BaseURL}/get_expressive_exercise_questions_latest/${id}/1`,
+      console.log(id,avatar)
+      `${BaseURL}/get_expressive_exercise_questions_latest/${id}/${avatar}`,
       {
         headers: { 'Authorization': 'Bearer ' + token }
       }

@@ -444,14 +444,14 @@ function ExpressiveAssessment() {
                         alt="Question"
                       />
                     </div>
-                    <div className="w-48 h-48">
+                    <div className="w-48 h-48 ">
                       <VideoPlayer
                         source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
                         onEnd={() => setIsVideoEnd(true)}
                         onStart={() => setIsVideoEnd(false)}
                         ref={videoRef}
                         videoHeight={192}
-                        className="rounded-xl shadow-lg object-cover mt-6"
+                        className="rounded-xl shadow-lg object-cover "
                       />
                     </div>
                   </div>

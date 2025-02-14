@@ -95,7 +95,7 @@ function ExercisePage() {
     console.log("Token", token)
 
     try {
-      const response = await fetch(`http://154.38.160.197:5000/get_Exercise_word_count/${userId}/${userDetail.AvatarID}/`, {
+      const response = await fetch(`${BaseURL}/get_Exercise_word_count/${userId}/1/`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token,
@@ -253,7 +253,8 @@ function ExercisePage() {
     }
     if (checkAssess?.data) {
       const token = await getToken();
-      const userId = User();
+      console.log(JSON.parse(localStorage.getItem("userDetails")))
+      const userId = JSON.parse(localStorage.getItem("userDetails"))
       setLoading(true);
       const formData = new FormData();
       formData.append('UserID', userId);

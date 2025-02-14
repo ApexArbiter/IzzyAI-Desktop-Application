@@ -214,23 +214,23 @@ const VoiceDisorderPage = () => {
               }
             }
 
-            const [videoResponse, audioResponse] = await Promise.all([
-              sendVideo(),
-              sendAudio(audioBlob)
-            ]);
+            // const [videoResponse, audioResponse] = await Promise.all([
+            //   sendVideo(),
+            //   sendAudio(audioBlob)
+            // ]);
 
-            console.log('Complete audio response:', audioResponse);
-            console.log('Complete video response:', videoResponse);
+            // console.log('Complete audio response:', audioResponse);
+            // console.log('Complete video response:', videoResponse);
 
-            if (videoResponse && audioResponse) {
+            // if (videoResponse && audioResponse) {
               const voiceResponse = await checkVoiceDisorder(audioBlob);
               console.log('Complete voice disorder response:', voiceResponse);
-            }
+            // }
 
-            resolve();
+            // resolve();
           } catch (error) {
             console.error('Detailed error in stop recording process:', error);
-            resolve();
+            // resolve();
           }
         };
 
@@ -440,12 +440,12 @@ const VoiceDisorderPage = () => {
                   Facial Expression: {expression.expression}
                 </div>
               )}
-              {recordingStatus === "stop" && voiceResponse?.predictions && (
+              {/* {recordingStatus === "stop" && voiceResponse?.predictions && (
                 <div className="text-sm text-center">
                   <p>Label: Normal</p>
                   <p className="text-green-600">Score: {voiceResponse.predictions.Normal}</p>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Box 2: Video Player */}

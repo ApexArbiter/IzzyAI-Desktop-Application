@@ -242,7 +242,7 @@ const ResultExpressiveLanguage = () => {
 
 
   return (
-<div className="h-screen overflow-hidden bg-[#f2f1f1]">
+<div className="h-screen  bg-[#f2f1f1]">
       <div className="h-[calc(100vh-64px)] p-4">
         <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl flex flex-col">
           <h1 className="text-2xl text-center font-semibold mb-4">

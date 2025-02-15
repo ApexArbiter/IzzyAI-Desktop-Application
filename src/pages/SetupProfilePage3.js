@@ -3,39 +3,48 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import CustomHeader from '../components/CustomHeader';
 
 // Progress Bar Components
+// Progress Bar Components - Made more responsive
 const BarFilled = () => (
-  <div className="h-2 w-16 md:w-24 bg-gray-900 rounded-full"></div>
+  <div className="h-1.5 w-[12%] bg-gray-900 rounded-full"></div>
 );
 
 const Bar = () => (
-  <div className="h-2 w-16 md:w-24 bg-gray-200 rounded-full"></div>
+  <div className="h-1.5 w-[12%] bg-gray-200 rounded-full"></div>
 );
 
-const CircularProgress = ({ percentage, size = 150, strokeWidth = 20, color, bgColor, children }) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (percentage / 100) * circumference;
+// Adjusted CircularProgress for better responsiveness
+const CircularProgress = ({ percentage, color, bgColor, children }) => {
+  // Dynamic size based on viewport
+  const size = 'min(120px, 25vw)';
+  const strokeWidth = 'min(15px, 3vw)';
+  const radius = `calc((${size} - ${strokeWidth}) / 2)`;
+  const circumference = `calc(${radius} * 2 * 3.14159)`;
+  const offset = `calc(${circumference} - (${percentage} / 100) * ${circumference})`;
 
   return (
     <div className="relative inline-flex">
-      <svg width={size} height={size} className="transform -rotate-90">
+      <svg 
+        style={{ width: size, height: size }} 
+        className="transform -rotate-90"
+        viewBox="0 0 120 120"
+      >
         <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
+          cx="60"
+          cy="60"
+          r="50"
           stroke={bgColor}
-          strokeWidth={strokeWidth}
+          strokeWidth="15"
           fill="none"
         />
         <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
+          cx="60"
+          cy="60"
+          r="50"
           stroke={color}
-          strokeWidth={strokeWidth}
+          strokeWidth="15"
           fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
+          strokeDasharray="314.159"
+          strokeDashoffset={`${314.159 - (percentage / 100) * 314.159}`}
           className="transition-all duration-700 ease-out"
         />
       </svg>
@@ -52,8 +61,8 @@ const CustomButton = ({ onClick, title, backgroundColor }) => {
   return (
     <button
       onClick={onClick}
-      className={`px-10 py-4 rounded-full text-white text-lg font-semibold 
-        transition-all duration-300 ${bgColor}`}
+      className={`px-6 py-2 sm:px-8 sm:py-3 rounded-full text-white text-base sm:text-lg font-semibold 
+        transition-all duration-300 ${bgColor} whitespace-nowrap`}
     >
       {title}
     </button>
@@ -121,7 +130,7 @@ console.log(location.state)
 
             {/* Content */}
             <div className="flex-1">
-              <h1 className="text-4xl font-medium text-gray-900 text-center mb-8">
+              <h1 className="lg:text-3xl text-2xl font-medium text-gray-900 text-center mb-8">
                 {passed 
                   ? "Congratulations! Your camera passed the test!"
                   : "Oops! Your Camera/Microphone didn't qualify the test"}

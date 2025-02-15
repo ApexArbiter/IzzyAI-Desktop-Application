@@ -263,8 +263,8 @@ const VoiceDisorderResult = () => {
 
           {!isQuick && expressionArray && (
             <div className="mb-2">
-              <p className="text-lg mb-2">
-                Facial Expressions: {expressionArray?.join(", ")}
+              <p className=" mb-2">
+              <span className='text-lg'>Facial Expressions:</span> {expressionArray?.join(", ")}
               </p>
 
               <div className="space-y-4">

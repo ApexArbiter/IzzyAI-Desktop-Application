@@ -370,7 +370,7 @@ const ArticulationResult = () => {
       {!isQuick && expressionsArray && (
         <div className="mb-2">
           <p className="text- mb-2">
-            Facial Expressions: {expressionsArray.join(", ")}
+            <span className='text-lg'>Facial Expressions:</span> {expressionsArray.join(", ")}
           </p>
 
           <div className="space-y-4">

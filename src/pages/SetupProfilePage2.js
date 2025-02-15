@@ -236,6 +236,15 @@ const SetupProfilePage2 = () => {
     
     // Improved video quality calculation
     const videoSize = videoBlob.size;
+    
+    // Check if video data is present and valid
+    if (!videoSize || videoSize < 1000) { // If size is too small or zero
+        return {
+            audioQuality: Math.round(audioQuality),
+            videoQuality: 0 // Return 0 for no video
+        };
+    }
+    
     // Base quality on file size - typical 5 second video should be between 500KB and 2MB
     const minSize = 500 * 1024; // 500KB
     const maxSize = 2 * 1024 * 1024; // 2MB
@@ -243,14 +252,19 @@ const SetupProfilePage2 = () => {
     // Calculate quality percentage based on size range
     let videoQuality = ((videoSize - minSize) / (maxSize - minSize)) * 100;
     
-    // Clamp between 40 and 80 to ensure reasonable range
-    videoQuality = Math.max(40, Math.min(80, videoQuality));
+    // Clamp between 0 and 100
+    videoQuality = Math.max(0, Math.min(100, videoQuality));
+    
+    // If quality is extremely low, it might indicate no real video data
+    if (videoQuality < 10) {
+        videoQuality = 0;
+    }
     
     return {
-      audioQuality: Math.round(audioQuality),
-      videoQuality: Math.round(videoQuality)
+        audioQuality: Math.round(audioQuality),
+        videoQuality: Math.round(videoQuality)
     };
-  };
+};
   
   
   const calculateVolumeLevel = (samples) => {
@@ -385,7 +399,7 @@ const SetupProfilePage2 = () => {
 
             {/* Bottom section */}
             <div className="space-y-2">
-              <LoaderWave isAnimation={playStart} />
+              {/* <LoaderWave isAnimation={playStart} /> */}
 
               {error && (
                 <div className="bg-red-50 text-red-800 p-2 rounded-xl text-sm text-center">

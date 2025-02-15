@@ -176,8 +176,8 @@ const StammeringReport = () => {
 
         {!isQuick && expressionsArray && (
           <div className="mb-2">
-            <p className="text-lg mb-2">
-              Facial Expressions: {expressionsArray.join(", ")}
+            <p className=" mb-2">
+            <span className='text-lg'>Facial Expressions:</span> {expressionsArray.join(", ")}
             </p>
 
             <div className="space-y-4">

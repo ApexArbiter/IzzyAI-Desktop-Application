@@ -242,7 +242,7 @@ const ResultExpressiveLanguage = () => {
 
 
   return (
-<div className="h-screen  bg-[#f2f1f1]">
+    <div className="h-screen  bg-[#f2f1f1]">
       <div className="h-[calc(100vh-64px)] p-4">
         <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl flex flex-col">
           <h1 className="text-2xl text-center font-semibold mb-4">
@@ -272,8 +272,8 @@ const ResultExpressiveLanguage = () => {
 
           {(isExpressive && !isQuick) && (
             <div className="mb-2">
-              <p className="text-lg mb-2">
-                Facial Expressions: {expressionsArray?.join(", ")}
+              <p className=" mb-2">
+                <span className='text-lg'>Facial Expressions:</span> {expressionsArray?.join(", ")}
               </p>
 
               <div className="space-y-4">

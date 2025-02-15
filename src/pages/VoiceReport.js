@@ -263,8 +263,8 @@ const VoiceDisorderResult = () => {
 
           {!isQuick && expressionArray && (
             <div className="mb-2">
-              <p className=" mb-2">
-              <span className='text-lg'>Facial Expressions:</span> {expressionArray?.join(", ")}
+              <p className=" mb-4">
+                <span className='text-lg'>Facial Expressions:</span> {expressionArray?.join(", ")}
               </p>
 
               <div className="space-y-4">
@@ -293,7 +293,7 @@ const VoiceDisorderResult = () => {
                 <p className="text-lg">{`Percentage of incorrect sound ${item?.wordtext?.[0]}`}</p>
                 <LinearProgressBar
                   value={typeof item === 'number' ? item : parseFloat(item['Voice-Disorder']) || 0}
-                  color={typeof item === 'number' ? (item >= 50 ? "#FC4343" :  "#71D860"): (parseFloat(item['Voice-Disorder']) >= 50 ? "#FC4343" : "#71D860")}
+                  color={typeof item === 'number' ? (item >= 50 ? "#FC4343" : "#71D860") : (parseFloat(item['Voice-Disorder']) >= 50 ? "#FC4343" : "#71D860")}
                 />
               </div>
             ))}

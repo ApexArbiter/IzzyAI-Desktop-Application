@@ -96,8 +96,8 @@ function AllAssessmentPage() {
                 className="h-full w-full object-contain"
               />
             </div>
-    <div className="h-[calc(100vh-64px)]  p-4">
-      <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl h-4/5 flex flex-col">
+    <div className="h-[calc(100vh-64px)]  ">
+      <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl h-5/6 flex flex-col">
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto pr-2">
           {[

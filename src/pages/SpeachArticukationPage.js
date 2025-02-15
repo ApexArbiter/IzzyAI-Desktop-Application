@@ -467,7 +467,7 @@ const SpeechArticulationPage = () => {
 
   return (
     <div className=" bg-gray-100 mb-0 overflow-hidden min-h-screen">
-      <CustomHeader title="Articulation Disorder" goBack={navigateBack} />
+      <CustomHeader title="Articulation Disorder Assessment" goBack={navigateBack} />
 
       <div className="max-w-4xl mx-auto">
         <div className=" mb-0 overflow-hidden">

@@ -214,23 +214,23 @@ const VoiceDisorderPage = () => {
               }
             }
 
-            const [videoResponse, audioResponse] = await Promise.all([
-              sendVideo(),
-              sendAudio(audioBlob)
-            ]);
+            // const [videoResponse, audioResponse] = await Promise.all([
+            //   sendVideo(),
+            //   sendAudio(audioBlob)
+            // ]);
 
-            console.log('Complete audio response:', audioResponse);
-            console.log('Complete video response:', videoResponse);
+            // console.log('Complete audio response:', audioResponse);
+            // console.log('Complete video response:', videoResponse);
 
-            if (videoResponse && audioResponse) {
+            // if (videoResponse && audioResponse) {
               const voiceResponse = await checkVoiceDisorder(audioBlob);
               console.log('Complete voice disorder response:', voiceResponse);
-            }
+            // }
 
-            resolve();
+            // resolve();
           } catch (error) {
             console.error('Detailed error in stop recording process:', error);
-            resolve();
+            // resolve();
           }
         };
 
@@ -392,6 +392,26 @@ const VoiceDisorderPage = () => {
   const navigateBack = () => {
     history(-1);
   };
+  const handleEndNow = () => {
+    // Save scores to localStorage before navigating
+    localStorage.setItem('questionScores', JSON.stringify(questionScores));
+    localStorage.setItem('sessionId', sessionId);
+    localStorage.setItem('startTime', startTime);
+
+    // Navigate to results page with current progress
+    history('/voiceReport', {
+      state: {
+        date: formattedDate,
+        expressionArray,
+        questionScores,
+        sessionId,
+        startTime,
+        totalQuestions: 3,
+        incorrectExpressions,
+        correctExpressions
+      }
+    });
+  };
 
   const percentageCompleted = (exerciseCount / 3) * 100;
 
@@ -430,7 +450,7 @@ const VoiceDisorderPage = () => {
 
           <div className="flex gap-4 justify-center mb-6">
             {/* Box 1: Question, Expression, Voice Response */}
-            <div className="w-48 flex flex-col gap-2 justify-center  ">
+            <div className="w-52 flex flex-col gap-2 justify-center  ">
               <LogoQuestionView
                 first_text={"Say this..."}
                 second_text={exerciseData?.[exerciseCount - 1]?.WordText || "loading"}
@@ -440,12 +460,12 @@ const VoiceDisorderPage = () => {
                   Facial Expression: {expression.expression}
                 </div>
               )}
-              {recordingStatus === "stop" && voiceResponse?.predictions && (
+              {/* {recordingStatus === "stop" && voiceResponse?.predictions && (
                 <div className="text-sm text-center">
                   <p>Label: Normal</p>
                   <p className="text-green-600">Score: {voiceResponse.predictions.Normal}</p>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Box 2: Video Player */}
@@ -485,39 +505,47 @@ const VoiceDisorderPage = () => {
 
             {/* Box 4: Controls */}
             <div className="w-48">
-              <div className="flex justify-center items-center">
-                {recordingStatus === "idle" && isVideoEnd && (
-                  <button
-                    onClick={onStartRecord}
-                    className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-16 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
-                  >
-                    <span className="text-white font-semibold flex items-center gap-2 text-sm">
-                      <span className="text-red-500">●</span> Record
-                    </span>
-                  </button>
-                )}
+        <div className="flex justify-center items-center">
+          {recordingStatus === "idle" && isVideoEnd && (
+            <button
+              onClick={onStartRecord}
+              className="w-full rounded-full bg-slate-900 py-2 px-3 h-10 flex items-center justify-center mt-16 mb-4 transition-all hover:bg-slate-800 active:bg-slate-700"
+            >
+              <span className="text-white font-semibold flex items-center gap-2 text-sm">
+                <span className="text-red-500">●</span> Record
+              </span>
+            </button>
+          )}
 
-                {recordingStatus === "recording" && (
-                  <div className="mt-16 mb-4 text-center">
-                    <p className="text-lg font-semibold text-red-500 mb-2">
-                      0:0{timer > 0 ? timer : 0} Seconds Left
-                    </p>
-                    <CircularProgress variant="determinate" value={counter} color="error" size={40} thickness={4} />
-                  </div>
-                )}
-
-                {recordingStatus === "stop" && voiceResponse?.predictions && (
-                  <div className="space-y-4 w-full mt-16">
-                    <button
-                      onClick={handleNextExercise}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
-                    >
-                      {exerciseCount < 3 ? "Next Exercise" : "Finish"}
-                    </button>
-                  </div>
-                )}
-              </div>
+          {recordingStatus === "recording" && (
+            <div className="mt-16 mb-4 text-center">
+              <p className="text-lg font-semibold text-red-500 mb-2">
+                0:0{timer > 0 ? timer : 0} Seconds Left
+              </p>
+              <CircularProgress variant="determinate" value={counter} color="error" size={40} thickness={4} />
             </div>
+          )}
+
+          {recordingStatus === "stop" && voiceResponse?.predictions && (
+            <div className="space-y-2 w-full mt-16">
+              <button
+                onClick={handleNextExercise}
+                className="w-full bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+              >
+                {exerciseCount < 3 ? "Next Exercise" : "Finish"}
+              </button>
+              {exerciseCount < 3 && (
+                <button
+                  onClick={handleEndNow}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors flex items-center justify-center"
+                >
+                  End Now
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
           </div>
 
           <Loader loading={loader} />

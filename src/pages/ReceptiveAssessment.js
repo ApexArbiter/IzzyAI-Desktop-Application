@@ -187,7 +187,7 @@ const ReceptiveAssessment = () => {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
-          <CustomHeader title="Receptive Language Assessment" goBack={() => { navigate(-1) }} />
+          <CustomHeader title="Receptive Language Dsiorder Assessment" goBack={() => { navigate(-1) }} />
 
 
           <main className="p-6">
@@ -269,97 +269,97 @@ const ReceptiveAssessment = () => {
 
 
 
-{/* Video and Buttons Row */}
-<div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
-  {/* Video Player - Centered when no response, moves to side when response shows */}
-  <motion.div 
-    className={`w-48 h-48 ${!questionResponse ? 'mx-auto' : ''}`}
-    animate={{ 
-      x: questionResponse ? 0 : 0,
-    }}
-    transition={{ duration: 0.5 }}
-  >
-    <VideoPlayer
-      ref={videoRef}
-      source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
-      onEnd={() => setIsVideoEnd(true)}
-      onStart={() => setIsVideoEnd(false)}
-    />
-  </motion.div>
-
-  {/* Buttons Section with Fade In Animation */}
-  {questionResponse && (
-    <motion.div 
-      className="w-48 relative"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      {/* Response Message */}
-      <div className='absolute top-4 left-8'>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative pb-1 items-center rounded-lg"
-        >
-          <LogoQuestionView
-            second_text={""}
-            first_text={questionResponse}
-            questionResponse={questionResponse}
-          />
-        </motion.div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="space-y-2 mt-24 h-1/2">
-        {questionCount < questions?.length && (
-          <div className="flex gap-4">
-            {questionCount !== 1 && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  setQuestionResponse('');
-                  setIsVideoEnd(false);
-                  setQuestionCount(prev => prev - 1);
-                  setCurrentImages(shuffleArray(questions?.[questionCount - 2]?.images));
+            {/* Video and Buttons Row */}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+              {/* Video Player - Centered when no response, moves to side when response shows */}
+              <motion.div
+                className={`w-48 h-48 ${!questionResponse ? 'mx-auto' : ''}`}
+                animate={{
+                  x: questionResponse ? 0 : 0,
                 }}
-                className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors"
+                transition={{ duration: 0.5 }}
               >
-                Previous
-              </motion.button>
-            )}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => {
-                if (questionCount < questions?.length) {
-                  setQuestionResponse('');
-                  setIsVideoEnd(false);
-                  setQuestionCount(prev => prev + 1);
-                  setCurrentImages(shuffleArray(questions?.[questionCount]?.images));
-                } else {
-                  navigateTo();
-                }
-              }}
-              className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors"
-            >
-              Next
-            </motion.button>
-          </div>
-        )}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={navigateTo}
-          className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors"
-        >
-          {questionCount < questions?.length ? 'End Now' : 'Finish'}
-        </motion.button>
-      </div>
-    </motion.div>
-  )}
-</div>
+                <VideoPlayer
+                  ref={videoRef}
+                  source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}
+                  onEnd={() => setIsVideoEnd(true)}
+                  onStart={() => setIsVideoEnd(false)}
+                />
+              </motion.div>
+
+              {/* Buttons Section with Fade In Animation */}
+              {questionResponse && (
+                <motion.div
+                  className="w-48 relative"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  {/* Response Message */}
+                  <div className='absolute top-4 left-8'>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="relative pb-1 items-center rounded-lg"
+                    >
+                      <LogoQuestionView
+                        second_text={""}
+                        first_text={questionResponse}
+                        questionResponse={questionResponse}
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="space-y-2 mt-24 h-1/2">
+                    {questionCount < questions?.length && (
+                      <div className="flex gap-4">
+                        {questionCount !== 1 && (
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              setQuestionResponse('');
+                              setIsVideoEnd(false);
+                              setQuestionCount(prev => prev - 1);
+                              setCurrentImages(shuffleArray(questions?.[questionCount - 2]?.images));
+                            }}
+                            className="flex-1 border border-gray-300 hover:bg-gray-50 rounded-full py-2 px-4 font-semibold transition-colors"
+                          >
+                            Previous
+                          </motion.button>
+                        )}
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            if (questionCount < questions?.length) {
+                              setQuestionResponse('');
+                              setIsVideoEnd(false);
+                              setQuestionCount(prev => prev + 1);
+                              setCurrentImages(shuffleArray(questions?.[questionCount]?.images));
+                            } else {
+                              navigateTo();
+                            }
+                          }}
+                          className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-full py-2 px-4 font-semibold transition-colors"
+                        >
+                          Next
+                        </motion.button>
+                      </div>
+                    )}
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={navigateTo}
+                      className="w-full bg-red-500 hover:bg-red-600 text-white rounded-full py-2 px-4 font-semibold transition-colors"
+                    >
+                      {questionCount < questions?.length ? 'End Now' : 'Finish'}
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+            </div>
 
             {/* Loading State */}
             <Loader loading={isLoading} />

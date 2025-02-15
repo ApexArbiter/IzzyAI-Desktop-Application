@@ -386,7 +386,7 @@ function ExpressiveAssessment() {
   return (
     <div className="bg-gray-100 mb-0 overflow-hidden min-h-screen">
       <CustomHeader
-        title="Expressive Language Disorder"
+        title="Expressive Language Disorder Assessment"
         goBack={() => navigate(-1)}
       />
 

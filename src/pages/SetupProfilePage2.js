@@ -8,22 +8,23 @@ import Loader from '../components/Loader';
 
 // Existing components remain the same
 const BarFilled = () => (
-  <div className="h-2 w-16 md:w-24 bg-gray-900 rounded-full"></div>
+  <div className="h-1.5 w-[12%] bg-gray-900 rounded-full"></div>
 );
 
 const Bar = () => (
-  <div className="h-2 w-16 md:w-24 bg-gray-200 rounded-full"></div>
+  <div className="h-1.5 w-[12%] bg-gray-200 rounded-full"></div>
 );
 
+// Adjusted LoaderWave for better scaling
 const LoaderWave = ({ isAnimation }) => {
   if (!isAnimation) return null;
   
   return (
-    <div className="flex justify-center items-center gap-1 h-8 my-4">
+    <div className="flex justify-center items-center gap-0.5 h-6 my-2">
       {[...Array(5)].map((_, i) => (
         <div
           key={i}
-          className="w-1 bg-gray-900 rounded-full animate-sound-wave"
+          className="w-0.5 bg-gray-900 rounded-full animate-sound-wave"
           style={{
             height: '100%',
             animation: `soundWave 1s ease-in-out infinite`,
@@ -35,7 +36,7 @@ const LoaderWave = ({ isAnimation }) => {
   );
 };
 
-const CircularProgress = ({ progress, size = 60, strokeWidth = 5, onClick, disabled }) => {
+const CircularProgress = ({ progress, size = 48, strokeWidth = 4, onClick, disabled }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
@@ -68,11 +69,12 @@ const CircularProgress = ({ progress, size = 60, strokeWidth = 5, onClick, disab
       </svg>
       <div 
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                   w-10 h-10 bg-[#FC4343] rounded-full"
+                   w-8 h-8 bg-[#FC4343] rounded-full"
       />
     </div>
   );
 };
+
 
 const SetupProfilePage2 = () => {
   const { userId } = useDataContext();
@@ -323,85 +325,91 @@ const SetupProfilePage2 = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-screen w-screen overflow-hidden bg-white flex flex-col">
       <CustomHeader title="Setup Profile" goBack={handleBack} />
       
-      <div className="flex flex-col min-h-[calc(100vh-64px)]">
-        <div className="flex-1 px-4 py-6 md:px-6 lg:px-8 max-w-3xl mx-auto w-full">
-          <div className="flex flex-col h-full">
-            {/* Logo */}
-            <div className="h-20 w-40 mx-auto mb-8">
-              <img
-                src={require("../assets/images/logo.png")}
-                alt="Logo"
-                className="h-full w-full object-contain"
-              />
+      <div className="flex-1 flex flex-col">
+        {/* Main content container with dynamic padding */}
+        <div className="flex-1 px-4 py-2 md:px-6 lg:px-8 max-w-3xl mx-auto w-full flex flex-col">
+          {/* Logo section - reduced vertical space */}
+          <div className="h-12 w-32 mx-auto mb-4">
+            <img
+              src={require("../assets/images/logo.png")}
+              alt="Logo"
+              className="h-full w-full object-contain"
+            />
+          </div>
+
+          {/* Progress bar - made more compact */}
+          <div className="flex justify-between items-center gap-1 mb-4">
+            <BarFilled />
+            <BarFilled />
+            <BarFilled />
+            <Bar />
+            <Bar />
+          </div>
+
+          {/* Loading overlay */}
+          {isLoading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent" />
             </div>
+          )}
 
-            {/* Progress Bar */}
-            <div className="flex justify-between items-center gap-2 mb-8">
-              <BarFilled />
-              <BarFilled />
-              <BarFilled />
-              <Bar />
-              <Bar />
-            </div>
-
-            {isLoading && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent" />
-              </div>
-            )}
-
-            {/* Content */}
-            <div className="flex-1">
-              <h1 className="text-2xl font-medium text-gray-900 text-center mb-8">
+          {/* Main content area with flexible spacing */}
+          <div className="flex-1 flex flex-col justify-between min-h-0">
+            <div className="space-y-2">
+              <h1 className="text-xl md:text-2xl font-medium text-gray-900 text-center">
                 Test your microphone & camera
               </h1>
 
-              <div className="space-y-4">
-                <p className="text-center text-lg font-medium">
-                  Record yourself saying:
-                  <br />
-                  "The quick brown fox jumps over the lazy dog"
+              <p className="text-center text-base md:text-lg font-medium">
+                Record yourself saying:
+                <br />
+                "The quick brown fox jumps over the lazy dog"
+              </p>
+            </div>
+
+            {/* Video container with dynamic sizing */}
+            <div className="flex-1 min-h-0 my-4">
+              <div className="relative w-full h-full rounded-xl overflow-hidden bg-gray-100">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Bottom section */}
+            <div className="space-y-2">
+              <LoaderWave isAnimation={playStart} />
+
+              {error && (
+                <div className="bg-red-50 text-red-800 p-2 rounded-xl text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex flex-col items-center space-y-2">
+                <p className="text-xl font-medium">
+                  <span className="text-[#FC4343]">0:0{timer > 0 ? timer : 0}</span>
+                  {' '}Seconds Left
                 </p>
 
-                <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-gray-100">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
-
-                <LoaderWave isAnimation={playStart} />
-
-                {error && (
-                  <div className="bg-red-50 text-red-800 p-2 rounded-xl text-sm text-center">
-                    {error}
-                  </div>
-                )}
-
-                <div className="flex flex-col items-center space-y-4">
-                  <p className="text-2xl font-medium">
-                    <span className="text-[#FC4343]">0:0{timer > 0 ? timer : 0}</span>
-                    {' '}Seconds Left
-                  </p>
-
-                  <CircularProgress
-                    progress={counter}
-                    onClick={recordingStatus === 'idle' ? onStartRecord : undefined}
-                    disabled={recordingStatus === 'recording'}
-                  />
-                </div>
+                <CircularProgress
+                  progress={counter}
+                  onClick={recordingStatus === 'idle' ? onStartRecord : undefined}
+                  disabled={recordingStatus === 'recording'}
+                />
               </div>
             </div>
           </div>
         </div>
-        <Loader loading={loader} />
       </div>
+      <Loader loading={loader} />
     </div>
   );
 };

@@ -59,7 +59,10 @@ function ReceptiveExercise() {
 
   const videoRef = useRef(null);
 
-  const { userId, setExpressiveReport, userDetail } = useDataContext();
+  // const { userId, setExpressiveReport, userDetail } = useDataContext();
+  const userDetail = JSON.parse(localStorage.getItem('userDetails'));
+  const userId = JSON.parse(localStorage.getItem('userId'));
+
 
   useEffect(() => {
     const currentStartTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -88,7 +91,7 @@ function ReceptiveExercise() {
       setIsLoading(true);
       console.log("user Details", userId, userDetail?.AvatarID)
       // console.log("isAll", isAll)
-      const response = isAll ? await getReceptiveAllExerciseQuestions(12, 1) : await getReceptiveAllExerciseQuestions(12, 1)
+      const response = isAll ? await getReceptiveAllExerciseQuestions(userId,userDetail?.AvatarID ) : await getReceptiveExerciseQuestions(userId,userDetail?.AvatarID)
       // const response = await getReceptiveAllExerciseQuestions(353, 1)
       console.log("response", response)
 

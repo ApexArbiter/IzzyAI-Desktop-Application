@@ -71,7 +71,7 @@ function AllExercisesPage() {
             try {
                 const storedUserDetail = localStorage.getItem("userDetails");
                 if (storedUserDetail) {
-                    setUserDetail(JSON.parse(storedUserDetail));
+                    // setUserDetail(JSON.parse(storedUserDetail));
                 }
             } catch (error) {
                 console.error("Error retrieving or parsing userDetails from localStorage", error);

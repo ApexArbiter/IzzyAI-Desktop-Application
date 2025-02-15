@@ -104,14 +104,28 @@ const ArticulationResult = () => {
 
   // Calculate scores
   console.log("SessionID", sessionId)
-  const totalQuestions = correctAnswers + incorrectQuestions?.length;
-  const percentage = totalQuestions > 0 ? (incorrectQuestions.length / totalQuestions) * 100 : 0;
-  const correctPercentage = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
-  const expressionScore = expressionsArray?.length > 0
-    ? (correctExpressions?.length / expressionsArray?.length) * 100
-    : 0;
-  const expressionpercentage = (incorrectExpressions?.length / totalQuestions) * 100;
-  const correctexpressionPercentage = (correctExpressions?.length / totalQuestions) * 100;
+  const totalQuestions = (correctAnswers || 0) + (incorrectQuestions?.length || 0);
+  
+  // Fix for percentage calculations
+  const calculatePercentage = (value, total) => {
+    if (!total || total === 0) return 0;
+    // Round to 1 decimal place to ensure consistency
+    return Math.round((value / total) * 1000) / 10;
+  };
+
+  // Main percentages
+  const percentage = calculatePercentage(incorrectQuestions?.length || 0, totalQuestions);
+  const correctPercentage = calculatePercentage(correctAnswers || 0, totalQuestions);
+
+  // Expression percentages
+  const totalExpressions = expressionsArray?.length || 0;
+  const expressionScore = calculatePercentage(correctExpressions?.length || 0, totalExpressions);
+  
+  // Fix for expression percentages to ensure consistency
+  const expressionpercentage = calculatePercentage(incorrectExpressions?.length || 0, 
+    incorrectExpressions?.length + (correctExpressions?.length || 0));
+  const correctexpressionPercentage = calculatePercentage(correctExpressions?.length || 0,
+    incorrectExpressions?.length + (correctExpressions?.length || 0));
 
   const getIncorrectQuestions = () => {
     console.log("getting")
@@ -341,55 +355,61 @@ const ArticulationResult = () => {
 
 
           <div className="flex justify-center gap-8 mb-3">
-            <CircularProgress
-              percentage={percentage}
-              size={!isQuick ? "lg" : "lg"}
-            />
-            {!isQuick && (
-              <CircularProgress
-                percentage={expressionpercentage}
-                size="lg"
+        <CircularProgress
+          percentage={Number.isFinite(percentage) ? percentage : 0}
+          size={!isQuick ? "lg" : "lg"}
+        />
+        {!isQuick && (
+          <CircularProgress
+            percentage={Number.isFinite(expressionpercentage) ? expressionpercentage : 0}
+            size="lg"
+          />
+        )}
+      </div>
+
+      {!isQuick && expressionsArray && (
+        <div className="mb-2">
+          <p className="text- mb-2">
+            Facial Expressions: {expressionsArray.join(", ")}
+          </p>
+
+          <div className="space-y-4">
+            <div>
+              <p className="text-lg">Correct Facial Expressions</p>
+              <LinearProgressBar
+                value={Number.isFinite(correctexpressionPercentage) ? correctexpressionPercentage : 0}
+                color="#71D860"
               />
-            )}
-          </div>
-
-          {!isQuick && expressionsArray && (
-            <div className="mb-2">
-              <p className="text-  mb-2">
-                Facial Expressions: {expressionsArray.join(", ")}
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <p className="text-lg ">Correct Facial Expressions</p>
-                  <LinearProgressBar
-                    value={(correctExpressions?.length / totalQuestions) * 100}
-                    color="#71D860"
-                  />
-                </div>
-
-                <div>
-                  <p className="text-lg ">Incorrect Facial Expressions</p>
-                  <LinearProgressBar
-                    value={(incorrectExpressions?.length / totalQuestions) * 100}
-                    color="#FC4343"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-4 mb-2">
-            <div>
-              <p className="text-lg ">Correct Answers</p>
-              <LinearProgressBar value={correctPercentage} color="#71D860" />
             </div>
 
             <div>
-              <p className="text-lg ">Incorrect Answers</p>
-              <LinearProgressBar value={percentage} color="#FC4343" />
+              <p className="text-lg">Incorrect Facial Expressions</p>
+              <LinearProgressBar
+                value={Number.isFinite(expressionpercentage) ? expressionpercentage : 0}
+                color="#FC4343"
+              />
             </div>
           </div>
+        </div>
+      )}
+
+      <div className="space-y-4 mb-2">
+        <div>
+          <p className="text-lg">Correct Answers</p>
+          <LinearProgressBar 
+            value={Number.isFinite(correctPercentage) ? correctPercentage : 0} 
+            color="#71D860" 
+          />
+        </div>
+
+        <div>
+          <p className="text-lg">Incorrect Answers</p>
+          <LinearProgressBar 
+            value={Number.isFinite(percentage) ? percentage : 0} 
+            color="#FC4343" 
+          />
+        </div>
+      </div>
 
           <div className="flex flex-col">
   <h3 className="text-lg mt-2">List of Incorrect Pronunciations:</h3>

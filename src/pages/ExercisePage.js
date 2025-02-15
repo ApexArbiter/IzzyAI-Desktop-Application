@@ -149,8 +149,8 @@ function ExercisePage() {
   }, []);
 
   const handleButtonClick = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const checkAssess = await checkArticulationAssessment(userId);
       if (checkAssess?.data) {
         const token = await getToken();
@@ -159,49 +159,59 @@ function ExercisePage() {
         formData.append('UserID', userId);
         formData.append('SessionTypeID', 2);
 
-        fetch(`${BaseURL}/insert_session_first_data`, {
+        const sessionResponse = await fetch(`${BaseURL}/insert_session_first_data`, {
           method: 'POST',
           body: formData,
-          headers: { 'Authorization': 'Bearer ' + token }
-        })
-          .then(response => response.json())
-          .then(data => {
-            setLoading(false);
-            history('/speechExcercisePage', {
-              state: {
-                sessionId: data.SessionID,
-                SessiontypId: SessiontypId,
-                isAll: false,
-              }
-            });
-          })
-          .catch(error => {
-            setLoading(false);
-            console.error('Error:', error);
+          headers: {
+            'Authorization': 'Bearer ' + token,
+          },
+        });
+
+        setLoading(false);
+
+        if (sessionResponse.ok) {
+          const data = await sessionResponse.json();
+          history('/speechExcercisePage', {
+            state: {
+              sessionId: data.SessionID,
+              SessiontypId: SessiontypId,
+              isAll: false,
+            }
           });
+        } else {
+          throw new Error(sessionResponse.statusText);
+        }
       } else {
         setLoading(false);
         alert('Complete your articulation disorder assessment.');
       }
     } catch (error) {
       setLoading(false);
+      console.error('Error:', error);
     }
   };
 
+  // Updated handleButtonClickStammering function
   const handleButtonClickStammering = async () => {
-    const token = await getToken();
+    setLoading(true);
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('UserID', userId);
+      formData.append('SessionTypeID', 2);
 
-    const formData = new FormData();
-    formData.append('UserID', userId);
-    formData.append('SessionTypeID', 2);
+      const sessionResponse = await fetch(`${BaseURL}/insert_session_first_data`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
 
-    fetch(`${BaseURL}/insert_session_first_data`, {
-      method: 'POST',
-      body: formData,
-      headers: { 'Authorization': 'Bearer ' + token }
-    })
-      .then(response => response.json())
-      .then(data => {
+      setLoading(false);
+
+      if (sessionResponse.ok) {
+        const data = await sessionResponse.json();
         history('/stammeringExercisePage', {
           state: {
             sessionId: data.SessionID,
@@ -209,27 +219,36 @@ function ExercisePage() {
             isAll: false,
           }
         });
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+      } else {
+        throw new Error(sessionResponse.statusText);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Error:', error);
+    }
   };
 
+  // Updated handleButtonClickVoice function
   const handleButtonClickVoice = async () => {
-    const token = await getToken();
     setLoading(true);
-    const formData = new FormData();
-    formData.append('UserID', userId);
-    formData.append('SessionTypeID', 2);
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('UserID', userId);
+      formData.append('SessionTypeID', 2);
 
-    fetch(`${BaseURL}/insert_session_first_data`, {
-      method: 'POST',
-      body: formData,
-      headers: { 'Authorization': 'Bearer ' + token }
-    })
-      .then(response => response.json())
-      .then(data => {
-        setLoading(false);
+      const sessionResponse = await fetch(`${BaseURL}/insert_session_first_data`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': 'Bearer ' + token,
+        },
+      });
+
+      setLoading(false);
+
+      if (sessionResponse.ok) {
+        const data = await sessionResponse.json();
         history('/VoiceExercisePage', {
           state: {
             sessionId: data.SessionID,
@@ -237,50 +256,63 @@ function ExercisePage() {
             isAll: false,
           }
         });
-      })
-      .catch(error => {
-        setLoading(false);
-        console.error('Error:', error);
-      });
+      } else {
+        throw new Error(sessionResponse.statusText);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Error:', error);
+    }
   };
 
+  // Updated handleButtonLanguage function
   const handleButtonLanguage = async (isReceptive = false) => {
-    let checkAssess;
-    if (isReceptive) {
-      checkAssess = await checkReceptiveAssessment(userId);
-    } else {
-      checkAssess = await checkExpressiveAssessment(userId);
-    }
-    if (checkAssess?.data) {
-      const token = await getToken();
-      const userId = User();
-      setLoading(true);
-      const formData = new FormData();
-      formData.append('UserID', userId);
-      formData.append('SessionTypeID', 2);
+    setLoading(true);
+    try {
+      let checkAssess;
+      if (isReceptive) {
+        checkAssess = await checkReceptiveAssessment(userId);
+      } else {
+        checkAssess = await checkExpressiveAssessment(userId);
+      }
 
-      fetch(`${BaseURL}/insert_session_first_data`, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Authorization': 'Bearer ' + token }
-      })
-        .then(response => response.json())
-        .then(data => {
-          setLoading(false);
-          history(isReceptive ? "/ReceptiveExercise" : '/ExpressiveExercise', {
+      if (checkAssess?.data) {
+        const token = await getToken();
+        const formData = new FormData();
+        formData.append('UserID', userId);
+        formData.append('SessionTypeID', 2);
+
+        const sessionResponse = await fetch(`${BaseURL}/insert_session_first_data`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Authorization': 'Bearer ' + token,
+          },
+        });
+
+        setLoading(false);
+
+        if (sessionResponse.ok) {
+          const data = await sessionResponse.json();
+          history(isReceptive ? '/ReceptiveExercise' : '/ExpressiveExercise', {
             state: {
               sessionId: data.SessionID,
               SessiontypId: SessiontypId,
               isAll: false,
             }
           });
-        })
-        .catch(error => {
-          setLoading(false);
-          console.error('Error:', error);
-        });
-    } else {
-      alert(isReceptive ? 'Complete your receptive language disorder assessment' : 'Complete your expressive language disorder assessment');
+        } else {
+          throw new Error(sessionResponse.statusText);
+        }
+      } else {
+        setLoading(false);
+        alert(isReceptive
+          ? 'Complete your receptive language disorder assessment'
+          : 'Complete your expressive language disorder assessment');
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Error:', error);
     }
   };
   useEffect(() => {

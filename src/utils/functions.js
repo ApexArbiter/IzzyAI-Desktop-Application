@@ -105,6 +105,7 @@ export const getReceptiveExerciseQuestions = async (id, avatar) => {
         headers: { 'Authorization': 'Bearer ' + token }
       }
     );
+    console.log(response)
     if (response?.data?.length > 0) {
       return response?.data;
     }

@@ -95,7 +95,7 @@ const HomePage = () => {
 
   const cards = [
     {
-      title: "Assessment",
+      title: "Assessments",
       description: "Test your speech-language skills with our AI-based assessments",
       image: require('../../assets/images/home1.png'),
       route: 'assessmentPage'
@@ -150,7 +150,7 @@ const HomePage = () => {
                   <span className="font-medium text-gray-900">{userData.FullName}</span>
                 </div>
               </div>
-              <div className="flex-1 flex justify-center">
+              <div className="flex-1 flex justify-center mr-8">
                 <img
                   src={require("../../assets/images/logo.png")}
                   alt="Logo"

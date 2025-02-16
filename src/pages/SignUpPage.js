@@ -148,14 +148,14 @@ const SignUpPage = () => {
         setAlertMessage("Looks like you're under 18. No worries—just pop in your Parent/Guardian's email address to keep going");
         setShowAlert(true);
       }
-      navigate("/consent-guardian", {
+      navigate("/ConsentGuardian", {
         state: {
           data: userData,
           isChild: true
         }
       });
     } else {
-      navigate("/someone-care", {
+      navigate("/SomeoneCareScreen", {
         state: {
           data: userData
         }

@@ -31,7 +31,7 @@ function Card({ reportData, assessment, itemNum }) {
           <div className="flex justify-between items-center bg-white rounded-2xl p-4">
             <div className="flex-1 mr-2.5">
               <h3 className="text-lg font-medium text-gray-900">
-                {DisorderName} Assessment
+                {DisorderName} Assessment Report
               </h3>
               <div className="flex items-center mt-1.5">
                 <Calendar className="w-4 h-4" />
@@ -78,7 +78,7 @@ function ExerciseCard({ reportData, exercise, itemNum }) {
           <div className="flex justify-between items-center bg-white rounded-2xl p-4">
             <div className="flex-1 mr-2.5">
               <h3 className="text-lg font-medium text-gray-900">
-                {DisorderName} Exercise
+                {DisorderName} Exercise Report
               </h3>
               <div className="flex items-center mt-1.5">
                 <Calendar className="w-4 h-4" />

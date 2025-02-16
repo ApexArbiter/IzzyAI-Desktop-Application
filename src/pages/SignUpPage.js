@@ -339,9 +339,10 @@ const SignUpPage = () => {
             setIsAlertOpen(false); // Then close the modal
           }}
           onClose={() => {
-            setTimeout(() => {
-              console.log("hello")
-            }, 2000);
+            // setTimeout(() => {
+            //   console.log("hello")
+            // }, 2000);
+            navigate("/SignIn");
             setIsAlertOpen(false); // Just close the modal for the X button
           }}
           type="success"

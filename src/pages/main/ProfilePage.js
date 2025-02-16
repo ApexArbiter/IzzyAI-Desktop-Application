@@ -15,7 +15,7 @@ function ProfilePage() {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const navigate = useNavigate()
   const navigateBack = () => {
-    navigate(-1);
+    navigate("/home");
   };
   let userDetail = JSON.parse(localStorage.getItem('userDetails'))
 

@@ -49,6 +49,7 @@ const HomePage = () => {
         },
       });
       const userData = await response.json();
+      console.log("UserProfile",userData)
       updateUserDetail(userData);
       setUserData(userData);
 

@@ -56,16 +56,16 @@ const UpdateAvatar = () => {
   const userId = localStorage.getItem('userId');
   const userDetails = localStorage.getItem('userDetails');
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [data, setData] = useState({title:"", message:""})
+  const [data, setData] = useState({ title: "", message: "" })
   const navigate = useNavigate()
 
   const handleUpdateAvatar = async () => {
     if (!selectedAvatar) {
-      setData({title:"Error", message:"Please select an avatar"});
+      setData({ title: "Error", message: "Please select an avatar" });
       setIsAlertOpen(true);
       return;
     }
-
+console.log(userDetails)
     setIsLoading(true);
     const token = await getToken();
     const formData = new FormData();
@@ -97,11 +97,11 @@ const UpdateAvatar = () => {
 
 
 
-      setData({title:"Success", message:"Avatar Updated Successfully"});
+      setData({ title: "Success", message: "Avatar Updated Successfully", navigate: true });
       setIsAlertOpen(true);
     } catch (error) {
       console.error('Error:', error);
-      setData({title:"Error", message:"Failed to update avatar"});
+      setData({ title: "Error", message: "Failed to update avatar" });
       setIsAlertOpen(true);
     } finally {
       setIsLoading(false);
@@ -215,13 +215,23 @@ const UpdateAvatar = () => {
           </div>
         </div>
         <AlertModal
-        isOpen={isAlertOpen}
-        onClose={() => setIsAlertOpen(false)}
-        type="success"
-        title={data.title}
-        message={data.message}
-        confirmText="OK"
-      />
+          isOpen={isAlertOpen}
+          onConfirm={() => {
+            data.navigate && navigate("/settings"); // Navigate first
+            setIsAlertOpen(false); // Then close the modal
+          }}
+          onClose={() => {
+            // setTimeout(() => {
+            //   console.log("hello")
+            // }, 2000);
+            data.navigate && navigate("/settings");
+            setIsAlertOpen(false); // Just close the modal for the X button
+          }}
+          type="success"
+          title={data.title}
+          message={data.message}
+          confirmText="OK"
+        />
       </main>
     </div>
   );

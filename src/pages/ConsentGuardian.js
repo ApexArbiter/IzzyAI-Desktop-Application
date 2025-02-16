@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { UserIcon, Mail } from 'lucide-react';
-import { registerGuardian, setToken, signup} from '../utils/functions';
+import { registerGuardian, setToken, signup } from '../utils/functions';
 import CustomHeader from '../components/CustomHeader';
 import axios from 'axios';
 import BaseURL from '../components/ApiCreds';
+import AlertModal from '../components/AlertModal';
 
 const CustomButton = ({ onPress, title, loading, className }) => {
   return (
@@ -67,6 +68,7 @@ const ConsentGuardian = () => {
   const [email, setEmail] = useState(data?.email);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const onPressNext = async () => {
     if (!firstName || !lastName || !email || !relation) {
@@ -87,7 +89,7 @@ const ConsentGuardian = () => {
       if (signupresponse?.data?.access_token) {
         await setToken(signupresponse?.data?.access_token);
       }
-      
+
       if (signupresponse?.data?.error || signupresponse?.response?.data?.error) {
         setError(signupresponse?.data?.error || signupresponse?.response?.data?.error);
       } else {
@@ -101,17 +103,18 @@ const ConsentGuardian = () => {
           consentStatus: true,
           userId: signupresponse?.data?.user_id,
         };
-        
+
         const response = await registerGuardian(userData);
-        console.log("Guardian Reponse",response);
+        console.log("Guardian Reponse", response);
         if (response?.data) {
-          navigate("/otpScreen", { state: { email: data?.email, isSignup: true }});
+          setIsAlertOpen(true)
+          // navigate("/otpScreen", { state: { email: data?.email, isSignup: true }});
         } else {
           setError(response?.data?.error || response?.response?.data?.error);
         }
       }
     } catch (error) {
-        console.error(error);
+      console.error(error);
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -121,73 +124,89 @@ const ConsentGuardian = () => {
   return (
     <div className="h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <CustomHeader title="Consent Process" goBack={() => navigate(-1)} />
-<div className=''>
-  
-<div className="h-[calc(100vh-64px)] flex  justify-center items-center p-4">
-        <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl mb-2">
-          <div className="flex justify-center mb-6">
-            <img
-              src={require('../assets/images/logo.png')}
-              alt="Logo"
-              className="h-12 w-auto object-contain"
-            />
-          </div>
+      <div className=''>
 
-          <h1 className="text-2xl font-semibold text-gray-900 mb-8">
-            {isSomeone ? "Legal Representative Details" : "Parents & Guardians Details"}
-          </h1>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField
-              label="First Name"
-              placeholder="First Name"
-              value={firstName}
-              onChangeText={setFirstName}
-              icon={<UserIcon className="w-5 h-5" />}
-            />
-
-            <InputField
-              label="Last Name"
-              placeholder="Last Name"
-              value={lastName}
-              onChangeText={setLastName}
-              icon={<UserIcon className="w-5 h-5" />}
-            />
-
-            <InputField
-              label="Relationship"
-              placeholder="Relation"
-              value={relation}
-              onChangeText={setRelation}
-              icon={<UserIcon className="w-5 h-5" />}
-            />
-
-            <InputField
-              label="Email"
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              icon={<Mail className="w-5 h-5" />}
-              type="email"
-            />
-          </div>
-
-          {error && (
-            <div className="mt-6 text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg border border-red-100">
-              {error}
+        <div className="h-[calc(100vh-64px)] flex  justify-center items-center p-4">
+          <div className="w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-xl mb-2">
+            <div className="flex justify-center mb-6">
+              <img
+                src={require('../assets/images/logo.png')}
+                alt="Logo"
+                className="h-12 w-auto object-contain"
+              />
             </div>
-          )}
 
-          <div className="mt-8">
-            <CustomButton
-              onPress={onPressNext}
-              title="Next"
-              loading={isLoading}
-            />
+            <h1 className="text-2xl font-semibold text-gray-900 mb-8">
+              {isSomeone ? "Legal Representative Details" : "Parents & Guardians Details"}
+            </h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="First Name"
+                placeholder="First Name"
+                value={firstName}
+                onChangeText={setFirstName}
+                icon={<UserIcon className="w-5 h-5" />}
+              />
+
+              <InputField
+                label="Last Name"
+                placeholder="Last Name"
+                value={lastName}
+                onChangeText={setLastName}
+                icon={<UserIcon className="w-5 h-5" />}
+              />
+
+              <InputField
+                label="Relationship"
+                placeholder="Relation"
+                value={relation}
+                onChangeText={setRelation}
+                icon={<UserIcon className="w-5 h-5" />}
+              />
+
+              <InputField
+                label="Email"
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                icon={<Mail className="w-5 h-5" />}
+                type="email"
+              />
+            </div>
+
+            {error && (
+              <div className="mt-6 text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg border border-red-100">
+                {error}
+              </div>
+            )}
+
+            <div className="mt-8">
+              <CustomButton
+                onPress={onPressNext}
+                title="Next"
+                loading={isLoading}
+              />
+            </div>
           </div>
         </div>
+        <AlertModal
+          isOpen={isAlertOpen}
+          onConfirm={() => {
+            navigate("/SignIn"); // Navigate first
+            setIsAlertOpen(false); // Then close the modal
+          }}
+          onClose={() => {
+           
+            navigate("/SignIn");
+            setIsAlertOpen(false); // Just close the modal for the X button
+          }}
+          type="success"
+          title="Verification Email Sent"
+          message={`Thank you for signing up! We've sent a verification email to ${email?.trim()?.toLowerCase()}. Please check your inbox and click the verification link to activate your account.`}
+          confirmText="OK!"
+        />
       </div>
-</div>
     </div>
   );
 };

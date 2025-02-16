@@ -15,6 +15,7 @@ import BaseURL from '../components/ApiCreds';
 import { useNavigate } from 'react-router-dom';
 import DocumentIcon from '../assets/DocumentIcon';
 import CustomHeader from '../components/CustomHeader';
+import AlertModal from '../components/AlertModal';
 
 const DarkButton = ({ isLock, onClick, title }) => {
   return (
@@ -57,6 +58,8 @@ function ExercisePage() {
   const [loading, setLoading] = useState(false);
   const [receptiveQuestions, setReceptiveQuestions] = useState([]);
   const [expressiveQuestions, setExpressiveQuestions] = useState([]);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [data, setData] = useState({ title: "", message: "" })
 
 
   const report = () => localStorage.getItem("questionReport");
@@ -95,7 +98,7 @@ function ExercisePage() {
     console.log("Token", token)
 
     try {
-      const response = await fetch(`http://154.38.160.197:5000/get_Exercise_word_count/${userId}/${userDetail.AvatarID}/`, {
+      const response = await fetch(`${BaseURL}/get_Exercise_word_count/${userId}/${userDetail.AvatarID}/`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + token,
@@ -183,7 +186,9 @@ function ExercisePage() {
         }
       } else {
         setLoading(false);
-        alert('Complete your articulation disorder assessment.');
+        setIsAlertOpen(true)
+        setData({ title: "Error", message: "Complete your articulation disorder assessment." })
+        // alert('Complete your articulation disorder assessment.');
       }
     } catch (error) {
       setLoading(false);
@@ -306,6 +311,8 @@ function ExercisePage() {
         }
       } else {
         setLoading(false);
+        // setIsAlertOpen(true)
+        // setData({ title: "Error", message: "Complete your articulation disorder assessment." })
         alert(isReceptive
           ? 'Complete your receptive language disorder assessment'
           : 'Complete your expressive language disorder assessment');
@@ -410,6 +417,19 @@ function ExercisePage() {
           </div>
         </div>
       </div>
+      <AlertModal
+        isOpen={isAlertOpen}
+        onConfirm={() => {
+          setIsAlertOpen(false);
+        }}
+        onClose={() => {
+          setIsAlertOpen(false);
+        }}
+        type="success"
+        title={data.title}
+        message={data.message}
+        confirmText="OK"
+      />
 
       {/* Loading Indicator */}
       {loading && <Loader loading={loading} />}

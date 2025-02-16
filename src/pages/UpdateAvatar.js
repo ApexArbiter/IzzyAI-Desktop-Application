@@ -8,6 +8,7 @@ import male2 from "../assets/images/male2.png"
 import logo from '../assets/images/logo.png';
 import CustomHeader from '../components/CustomHeader';
 import { useNavigate } from 'react-router-dom';
+import AlertModal from '../components/AlertModal';
 
 const CustomButton = ({ onClick, title, loading, className }) => {
   return (
@@ -54,11 +55,14 @@ const UpdateAvatar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const userId = localStorage.getItem('userId');
   const userDetails = localStorage.getItem('userDetails');
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [data, setData] = useState({title:"", message:""})
   const navigate = useNavigate()
 
   const handleUpdateAvatar = async () => {
     if (!selectedAvatar) {
-      alert('Please select an avatar');
+      setData({title:"Error", message:"Please select an avatar"});
+      setIsAlertOpen(true);
       return;
     }
 
@@ -93,10 +97,12 @@ const UpdateAvatar = () => {
 
 
 
-      alert("Avatar Updated Successfully");
+      setData({title:"Success", message:"Avatar Updated Successfully"});
+      setIsAlertOpen(true);
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to update avatar');
+      setData({title:"Error", message:"Failed to update avatar"});
+      setIsAlertOpen(true);
     } finally {
       setIsLoading(false);
     }
@@ -208,6 +214,14 @@ const UpdateAvatar = () => {
             </div>
           </div>
         </div>
+        <AlertModal
+        isOpen={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        type="success"
+        title={data.title}
+        message={data.message}
+        confirmText="OK"
+      />
       </main>
     </div>
   );

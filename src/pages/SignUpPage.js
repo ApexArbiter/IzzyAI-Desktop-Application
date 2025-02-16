@@ -15,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../components/ui/alert-dialog"
+import AlertModal from '../components/AlertModal';
 const CustomButton = ({ onPress, title, loading, className }) => {
   return (
     <button
@@ -76,7 +77,7 @@ const SignUpPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { type } = location.state;
-
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -134,12 +135,8 @@ const SignUpPage = () => {
         if (response?.response?.data?.error || response?.data?.error) {
           setError(response?.response?.data?.error || response?.data?.error);
         } else {
-          navigate("/otpScreen", {
-            state: {
-              email: userData?.email,
-              isSignup: true
-            }
-          });
+          // setAlertMessage(`Thank you for signing up! We've sent a verification email to ${email?.trim()?.toLowerCase()}. Please check your inbox and click the verification link to activate your account.`);
+          setIsAlertOpen(true);
         }
       }
     } else if (type === 'child') {
@@ -301,6 +298,7 @@ const SignUpPage = () => {
               title="Sign Up"
               loading={isLoading}
             />
+
             <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
               <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
@@ -334,6 +332,23 @@ const SignUpPage = () => {
             </p>
           </div>
         </div>
+        <AlertModal
+          isOpen={isAlertOpen}
+          onConfirm={() => {
+            navigate("/SignIn"); // Navigate first
+            setIsAlertOpen(false); // Then close the modal
+          }}
+          onClose={() => {
+            setTimeout(() => {
+              console.log("hello")
+            }, 2000);
+            setIsAlertOpen(false); // Just close the modal for the X button
+          }}
+          type="success"
+          title="Verification Email Sent"
+          message={`Thank you for signing up! We've sent a verification email to ${email?.trim()?.toLowerCase()}. Please check your inbox and click the verification link to activate your account.`}
+          confirmText="OK!"
+        />
       </div>
     </div>
   );

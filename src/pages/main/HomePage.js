@@ -15,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog";
+import AlertModal from '../../components/AlertModal';
 
 const HomePage = () => {
   const { userId } = useDataContext();
@@ -24,8 +25,8 @@ const HomePage = () => {
   const history = useNavigate();
   const [userDetail, setUserDetail] = useState(null);
   const userDetails = JSON.parse(localStorage.getItem('userDetails'));
-  const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
-
+  // const [showSubscriptionAlert, setShowSubscriptionAlert] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
   useEffect(() => {
     try {
       const storedUserDetail = localStorage.getItem("userDetails");
@@ -38,7 +39,7 @@ const HomePage = () => {
   }, []);
 
   const fetchData = async () => {
-    const token = await getToken();
+    const token = await getToken(); 
     console.log(token)
     const UserId = localStorage.getItem("userId");
     try {
@@ -84,7 +85,8 @@ const HomePage = () => {
     if (route === 'assessmentPage' || userDetail?.SubscriptionDetails) {
       history(`/${route}`);
     } else {
-      setShowSubscriptionAlert(true);
+      setIsAlertOpen(true)
+      // setShowSubscriptionAlert(true);
     }
   };
 
@@ -116,7 +118,7 @@ const HomePage = () => {
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
-      <AlertDialog open={showSubscriptionAlert} onOpenChange={setShowSubscriptionAlert}>
+      {/* <AlertDialog open={showSubscriptionAlert} onOpenChange={setShowSubscriptionAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Subscription Required</AlertDialogTitle>
@@ -129,7 +131,15 @@ const HomePage = () => {
             <AlertDialogAction onClick={() => history('/subscription')}>Subscribe Now</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
+      <AlertModal
+        isOpen={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        type="success"
+        title="Subscribe"
+        message="Please subscribe first"
+        confirmText="OK!"
+      />
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">

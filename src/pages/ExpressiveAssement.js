@@ -437,13 +437,13 @@ function ExpressiveAssessment() {
                   className="flex justify-center mb-4"
                 >
                   <div className="flex gap-4">
-                    <div className="px-6 py-3 border border-sky-400 rounded-xl">
+                    
                       <img
-                        className="w-48 h-48 rounded-lg shadow-lg object-cover"
+                        className="w-48 h-48 border-sky-400  border-2 rounded-lg shadow-lg object-cover"
                         src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
                         alt="Question"
                       />
-                    </div>
+                    
                     <div className="w-48 h-48 ">
                       <VideoPlayer
                         source={`${IMAGE_BASE_URL}${questions?.[questionCount - 1]?.avatar_assessment}`}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getReceptiveExerciseQuestions, getReceptiveQuestions, shuffleArray } from "../utils/functions";
+import { getReceptiveQuestions, shuffleArray } from "../utils/functions";
 import Loader from '../components/Loader';
 import VideoPlayer from '../components/VideoPlayer';
 import LogoQuestionView from '../components/LogoQuestionView';
@@ -73,8 +73,7 @@ const ReceptiveAssessment = () => {
   const fetchQuestionData = async () => {
     try {
       setIsLoading(true);
-      const response = await getReceptiveExerciseQuestions(userId, userDetail?.AvatarID);
-      console.log(response)
+      const response = await getReceptiveQuestions(userId, userDetail?.AvatarID);
       if (response) {
         setQuestions(response);
         setCurrentImages(shuffleArray(response?.[questionCount - 1]?.images || []));

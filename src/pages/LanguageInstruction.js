@@ -24,7 +24,7 @@ function LanguageInstructions() {
 
     <div className="flex flex-col min-h-screen">
       <CustomHeader
-        title="Receptive Language Disorder"
+        title="Expressive Language Disorder"
         goBack={() => history(-1)}
       />
 

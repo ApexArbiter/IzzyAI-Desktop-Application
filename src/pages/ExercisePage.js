@@ -311,11 +311,15 @@ function ExercisePage() {
         }
       } else {
         setLoading(false);
-        // setIsAlertOpen(true)
-        // setData({ title: "Error", message: "Complete your articulation disorder assessment." })
-        alert(isReceptive
-          ? 'Complete your receptive language disorder assessment'
-          : 'Complete your expressive language disorder assessment');
+        setIsAlertOpen(true)
+        setData({
+          title: "Error", message: (isReceptive
+            ? 'Complete your receptive language disorder assessment'
+            : 'Complete your expressive language disorder assessment')
+        })
+        // alert(isReceptive
+        //   ? 'Complete your receptive language disorder assessment'
+        //   : 'Complete your expressive language disorder assessment');
       }
     } catch (error) {
       setLoading(false);

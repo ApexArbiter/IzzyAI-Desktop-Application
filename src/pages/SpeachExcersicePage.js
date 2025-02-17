@@ -10,7 +10,7 @@ import BaseURL, { IMAGE_BASE_URL } from '../components/ApiCreds';
 import Loader from '../components/Loader';
 import dynamicfunctions from '../utils/dynamicfunctions';
 import html2canvas from 'html2canvas';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Pause, Play } from 'lucide-react';
 import LogoQuestionView from '../components/LogoQuestionView';
 import WaveIcon from '../assets/Wave';
 const RecordButton = (props) => {
@@ -78,6 +78,8 @@ const PlayButton = (props) => {
 const SpeechArticulationPage = () => {
   const location = useLocation(); // Get the location object
   const { sessionId, isAll } = location?.state || {}; // Use fallback if state is undefined
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
 
   const { setArticulationReport } = useDataContext();
   const [startTime, setStartTime] = useState('');
@@ -131,7 +133,39 @@ const SpeechArticulationPage = () => {
     console.log(User());
   }, []); // Empty dependency array ensures this runs only once when the component mounts
 
+  const togglePlayPause = () => {
+    const videoElement = document.querySelector('video');
+    if (videoElement) {
+      if (isPlaying) {
+        videoElement.pause();
+      } else {
+        videoElement.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+  useEffect(() => {
+    const videoElement = document.querySelector('video');
+    if (videoElement) {
+      const updateProgress = () => {
+        if (videoElement.duration) {
+          setVideoProgress((videoElement.currentTime / videoElement.duration) * 100);
+        }
+      };
 
+      videoElement.addEventListener('timeupdate', updateProgress);
+      videoElement.addEventListener('play', () => setIsPlaying(true));
+      videoElement.addEventListener('pause', () => setIsPlaying(false));
+      videoElement.addEventListener('ended', () => setIsPlaying(false));
+
+      return () => {
+        videoElement.removeEventListener('timeupdate', updateProgress);
+        videoElement.removeEventListener('play', () => setIsPlaying(true));
+        videoElement.removeEventListener('pause', () => setIsPlaying(false));
+        videoElement.removeEventListener('ended', () => setIsPlaying(false));
+      };
+    }
+  }, [videoUrl]);
   const {
     correctAnswersCount,
     correctExpressions,
@@ -611,6 +645,7 @@ const SpeechArticulationPage = () => {
             </div>
 
             {/* Question Image and Video */}
+            {/* Question Image and Video */}
             {questionData && questionData.PictureUrl && (
               <motion.div
                 initial={{ scale: 0.95 }}
@@ -623,20 +658,47 @@ const SpeechArticulationPage = () => {
                     src={`${IMAGE_BASE_URL}${questionData.PictureUrl}`}
                     alt="Question"
                   />
-                  <video
-                    key={`${videoUrl}-${tries}`}
-                    className="rounded-xl shadow-lg object-cover"
-                    // autoPlay
-                    width={192}
-                    height={192}
-                    playsInline
-                  >
-                    <source src={`${IMAGE_BASE_URL}${videoUrl}`} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+                  <div className="relative">
+                    <video
+                      key={`${videoUrl}-${tries}`}
+                      className="rounded-xl  object-cover"
+                      width={192}
+                      height={192}
+                      playsInline
+                    >
+                      <source src={`${IMAGE_BASE_URL}${videoUrl}`} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                    <div className="absolute bottom-[-34px] left-0 right-0 flex items-center space-x-2">
+                    <button
+                      onClick={togglePlayPause}
+                      className="text-[#2DEEAA] hover:text-cyan-300 transition-colors z-10"
+                      aria-label={isPlaying ? 'Pause' : 'Play'}
+                    >
+                      {isPlaying ? (
+                        <Pause className="w-6 h-6 fill-[#2DEEAA] stroke-[#2DEEAA]" />
+                      ) : (
+                        <Play className="w-6 h-6 fill-[#2DEEAA] stroke-[#2DEEAA]" />
+                      )}
+                    </button>
+
+                    <div
+                      className="relative w-full h-1 bg-gray-200 cursor-pointer rounded-full"
+
+                    >
+                      <div
+                        className="h-full bg-[#2DEEAA] rounded-full "
+                        style={{ width: `${videoProgress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                   
+                  </div>
                 </div>
               </motion.div>
             )}
+                 
 
             <div className="flex justify-center items-center">
               <div className="w-48">

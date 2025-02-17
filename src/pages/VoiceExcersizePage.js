@@ -477,7 +477,7 @@ const VoiceDisorderPage = () => {
 
             <div className="flex gap-4 justify-center relative mb-6">
               {/* Box 1: Question, Expression, Voice Response */}
-              <div className="w-52 flex flex-col gap-2  justify-center">
+              <div className="w-56 pl-2 flex flex-col gap-2  justify-center">
                 <p className="text-sm  top-[-15px] absolute  ">Attempts: {attempts}</p>
                 <LogoQuestionView
                   first_text={"Say this..."}
@@ -499,10 +499,11 @@ const VoiceDisorderPage = () => {
 
 
               {/* Box 2: Video Player */}
-              <div className="w-48 h-48 rounded-xl overflow-hidden ">
-                <div className='w-full h-full relative' >
+              
+                
                   {exerciseData && (
                     <VideoPlayer
+                    className={"w-48 h-48 rounded-xl relative overflow-hidden"}
                       ref={videoRef}
                       onEnd={() => {
                         setIsVideoEnd(true);
@@ -516,8 +517,8 @@ const VoiceDisorderPage = () => {
                       source={`${IMAGE_BASE_URL}${exerciseData[exerciseCount - 1]?.VideoUrl}`}
                     />
                   )}
-                </div>
-              </div>
+               
+              
             </div>
 
             <div className='h-6'>

@@ -335,15 +335,13 @@ const SignUpPage = () => {
         <AlertModal
           isOpen={isAlertOpen}
           onConfirm={() => {
-            navigate("/SignIn"); // Navigate first
-            setIsAlertOpen(false); // Then close the modal
+            navigate("/SignIn"); 
+            setIsAlertOpen(false);
           }}
           onClose={() => {
-            // setTimeout(() => {
-            //   console.log("hello")
-            // }, 2000);
+          
             navigate("/SignIn");
-            setIsAlertOpen(false); // Just close the modal for the X button
+            setIsAlertOpen(false); 
           }}
           type="success"
           title="Verification Email Sent"

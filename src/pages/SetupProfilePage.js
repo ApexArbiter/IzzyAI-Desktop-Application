@@ -19,9 +19,8 @@ const CustomButton = ({ onClick, title, loading }) => {
     <button
       onClick={onClick}
       disabled={loading}
-      className="w-full h-[50px] bg-[#111920] text-white rounded-full font-semibold
-        transition-all duration-300 hover:bg-gray-800 disabled:opacity-50 
-        disabled:cursor-not-allowed flex items-center justify-center mt-5"
+      className="bg-gray-900 text-white rounded-full py-3 px-8 font-semibold
+        hover:bg-gray-800 transition-all duration-300 mt-4 flex items-center justify-center w-fit mx-auto"
     >
       {loading ? (
         <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -35,7 +34,7 @@ const CustomButton = ({ onClick, title, loading }) => {
 const CheckBox = ({ checked, onPress, title }) => {
   return (
     <label className="flex items-center space-x-3 cursor-pointer py-2 select-none">
-      <div 
+      <div
         onClick={onPress}
         className={`w-6 h-6 border-2 rounded flex items-center justify-center
           ${checked ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`}
@@ -86,7 +85,7 @@ const SetupProfilePage = () => {
   };
 
   const handleCheckboxChange = (preference) => {
-    setImprovementPreferences(prev => 
+    setImprovementPreferences(prev =>
       prev.includes(preference)
         ? prev.filter(item => item !== preference)
         : [...prev, preference]
@@ -95,8 +94,8 @@ const SetupProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <CustomHeader title="Setup Profile" />
-      
+      <CustomHeader title="Setup Profile" goBack={() => { navigate("/SignIn") }} />
+
       <div className="flex flex-col min-h-[calc(100vh-64px)]">
         <div className="flex-1 px-4 py-6 md:px-6 lg:px-8 max-w-3xl mx-auto w-full">
           <div className="flex flex-col h-full">
@@ -124,7 +123,7 @@ const SetupProfilePage = () => {
                 Setup your profile to continue
               </h1>
 
-              <div className="space-y-6">
+              <div className="space-y-6 ">
                 <div>
                   <h2 className="text-lg font-medium text-gray-900 mb-4">
                     What do you want to improve?
@@ -148,11 +147,14 @@ const SetupProfilePage = () => {
                   </div>
                 </div>
 
-                <CustomButton
-                  onClick={handleNavigate}
-                  title="Next"
-                  loading={isLoading}
-                />
+                {/* Update the button section */}
+                <div className="flex justify-center w-full">
+                  <CustomButton
+                    onClick={handleNavigate}
+                    title="Next"
+                    loading={isLoading}
+                  />
+                </div>
               </div>
             </div>
           </div>

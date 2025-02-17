@@ -4,6 +4,7 @@ import { useDataContext } from '../contexts/DataContext';
 import BaseURL from '../components/ApiCreds';
 import { getToken } from '../utils/functions';
 import CustomHeader from '../components/CustomHeader';
+import AlertModal from '../components/AlertModal';
 
 // Progress Bar Components
 const BarFilled = () => (
@@ -50,8 +51,10 @@ const AvatarOption = ({ id, imgSrc, selected, onClick }) => (
 const SetupProfilePage1 = () => {
   const { userId, userDetail, updateUserDetail } = useDataContext();
   const [selectedAvatar, setSelectedAvatar] = useState(null);
-  const [gender, setGender] = useState(userDetail?.Gender|| "Male");
+  const [gender, setGender] = useState(userDetail?.Gender || "Male");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [data, setData] = useState({ title: "", message: "" })
   console.log(userId, userDetail)
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,7 +67,9 @@ const SetupProfilePage1 = () => {
 
   const handleNavigateNext = async () => {
     if (!selectedAvatar) {
-      alert('Please select an avatar');
+      setData({ title: "Error", message: "Please select an avatar" });
+      setIsAlertOpen(true);
+      // alert('Please select an avatar');
       return;
     }
 
@@ -89,12 +94,13 @@ const SetupProfilePage1 = () => {
         AvatarID: selectedAvatar,
       });
 
-      navigate('/setupProfile2', { 
-        state: location.state 
+      navigate('/setupProfile2', {
+        state: location.state
       });
     } catch (error) {
       console.error('Error updating avatar:', error);
-      alert('Failed to update avatar. Please try again.');
+      setData({ title: 'Error', message: 'Failed to update avatar. Please try again.' });
+      setIsAlertOpen(true);
     } finally {
       setIsLoading(false);
     }
@@ -195,7 +201,7 @@ const SetupProfilePage1 = () => {
   return (
     <div className="min-h-screen bg-white">
       <CustomHeader title="Setup Profile" goBack={handleBack} />
-      
+
       <div className="flex flex-col min-h-[calc(100vh-64px)]">
         <div className="flex-1 px-4 py-6 md:px-6 lg:px-8 max-w-3xl mx-auto w-full">
           <div className="flex flex-col h-full">
@@ -235,6 +241,22 @@ const SetupProfilePage1 = () => {
             </div>
           </div>
         </div>
+        <AlertModal
+          isOpen={isAlertOpen}
+          onConfirm={() => {
+            data.navigate && navigate("/settings");
+            setIsAlertOpen(false);
+          }}
+          onClose={() => {
+
+            data.navigate && navigate("/settings");
+            setIsAlertOpen(false);
+          }}
+          type="success"
+          title={data.title}
+          message={data.message}
+          confirmText="OK"
+        />
       </div>
     </div>
   );

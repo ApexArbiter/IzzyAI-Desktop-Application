@@ -60,7 +60,7 @@ const VideoPlayer = ({ source, onEnd, onStart, className, controls = false }) =>
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-48">
       <video
         ref={videoRef}
         src={source}
@@ -70,19 +70,10 @@ const VideoPlayer = ({ source, onEnd, onStart, className, controls = false }) =>
       />
       
       {controls && (
-        <>
-          <div 
-            className="absolute bottom-0 left-0 w-full h-1 bg-gray-200 cursor-pointer"
-            onClick={handleProgressClick}
-          >
-            <div 
-              className="h-full bg-[#2DEEAA]"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <div className="absolute bottom-[-24px] left-0 right-2 flex items-center space-x-2">
           <button
             onClick={togglePlay}
-            className="absolute bottom-2 left-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            className="text-cyan-400 hover:text-cyan-300 transition-colors z-10"
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
@@ -91,7 +82,17 @@ const VideoPlayer = ({ source, onEnd, onStart, className, controls = false }) =>
               <Play className="w-6 h-6 fill-cyan-400 stroke-cyan-400" />
             )}
           </button>
-        </>
+          
+          <div 
+            className="relative w-full h-1 bg-gray-200 cursor-pointer rounded-full"
+            onClick={handleProgressClick}
+          >
+            <div 
+              className="h-full bg-cyan-400 rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

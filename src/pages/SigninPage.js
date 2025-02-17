@@ -225,6 +225,7 @@ function SignInPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <button className='p-2 border' onClick={()=>{navigate("/setupProfile")}} >SignUP Process Check Up</button>
       <div className="flex flex-col items-center justify-center min-h-screen  p-4">
         <div className="w-full max-w-sm lg:max-w-sm bg-white rounded-2xl  shadow-xl overflow-hidden">
           <div className="p-4 sm:p-6 lg:p-8 flex flex-col h-full">

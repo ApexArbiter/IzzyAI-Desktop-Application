@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CustomHeader from '../components/CustomHeader';
+import AlertModal from '../components/AlertModal';
 
 // Progress Bar Components
 // Progress Bar Components - Made more responsive
@@ -23,8 +24,8 @@ const CircularProgress = ({ percentage, color, bgColor, children }) => {
 
   return (
     <div className="relative inline-flex">
-      <svg 
-        style={{ width: size, height: size }} 
+      <svg
+        style={{ width: size, height: size }}
         className="transform -rotate-90"
         viewBox="0 0 120 120"
       >
@@ -57,7 +58,7 @@ const CircularProgress = ({ percentage, color, bgColor, children }) => {
 
 const CustomButton = ({ onClick, title, backgroundColor }) => {
   const bgColor = backgroundColor === 'red' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
-  
+
   return (
     <button
       onClick={onClick}
@@ -73,10 +74,12 @@ const SetupProfilePage3 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [passed, setPassed] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [data, setData] = useState({ title: "", message: "" })
 
   const videoQualityPercentage = location.state?.videoQualityPercentage || 0;
   const audioQualityPercentage = location.state?.audioQualityPercentage || 0;
-console.log(location.state)
+  console.log(location.state)
   useEffect(() => {
     const checkQuality = () => {
       if (videoQualityPercentage >= 40 && audioQualityPercentage >= 10) {
@@ -90,12 +93,13 @@ console.log(location.state)
 
   const handleNavigate = () => {
     if (passed) {
-      navigate('/setupProfile4', { 
-        state: location.state 
+      navigate('/setupProfile4', {
+        state: location.state
       });
     } else {
-      navigate(-1);
-      alert("Please try again to pass Camera/Microphone test.\nPlease say the sentence loud and close to the microphone.");
+      setData({ title: "Error", navigate: true, message: "Please try again to pass Camera/Microphone test.\nPlease say the sentence loud and close to the microphone." });
+      setIsAlertOpen(true)
+      // alert("Please try again to pass Camera/Microphone test.\nPlease say the sentence loud and close to the microphone.");
     }
   };
 
@@ -106,7 +110,7 @@ console.log(location.state)
   return (
     <div className="min-h-screen bg-white">
       <CustomHeader title="Setup Profile" showBack={true} goBack={handleBack} />
-      
+
       <div className="flex flex-col min-h-[calc(100vh-64px)]">
         <div className="flex-1 px-4 py-6 md:px-6 lg:px-8 max-w-3xl mx-auto w-full">
           <div className="flex flex-col h-full">
@@ -131,13 +135,13 @@ console.log(location.state)
             {/* Content */}
             <div className="flex-1">
               <h1 className="lg:text-3xl text-2xl font-medium text-gray-900 text-center mb-8">
-                {passed 
+                {passed
                   ? "Congratulations! Your camera passed the test!"
                   : "Oops! Your Camera/Microphone didn't qualify the test"}
               </h1>
 
               <p className="text-center text-lg lg:text-xl text-gray-700 max-w-md mx-auto mb-12">
-                {passed 
+                {passed
                   ? "Your camera is good to go! You can now proceed to the next step"
                   : "Try cleaning up your Camera/Microphone or use different device in order to use IzzyAI"}
               </p>
@@ -156,10 +160,10 @@ console.log(location.state)
                   </CircularProgress>
                   <p className="mt-6 mb-8 text-lg text-gray-900">Camera Score</p>
                   <CustomButton
-                  onClick={handleBack}
-                  title="Retry"
-                  backgroundColor="red"
-                />
+                    onClick={handleBack}
+                    title="Retry"
+                    backgroundColor="red"
+                  />
                 </div>
 
                 <div className="text-center">
@@ -174,17 +178,32 @@ console.log(location.state)
                   </CircularProgress>
                   <p className="mt-6 mb-8 text-lg text-gray-900">Microphone Score</p>
                   <CustomButton
-                  onClick={handleNavigate}
-                  title="Done"
-                  backgroundColor="green"
-                />
+                    onClick={handleNavigate}
+                    title="Done"
+                    backgroundColor="green"
+                  />
                 </div>
               </div>
 
               {/* Buttons */}
               <div className="flex justify-center gap-4">
-                
-               
+                <AlertModal
+                  isOpen={isAlertOpen}
+                  onConfirm={() => {
+                    data.navigate && navigate("/setupProfile2");
+                    setIsAlertOpen(false);
+                  }}
+                  onClose={() => {
+
+                    data.navigate && navigate("/setupProfile2");
+                    setIsAlertOpen(false);
+                  }}
+                  type="success"
+                  title={data.title}
+                  message={data.message}
+                  confirmText="OK"
+                />
+
               </div>
             </div>
           </div>

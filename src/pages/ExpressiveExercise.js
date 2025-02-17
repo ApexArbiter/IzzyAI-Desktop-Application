@@ -491,7 +491,7 @@ function ExpressiveAssessment() {
               )}
               <div className="flex items-center justify-center gap-16 w-full text-sm mb-2 text-gray-800">
                 <div className='w-48' ><p className='text-start text-sm'  >Attempt: {Math.min(recordCount + 1, 3)}</p></div>
-                <div className='w-48' ><p className='text-end' >Answer Count: {answerCount + 1}</p></div>
+                <div className='w-48 relative' ><p className='text-end absolute top-4 right-0' >Answer Count: {answerCount + 1}</p></div>
               </div>
 
               {/* Question Text Below Image */}

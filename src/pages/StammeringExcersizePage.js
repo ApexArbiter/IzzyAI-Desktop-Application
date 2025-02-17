@@ -567,16 +567,15 @@ const StammeringExercisePage = () => {
             </div>
 
             {/* Right Box: Video Player */}
-            <div className="w-48 h-48 rounded-xl relative bg-white overflow-hidden">
               {avatarPath && (
                 <VideoPlayer
                   source={`${IMAGE_BASE_URL}${avatarPath}`}
                   onEnd={() => setIsVideoEnd(true)}
                   onStart={() => setIsVideoEnd(false)}
                   controls={true}
+                  className={"w-48 h-48 rounded-xl relative bg-white overflow-hidden"}
                 />
               )}
-            </div>
           </div>
 
           {isDelay && (
@@ -587,7 +586,7 @@ const StammeringExercisePage = () => {
             </div>
           )}
 
-          <div className="flex flex-row justify-center items-center gap-4 mt-7">
+          <div className="flex flex-row justify-center items-center gap-4  mt-10">
             {/* Webcam Box */}
             <div className="rounded-2xl overflow-hidden flex justify-center">
               <Webcam

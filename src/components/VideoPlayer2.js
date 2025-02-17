@@ -1,8 +1,11 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
+import { Play, Pause } from 'lucide-react';
 
-const VideoPlayer = forwardRef(({ source, onEnd, onStart, videoHeight }, ref) => {
+const VideoPlayer = forwardRef(({ source, onEnd, onStart, videoHeight, className, controls = true }, ref) => {
   const videoRef = useRef(null);
   const [isComplete, setIsComplete] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useImperativeHandle(ref, () => ({
     stop: () => {
@@ -39,25 +42,96 @@ const VideoPlayer = forwardRef(({ source, onEnd, onStart, videoHeight }, ref) =>
     }
   }, [source, isComplete]);
 
-  const handleVideoEnd = () => {
-    if (onEnd) onEnd();
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    const handleTimeUpdate = () => {
+      const progress = (videoElement.currentTime / videoElement.duration) * 100;
+      setProgress(progress);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setIsComplete(true);
+      if (onEnd) onEnd();
+    };
+
+    const handlePlay = () => {
+      setIsPlaying(true);
+      if (onStart) onStart();
+    };
+
+    const handlePause = () => {
+      setIsPlaying(false);
+    };
+
+    videoElement.addEventListener('timeupdate', handleTimeUpdate);
+    videoElement.addEventListener('ended', handleEnded);
+    videoElement.addEventListener('play', handlePlay);
+    videoElement.addEventListener('pause', handlePause);
+
+    return () => {
+      videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+      videoElement.removeEventListener('ended', handleEnded);
+      videoElement.removeEventListener('play', handlePlay);
+      videoElement.removeEventListener('pause', handlePause);
+    };
+  }, [onEnd, onStart]);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+    }
   };
 
-  const handlePlay = () => {
-    if (onStart) onStart();
+  const handleProgressClick = (e) => {
+    const progressBar = e.currentTarget;
+    const clickPosition = (e.clientX - progressBar.getBoundingClientRect().left) / progressBar.offsetWidth;
+    const newTime = clickPosition * videoRef.current.duration;
+    videoRef.current.currentTime = newTime;
   };
 
   return (
-    <video
-      ref={videoRef}
-      src={source}
-      className="w-full rounded-lg"
-      style={{ height: videoHeight }}
-      onEnded={handleVideoEnd}
-      onPlay={handlePlay}
-      controls
-      playsInline
-    />
+    <div className="relative w-full">
+      <video
+        ref={videoRef}
+        src={source}
+        className={`w-full object-cover rounded-lg ${className || ''}`}
+        style={{ height: videoHeight }}
+        playsInline
+      />
+      
+      {controls && (
+        <div className="absolute bottom-[-30px] left-0 right-2 flex items-center space-x-2">
+          <button
+            onClick={togglePlay}
+            className="text-cyan-400 hover:text-cyan-300 transition-colors z-10"
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? (
+              <Pause className="w-6 h-6 fill-cyan-500 stroke-cyan-400" />
+            ) : (
+              <Play className="w-6 h-6 fill-cyan-400 stroke-cyan-400" />
+            )}
+          </button>
+          
+          <div 
+            className="relative w-full h-1 bg-gray-200 cursor-pointer rounded-full"
+            onClick={handleProgressClick}
+          >
+            <div 
+              className="h-full bg-cyan-400 rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 });
 

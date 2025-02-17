@@ -217,15 +217,13 @@ console.log(userDetails)
         <AlertModal
           isOpen={isAlertOpen}
           onConfirm={() => {
-            data.navigate && navigate("/settings"); // Navigate first
-            setIsAlertOpen(false); // Then close the modal
+            data.navigate && navigate("/settings"); 
+            setIsAlertOpen(false); 
           }}
           onClose={() => {
-            // setTimeout(() => {
-            //   console.log("hello")
-            // }, 2000);
+           
             data.navigate && navigate("/settings");
-            setIsAlertOpen(false); // Just close the modal for the X button
+            setIsAlertOpen(false); 
           }}
           type="success"
           title={data.title}

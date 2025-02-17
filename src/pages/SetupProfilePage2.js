@@ -423,6 +423,22 @@ const SetupProfilePage2 = () => {
           </div>
         </div>
       </div>
+      {/* <AlertModal
+          isOpen={isAlertOpen}
+          onConfirm={() => {
+            data.navigate && navigate("/settings"); 
+            setIsAlertOpen(false); 
+          }}
+          onClose={() => {
+           
+            data.navigate && navigate("/settings");
+            setIsAlertOpen(false); 
+          }}
+          type="success"
+          title={data.title}
+          message={data.message}
+          confirmText="OK"
+        /> */}
       <Loader loading={loader} />
     </div>
   );

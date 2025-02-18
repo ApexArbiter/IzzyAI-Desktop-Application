@@ -4,9 +4,8 @@ import CustomHeader from '../components/CustomHeader';
 import { useDataContext } from '../contexts/DataContext';
 
 const VoiceExerciseGame = () => {
-  let { userId } = useDataContext();
-  console.log('userId', userId)
-  userId = "353"
+  const userId = JSON.parse(localStorage.getItem('userId'));
+  
   const navigate = useNavigate();
 
   const handleButtonClick = (url) => {

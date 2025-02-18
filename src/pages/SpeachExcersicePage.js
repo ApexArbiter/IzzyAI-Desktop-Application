@@ -644,7 +644,7 @@ const SpeechArticulationPage = () => {
               </span>
             </div>
 
-            {/* Question Image and Video */}
+      
             {/* Question Image and Video */}
             {questionData && questionData.PictureUrl && (
               <motion.div
@@ -652,7 +652,7 @@ const SpeechArticulationPage = () => {
                 animate={{ scale: 1 }}
                 className="flex justify-center mb-6"
               >
-                <div className="flex gap-4">
+                <div className="flex gap-20">
                   <img
                     className="w-48 h-48 border-sky-400 border rounded-xl shadow-lg object-cover"
                     src={`${IMAGE_BASE_URL}${questionData.PictureUrl}`}
@@ -700,7 +700,7 @@ const SpeechArticulationPage = () => {
             )}
                  
 
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center gap-16">
               <div className="w-48">
                 {/* Question Text */}
                 <div className="flex justify-start">
@@ -716,22 +716,11 @@ const SpeechArticulationPage = () => {
 
               {/* Expression and Voice Result */}
               <div className="flex flex-col gap-2 justify-center items-center p-3 w-56 h-20">
-                {voiceResult && (
-                  <LogoQuestionView
-                    second_text={null}
-                    first_text={voiceResult}
-                    questionResponse={voiceResult}
-                  />
-                )}
-                {expression && (
-                  <p className="text-center">
-                    Facial Expression: {expression}
-                  </p>
-                )}
+               
               </div>
-            </div>
+            </div>        c       
 
-            <div className="flex flex-row justify-center items-center gap-4 mt-7">
+            <div className="flex flex-row justify-center items-center gap-20 mt-7">
               {/* Camera View */}
               <div ref={cameraContainerRef}>
                 <div className="rounded-2xl overflow-hidden flex justify-center">
@@ -751,7 +740,7 @@ const SpeechArticulationPage = () => {
 
               <div className="w-48">
                 {/* Recording Controls */}
-                <div className="flex justify-center items-center">
+                <div className="flex flex-col justify-center items-center">
                   {recordingStatus === 'idle' && tries <= 4 && (
                     <button
                       onClick={onStartRecord}
@@ -774,6 +763,18 @@ const SpeechArticulationPage = () => {
                       </button>
                     </div>
                   )}
+                   {voiceResult && (
+                  <LogoQuestionView
+                    second_text={null}
+                    first_text={voiceResult}
+                    questionResponse={voiceResult}
+                  />
+                )}
+                {expression && (
+                  <p className="text-center">
+                    Facial Expression: {expression}
+                  </p>
+                )}
                 </div>
 
                 {/* Navigation Buttons */}

@@ -84,7 +84,7 @@ const Games = () => {
     <div className="flex flex-col h-screen w-full ">
 
       <div className='absolute top-0 left-0 right-0 z-10'>
-        <CustomHeader title="" goBack={() => navigate(-1)} />
+        <CustomHeader title="" goBack={() => navigate("/voiceExerciseGame")} />
       </div>
       {renderContent()}
     </div>

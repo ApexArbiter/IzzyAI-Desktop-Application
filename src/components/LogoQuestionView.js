@@ -73,7 +73,7 @@ const LogoQuestionView = ({
           <img
             src={image || questionLogo}
             alt="Question Logo"
-            className="h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 object-contain"
+            className="h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 object-contain mt-1"
           />
         </div>
       )}
@@ -90,8 +90,8 @@ const LogoQuestionView = ({
               <HighlightedText indexes={highlighted} text={second_text} />
             </div>
           ) : (
-            <p className={` text-sm ${className}  md:text-lg lg:text-xl font-normal text-gray-900 
-                         break-words leading-relaxed `}>
+            <p className={` text-sm ${className} md:text-lg lg:text-xl font-normal  text-gray-900 
+                         break-words leading-tight `}>
               {second_text}
             </p>
           )}

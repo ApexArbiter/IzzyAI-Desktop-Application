@@ -77,9 +77,9 @@ const VideoPlayer = ({ source, onEnd, onStart, className, controls = false }) =>
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
-              <Pause className="w-6 h-6 fill-cyan-500 stroke-cyan-400" />
+              <Pause className="w-6 h-6 fill-[#2DEEAA] stroke-[#2DEEAA]" />
             ) : (
-              <Play className="w-6 h-6 fill-cyan-400 stroke-cyan-400" />
+              <Play className="w-6 h-6 fill-[#2DEEAA] stroke-[#2DEEAA]" />
             )}
           </button>
           
@@ -88,7 +88,7 @@ const VideoPlayer = ({ source, onEnd, onStart, className, controls = false }) =>
             onClick={handleProgressClick}
           >
             <div 
-              className="h-full bg-cyan-400 rounded-full"
+              className="h-full bg-[#2DEEAA] rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>

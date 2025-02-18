@@ -9,6 +9,7 @@ import GoogleIcon from '../assets/GoogleIcon';
 import AppleIcon from '../assets/AppleIcon';
 import { getGoogleToken, googleLogin, isIOS, resendOtp, setToken } from '../utils/functions';
 import EmailPopup from '../components/EmailPopup';
+import OTPVerificationModal from '../components/OTPVerificationModal';
 
 const CustomButton = ({ onPress, title, loading, className }) => {
   return (
@@ -40,6 +41,8 @@ function SignInPage() {
   const [forgetLoading, setForgetLoading] = useState(false);
   const [forgetError, setForgetError] = useState('');
   const [showEmailPopup, setShowEmailPopup] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [otpEmail, setOtpEmail] = useState('');
 
   const { updateUserId, updateUserDetail, setQuestionReport } = useDataContext();
   const navigate = useNavigate();
@@ -72,15 +75,13 @@ function SignInPage() {
 
     if (!data?.IsOTPVerified) {
       setIsLoading(false);
-      await resendOtp({ email: data?.email ?? email?.trim()?.toLowerCase() });
-      navigate("/otpScreen", {
-        state: {
-          isSignup: true,
-          email: data?.email ?? email?.trim()?.toLowerCase()
-        }
-      });
+      const emailToVerify = data?.email ?? email?.trim()?.toLowerCase();
+      setOtpEmail(emailToVerify);
+      setShowOTPModal(true);
+      await resendOtp({ email: emailToVerify });
       return;
     }
+
 
     try {
       const response = await fetch(`${BaseURL}/userdata_info/${data?.USERID}`, {
@@ -222,10 +223,14 @@ function SignInPage() {
     const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return regex.test(email);
   };
+  const handleResendOTP = async () => {
+    await resendOtp({ email: otpEmail });
+    alert('Verification email resent. Please check your inbox.');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <button className='p-2 border' onClick={()=>{navigate("/setupProfile")}} >SignUP Process Check Up</button>
+      <button className='p-2 border absolute left-0 top-0' onClick={() => { navigate("/setupProfile") }} >SignUP Process Check Up</button>
       <div className="flex flex-col items-center justify-center min-h-screen  p-4">
         <div className="w-full max-w-sm lg:max-w-sm bg-white rounded-2xl  shadow-xl overflow-hidden">
           <div className="p-4 sm:p-6 lg:p-8 flex flex-col h-full">
@@ -368,6 +373,13 @@ function SignInPage() {
         }}
         onConfirm={handleForgetPassword}
         loading={forgetLoading}
+      />
+
+      <OTPVerificationModal
+        visible={showOTPModal}
+        email={otpEmail}
+        onClose={() => setShowOTPModal(false)}
+        onResend={handleResendOTP}
       />
     </div>
   );

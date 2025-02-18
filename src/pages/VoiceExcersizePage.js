@@ -475,10 +475,10 @@ const VoiceDisorderPage = () => {
             </div>
 
 
-            <div className="flex gap-4 justify-center relative mb-6">
+            <div className="flex gap-20 justify-center relative mb-6">
               {/* Box 1: Question, Expression, Voice Response */}
               <div className="w-56 pl-2 flex flex-col gap-2  justify-center">
-                <p className="text-sm  top-[-15px] absolute  ">Attempts: {attempts}</p>
+                <p className="text-sm ml-2  top-[-15px] absolute  ">Attempts: {attempts}</p>
                 <LogoQuestionView
                   first_text={"Say this..."}
                   second_text={exerciseData?.[exerciseCount - 1]?.WordText || "loading"}
@@ -524,7 +524,7 @@ const VoiceDisorderPage = () => {
             <div className='h-6'>
               {isDelay && <p className=' text-center '>Please be ready for next attempt</p>}
             </div>
-            <div className="flex flex-row justify-center items-center gap-4 mt-7">
+            <div className="flex flex-row justify-center items-center gap-20 mt-7">
               {/* Box 3: Webcam */}
               <div className="rounded-2xl overflow-hidden flex justify-center">
                 <Webcam

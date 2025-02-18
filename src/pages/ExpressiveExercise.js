@@ -452,7 +452,7 @@ function ExpressiveAssessment() {
 
 
             {/* Media and Question Section */}
-            <div className="flex flex-col items-center mb-6">
+            <div className="flex flex-col items-center mb-2">
               {/* Question Image and Video */}
               {questions?.[questionCount - 1] && (
                 <motion.div
@@ -460,13 +460,13 @@ function ExpressiveAssessment() {
                   animate={{ scale: 1 }}
                   className="flex justify-center mb-2"
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-20 ">
                     {/* <div className="px-6 py-3 border border-sky-400 rounded-xl"> */}
-                      <img
-                        className="w-48 h-48  border-sky-400  border-2 rounded-lg shadow-lg object-cover"
-                        src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
-                        alt="Question"
-                      />
+                    <img
+                      className="w-48 h-48  border-sky-400  border-2 rounded-lg shadow-lg object-cover"
+                      src={`${IMAGE_BASE_URL}${questions[questionCount - 1]?.image_label}`}
+                      alt="Question"
+                    />
                     {/* </div> */}
                     <div className="w-48 h-48">
                       <VideoPlayer2
@@ -490,12 +490,12 @@ function ExpressiveAssessment() {
                 </motion.div>
               )}
               <div className="flex items-center justify-center gap-16 w-full text-sm mb-2 text-gray-800">
-                <div className='w-48' ><p className='text-start text-sm'  >Attempt: {Math.min(recordCount + 1, 3)}</p></div>
-                <div className='w-48 relative' ><p className='text-end absolute top-4 right-0' >Answer Count: {answerCount + 1}</p></div>
+                <div className='w-48' ></div>
+                <div className='w-48 relative' ><p className='text-end absolute top-6 right-0' >Answer Count: {answerCount + 1}</p><p className='text-end absolute top-12 right-0'  >Attempt: {Math.min(recordCount + 1, 3)}</p></div>
               </div>
 
               {/* Question Text Below Image */}
-              <div className="w-[480px]">
+              <div className="w-[480px] mt-4">
                 <LogoQuestionView
                   first_text={questions?.[questionCount - 1]?.question}
                   second_text={getCurrentAnswer()}
@@ -504,7 +504,7 @@ function ExpressiveAssessment() {
             </div>
 
             {/* Camera and Controls Section */}
-            <div className="flex flex-row justify-center items-start gap-12 mt-4">
+            <div className="flex flex-row justify-center items-start gap-20 mt-4">
               {/* Camera View */}
               <div className="">
                 <div className="rounded-2xl overflow-hidden flex justify-center">
@@ -531,9 +531,9 @@ function ExpressiveAssessment() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-center text-black font-semibold mb-4"
+                      className="text-center text-sm text-black font-semibold mb-4 leading-tight"
                     >
-                      {isNextAnswer ? "Please be ready for next answer part" : "Please be ready for next attempt"}
+                      {isNextAnswer ? "Please be ready for next answer" : "Please be ready for next attempt"}
                     </motion.p>
                   )}
                   {recordingStatus === 'stop' && questionResponse && (

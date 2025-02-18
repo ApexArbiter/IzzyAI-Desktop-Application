@@ -537,9 +537,9 @@ const StammeringExercisePage = () => {
             </span>
           </div>
 
-          <div className="flex gap-4 justify-center mb-6">
+          <div className="flex gap-20 justify-center mb-6">
             {/* Left Box: Question and Response */}
-            <div className="w-48 flex flex-col gap-2 justify-center">
+            <div className="w-54 flex flex-col gap-20 justify-center">
               <LogoQuestionView
                 first_text={"Say this..."}
                 second_text={(isWrong ? capitalize(questionWordsArray?.[wordCount]) : capitalize(exerciseData?.Sentence)) || 'Loading...'}
@@ -578,15 +578,17 @@ const StammeringExercisePage = () => {
               )}
           </div>
 
-          {isDelay && (
-            <div className="text-center mb-4">
+         <div className='h-6  pt-4 pb-2 text-center' >
+         {!isDelay && (
+            
               <p className="text-gray-700">
                 Please be ready for next attempt
               </p>
-            </div>
+            
           )}
+         </div>
 
-          <div className="flex flex-row justify-center items-center gap-4  mt-10">
+          <div className="flex flex-row justify-center items-center gap-20  mt-10">
             {/* Webcam Box */}
             <div className="rounded-2xl overflow-hidden flex justify-center">
               <Webcam

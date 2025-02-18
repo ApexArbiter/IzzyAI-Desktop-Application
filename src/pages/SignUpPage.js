@@ -335,20 +335,21 @@ const SignUpPage = () => {
         <AlertModal
           isOpen={isAlertOpen}
           onConfirm={() => {
-            navigate("/SignIn"); 
+            navigate("/SignIn");
             setIsAlertOpen(false);
           }}
           onClose={() => {
-          
+
             navigate("/SignIn");
-            setIsAlertOpen(false); 
+            setIsAlertOpen(false);
           }}
           type="success"
           title="Verification Email Sent"
-          message={`Thank you for signing up! We've sent a verification email to ${email?.trim()?.toLowerCase()}. Please check your inbox and click the verification link to activate your account.`}
+          message={`Thank you for signing up! We've sent a verification email to ${<span className='font-semibold'>{email?.trim()?.toLowerCase()}</span>} . Please check your inbox and click the verification link to activate your account.`}
           confirmText="OK!"
         />
       </div>
+
     </div>
   );
 };
